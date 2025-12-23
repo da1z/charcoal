@@ -187,20 +187,18 @@ export function updatePrBodyFooter(
   const escapedTitleText = titleText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const escapedFooterText = footerText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-  // Match a pattern where there's the main body content, followed by the footer section
-  // The footer section starts with the title text and ends with the footer text
-  const matchExistingFooter = new RegExp(
-    `(?<body>[\\s\\S]*)(?<footer>${escapedTitleText}[\\s\\S]*?${escapedFooterText})$`,
-    's'
+  // Match ALL Charcoal footers (not just at end of string)
+  // This handles cases where external bots add content after our footer,
+  // and also cleans up any duplicate footers that may exist
+  const footerPattern = new RegExp(
+    `\\n*${escapedTitleText}[\\s\\S]*?${escapedFooterText}`,
+    'g'
   );
 
-  const match = matchExistingFooter.exec(body);
+  // Remove all existing footers
+  const bodyWithoutFooters = body.replace(footerPattern, '');
 
-  if (match?.groups?.body) {
-    return match.groups.body + footer;
-  }
-
-  return body + footer;
+  return bodyWithoutFooters + footer;
 }
 
 async function selectBranches(
