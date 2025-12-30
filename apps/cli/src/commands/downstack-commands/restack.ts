@@ -3,7 +3,15 @@ import { restackBranches } from '../../actions/restack';
 import { SCOPE } from '../../lib/engine/scope_spec';
 import { graphite } from '../../lib/runner';
 
-const args = {} as const;
+const args = {
+  force: {
+    describe: `Override frozen status of branches.`,
+    demandOption: false,
+    type: 'boolean',
+    alias: 'f',
+    default: false,
+  },
+} as const;
 type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
 
 export const aliases = ['r'];
@@ -30,6 +38,7 @@ export const handler = async (argv: argsT): Promise<void> =>
         context.engine.currentBranchPrecondition,
         SCOPE.DOWNSTACK
       ),
-      context
+      context,
+      { force: argv.force }
     );
   });

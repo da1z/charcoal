@@ -1,12 +1,22 @@
 import chalk from 'chalk';
 import { TContext } from '../../lib/context';
 import { ExitFailedError, KilledError } from '../../lib/errors';
+import { assertBranchNotFrozen } from '../assert_not_frozen';
 import { syncPrInfo } from '../sync_pr_info';
 
 export async function validateBranchesToSubmit(
   branchNames: string[],
-  context: TContext
+  context: TContext,
+  opts?: { force?: boolean }
 ): Promise<string[]> {
+  // Check for frozen branches first
+  for (const branchName of branchNames) {
+    assertBranchNotFrozen(
+      { branchName, operation: 'submit', force: opts?.force },
+      context
+    );
+  }
+
   const syncPrInfoPromise = syncPrInfo(branchNames, context);
 
   try {

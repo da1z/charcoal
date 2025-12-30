@@ -88,6 +88,12 @@ export const args = {
     default: false,
     alias: 'f',
   },
+  'override-frozen': {
+    describe:
+      'Override frozen status of branches, allowing them to be submitted.',
+    type: 'boolean',
+    default: false,
+  },
   always: {
     describe:
       'Always push updates, even if the branch has not changed. Can be helpful for fixing an inconsistent Charcoal stack view on Web/GitHub resulting from downtime/a bug.',

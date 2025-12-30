@@ -8,10 +8,17 @@ const args = {
     describe: 'Which branch to run this command from (default: current branch)',
     type: 'string',
   },
+  force: {
+    describe: `Override frozen status of branches.`,
+    demandOption: false,
+    type: 'boolean',
+    alias: 'f',
+    default: false,
+  },
 } as const;
 type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
 
-export const aliases = ['r', 'fix', 'f'];
+export const aliases = ['r', 'fix'];
 export const command = 'restack';
 export const canonical = 'stack restack';
 export const description =
@@ -24,6 +31,7 @@ export const handler = async (argv: argsT): Promise<void> =>
         argv.branch ?? context.engine.currentBranchPrecondition,
         SCOPE.STACK
       ),
-      context
+      context,
+      { force: argv.force }
     );
   });

@@ -2,6 +2,7 @@ import chalk from 'chalk';
 import { TContext } from '../lib/context';
 import { SCOPE } from '../lib/engine/scope_spec';
 import { ExitFailedError } from '../lib/errors';
+import { assertBranchNotFrozen } from './assert_not_frozen';
 import { restackBranches } from './restack';
 
 export function deleteBranchAction(
@@ -14,6 +15,11 @@ export function deleteBranchAction(
   if (context.engine.isTrunk(args.branchName)) {
     throw new ExitFailedError('Cannot delete trunk!');
   }
+
+  assertBranchNotFrozen(
+    { branchName: args.branchName, operation: 'delete', force: args.force },
+    context
+  );
 
   if (!args.force && !isSafeToDelete(args.branchName, context).result) {
     throw new ExitFailedError(

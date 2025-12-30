@@ -2,7 +2,15 @@ import yargs from 'yargs';
 import { restackBranches } from '../../actions/restack';
 import { graphite } from '../../lib/runner';
 
-const args = {} as const;
+const args = {
+  force: {
+    describe: `Override frozen status of branches.`,
+    demandOption: false,
+    type: 'boolean',
+    alias: 'f',
+    default: false,
+  },
+} as const;
 type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
 
 export const aliases = ['r'];
@@ -24,5 +32,7 @@ export const handler = async (argv: argsT): Promise<void> =>
       ].join('\n')
     );
 
-    restackBranches([context.engine.currentBranchPrecondition], context);
+    restackBranches([context.engine.currentBranchPrecondition], context, {
+      force: argv.force,
+    });
   });

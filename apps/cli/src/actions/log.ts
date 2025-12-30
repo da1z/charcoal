@@ -269,6 +269,10 @@ function getBranchLines(
 
   // `gt log short` case
   if (args.short) {
+    const isFrozen =
+      !context.engine.isTrunk(args.branchName) &&
+      context.engine.isBranchFrozen(args.branchName);
+
     return [
       `${'│ '.repeat(args.indentLevel)}${'◯'}${
         args.skipBranchingLine || numChildren <= 2
@@ -281,6 +285,12 @@ function getBranchLines(
           ? '─┐'
           : '─┘'
       }▸${args.branchName}${
+        args.noStyleBranchName
+          ? ''
+          : isFrozen
+          ? ` ${chalk.reset(chalk.blue('(frozen)'))}`
+          : ''
+      }${
         args.noStyleBranchName || context.engine.isBranchFixed(args.branchName)
           ? ''
           : ` ${chalk.reset(`(needs restack)`)}`

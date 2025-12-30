@@ -44,6 +44,10 @@ export type TEngine = {
   trackBranch: (branchName: string, parentBranchName: string) => void;
   untrackBranch: (branchName: string) => void;
 
+  isBranchFrozen: (branchName: string) => boolean;
+  freezeBranch: (branchName: string) => void;
+  unfreezeBranch: (branchName: string) => void;
+
   currentBranch: string | undefined;
   currentBranchPrecondition: string;
 
@@ -362,6 +366,7 @@ export function composeEngine({
       parentBranchName: newCachedMeta.parentBranchName,
       parentBranchRevision: newCachedMeta.parentBranchRevision,
       prInfo: newCachedMeta.prInfo,
+      frozen: newCachedMeta.frozen,
     });
 
     splog.debug(
@@ -501,6 +506,25 @@ export function composeEngine({
         }
         childrenToUntrack.concat(childCachedMeta.children);
       }
+    },
+    isBranchFrozen: (branchName: string): boolean => {
+      assertBranch(branchName);
+      const meta = cache.branches[branchName];
+      return meta?.frozen === true;
+    },
+    freezeBranch: (branchName: string) => {
+      const cachedMeta = assertBranchIsValidAndNotTrunkAndGetMeta(branchName);
+      if (cachedMeta.frozen) {
+        return;
+      }
+      updateMeta(branchName, { ...cachedMeta, frozen: true });
+    },
+    unfreezeBranch: (branchName: string) => {
+      const cachedMeta = assertBranchIsValidAndNotTrunkAndGetMeta(branchName);
+      if (!cachedMeta.frozen) {
+        return;
+      }
+      updateMeta(branchName, { ...cachedMeta, frozen: undefined });
     },
     get currentBranch() {
       return cache.currentBranch;

@@ -7,7 +7,8 @@ import { printConflictStatus } from './print_conflict_status';
 
 export function restackBranches(
   branchNames: string[],
-  context: TContext
+  context: TContext,
+  opts?: { force?: boolean }
 ): void {
   context.splog.debug(
     branchNames.reduce((acc, curr) => `${acc}\n${curr}`, 'RESTACKING:')
@@ -20,6 +21,23 @@ export function restackBranches(
         `${chalk.cyan(branchName)} does not need to be restacked.`
       );
       continue;
+    }
+
+    // Handle frozen branches
+    if (context.engine.isBranchFrozen(branchName)) {
+      if (opts?.force) {
+        context.splog.warn(
+          `Overriding frozen status of ${chalk.yellow(
+            branchName
+          )} with --force.`
+        );
+      } else {
+        context.splog.info(
+          `Stopping at frozen branch ${chalk.cyan(branchName)}. ` +
+            `Use ${chalk.cyan('--force')} to restack frozen branches.`
+        );
+        return;
+      }
     }
 
     const result = context.engine.restackBranch(branchName);

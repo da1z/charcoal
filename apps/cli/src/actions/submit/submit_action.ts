@@ -25,6 +25,7 @@ export async function submitAction(
     reviewers: string | undefined;
     confirm: boolean;
     forcePush: boolean;
+    overrideFrozen: boolean;
     select: boolean;
     always: boolean;
     branch: string | undefined;
@@ -76,7 +77,9 @@ export async function submitAction(
     )
   );
   context.splog.newline();
-  await validateBranchesToSubmit(branchNames, context);
+  await validateBranchesToSubmit(branchNames, context, {
+    force: args.overrideFrozen,
+  });
 
   context.splog.info(
     chalk.blueBright(

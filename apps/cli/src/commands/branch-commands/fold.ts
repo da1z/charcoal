@@ -10,6 +10,13 @@ const args = {
     alias: 'k',
     default: false,
   },
+  force: {
+    describe: `Override frozen status of the branches.`,
+    demandOption: false,
+    type: 'boolean',
+    alias: 'f',
+    default: false,
+  },
 } as const;
 type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
 
@@ -21,5 +28,5 @@ export const description =
 export const builder = args;
 export const handler = async (argv: argsT): Promise<void> =>
   graphite(argv, canonical, async (context) =>
-    foldCurrentBranch(argv.keep, context)
+    foldCurrentBranch({ keep: argv.keep, force: argv.force }, context)
   );

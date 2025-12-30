@@ -23,6 +23,13 @@ const args = {
     default: false,
     alias: 'n',
   },
+  force: {
+    describe: `Override frozen status of the branch.`,
+    demandOption: false,
+    type: 'boolean',
+    alias: 'f',
+    default: false,
+  },
 } as const;
 type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
 
@@ -38,6 +45,7 @@ export const handler = async (argv: argsT): Promise<void> =>
       {
         message: argv.message,
         noEdit: argv['no-edit'] || !argv.edit,
+        force: argv.force,
       },
       context
     )

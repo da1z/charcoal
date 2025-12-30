@@ -49,13 +49,17 @@ export function getBranchInfo(
     ? undefined
     : context.engine.getPrInfo(args.branchName);
 
+  const isFrozen =
+    !context.engine.isTrunk(args.branchName) &&
+    context.engine.isBranchFrozen(args.branchName);
+
   const prTitleLine = getPRTitleLine(prInfo);
   const branchInfoLines = [
     `${
       args.displayAsCurrent
         ? chalk.cyan(`${args.branchName} (current)`)
         : chalk.blueBright(args.branchName)
-    } ${
+    }${isFrozen ? chalk.blue(' (frozen)') : ''} ${
       context.engine.isBranchFixed(args.branchName)
         ? ''
         : chalk.yellow(`(needs restack)`)

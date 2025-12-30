@@ -2,6 +2,7 @@ import chalk from 'chalk';
 import { TContext } from '../lib/context';
 import { ExitFailedError } from '../lib/errors';
 import { replaceUnsupportedCharacters } from '../lib/utils/branch_name';
+import { assertBranchNotFrozen } from './assert_not_frozen';
 
 async function getNewBranchName(
   context: TContext,
@@ -31,6 +32,11 @@ export async function renameCurrentBranch(
   context: TContext
 ): Promise<void> {
   const oldBranchName = context.engine.currentBranchPrecondition;
+
+  assertBranchNotFrozen(
+    { branchName: oldBranchName, operation: 'rename', force: args.force },
+    context
+  );
 
   const branchName =
     context.interactive && args.newBranchName

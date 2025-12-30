@@ -1,14 +1,29 @@
 import chalk from 'chalk';
 import { TContext } from '../lib/context';
 import { SCOPE } from '../lib/engine/scope_spec';
+import { assertBranchNotFrozen } from './assert_not_frozen';
 import { restackBranches } from './restack';
 
-export function foldCurrentBranch(keep: boolean, context: TContext): void {
+export function foldCurrentBranch(
+  args: { keep: boolean; force?: boolean },
+  context: TContext
+): void {
   const currentBranchName = context.engine.currentBranchPrecondition;
   const parentBranchName =
     context.engine.getParentPrecondition(currentBranchName);
-  context.engine.foldCurrentBranch(keep);
-  if (keep) {
+
+  // Check frozen status on both branches since one will be deleted
+  assertBranchNotFrozen(
+    { branchName: currentBranchName, operation: 'fold', force: args.force },
+    context
+  );
+  assertBranchNotFrozen(
+    { branchName: parentBranchName, operation: 'fold into', force: args.force },
+    context
+  );
+
+  context.engine.foldCurrentBranch(args.keep);
+  if (args.keep) {
     context.splog.info(
       `Folded ${chalk.green(currentBranchName)} into ${chalk.blueBright(
         parentBranchName
