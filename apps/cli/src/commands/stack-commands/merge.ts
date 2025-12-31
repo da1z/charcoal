@@ -118,13 +118,13 @@ function getCheckStatus(prNumber: number): CheckInfo {
       state = 'failure';
     } else if (pending === 0 && checks.length > 0) {
       state = 'success';
-    } else if (checks.length === 0) {
-      state = 'success';
     }
+    // When checks.length === 0, keep state as 'pending' to wait for checks to appear
 
     return { state, total: checks.length, completed };
   } catch {
-    return { state: 'success', total: 0, completed: 0 };
+    // gh pr checks failed - checks might not be registered yet, keep waiting
+    return { state: 'pending', total: 0, completed: 0 };
   }
 }
 
@@ -215,18 +215,34 @@ async function waitForChecks(
   const { prNumber, branchName, timeoutMinutes } = opts;
   const startTime = Date.now();
   const timeoutMs = timeoutMinutes * 60 * 1000;
-  const pollIntervalMs = 30 * 1000;
+  const pollIntervalMs = 10 * 1000;
 
   while (Date.now() - startTime < timeoutMs) {
     const checkInfo = getCheckStatus(prNumber);
-    const msg = `PR #${prNumber} (${branchName}): Waiting for checks (${checkInfo.completed}/${checkInfo.total} complete)...`;
-    context.splog.info(msg);
 
-    if (checkInfo.state === 'success') {
-      return 'success';
-    }
-    if (checkInfo.state === 'failure') {
-      return 'failure';
+    // If no checks registered, check if PR is actually mergeable (no checks required)
+    if (checkInfo.total === 0) {
+      const prInfo = getPRInfo(prNumber);
+      if (prInfo.mergeStateStatus === 'CLEAN') {
+        context.splog.info(
+          `PR #${prNumber} (${branchName}): No checks required, ready to merge.`
+        );
+        return 'success';
+      }
+      context.splog.info(
+        `PR #${prNumber} (${branchName}): Waiting for checks to start...`
+      );
+    } else {
+      context.splog.info(
+        `PR #${prNumber} (${branchName}): Waiting for checks (${checkInfo.completed}/${checkInfo.total} complete)...`
+      );
+
+      if (checkInfo.state === 'success') {
+        return 'success';
+      }
+      if (checkInfo.state === 'failure') {
+        return 'failure';
+      }
     }
 
     await sleep(pollIntervalMs);
@@ -322,6 +338,9 @@ async function mergeSinglePR(
     updatePRBase(branch.prNumber, trunk);
   }
 
+  // Always push to ensure remote matches local (may have been rebased)
+  context.engine.pushBranch(branch.branchName, true);
+
   // Re-validate approval status with fresh data
   if (
     freshPrInfo.reviewDecision !== 'APPROVED' &&
@@ -384,19 +403,6 @@ async function mergeSinglePR(
   }
 }
 
-async function pushRemainingBranches(
-  openPRs: BranchMergeInfo[],
-  startIndex: number,
-  context: TContext
-): Promise<void> {
-  for (let j = startIndex; j < openPRs.length; j++) {
-    const nextBranch = openPRs[j];
-    if (context.engine.branchExists(nextBranch.branchName)) {
-      context.engine.pushBranch(nextBranch.branchName, true);
-    }
-  }
-}
-
 async function mergeStack(
   openPRs: BranchMergeInfo[],
   opts: MergeOpts,
@@ -412,7 +418,7 @@ async function mergeStack(
     if (i < openPRs.length - 1) {
       context.splog.info(`\nRestacking remaining branches...`);
       await syncAndRestack(context);
-      await pushRemainingBranches(openPRs, i + 1, context);
+      // Don't push here - mergeSinglePR will update PR base and push
 
       const nextBranch = openPRs[i + 1];
       context.splog.info(
