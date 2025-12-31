@@ -122,7 +122,10 @@ for (const scene of [new BasicScene()]) {
 }
 
 describe('updatePrBodyFooter', () => {
-  const newFooter = `#### PR Dependency Tree
+  const newFooter = `
+
+
+#### PR Dependency Tree
 
 
 * **PR #83** 👈
