@@ -215,7 +215,7 @@ async function waitForChecks(
   const { prNumber, branchName, timeoutMinutes } = opts;
   const startTime = Date.now();
   const timeoutMs = timeoutMinutes * 60 * 1000;
-  const pollIntervalMs = 10 * 1000;
+  const pollIntervalMs = 30 * 1000;
 
   while (Date.now() - startTime < timeoutMs) {
     const checkInfo = getCheckStatus(prNumber);
@@ -330,17 +330,6 @@ async function mergeSinglePR(
     return true;
   }
 
-  // Update PR base to trunk if it's targeting a different branch
-  if (freshPrInfo.baseRefName !== trunk) {
-    context.splog.info(
-      `PR #${branch.prNumber} (${branch.branchName}): Updating base from ${freshPrInfo.baseRefName} to ${trunk}...`
-    );
-    updatePRBase(branch.prNumber, trunk);
-  }
-
-  // Always push to ensure remote matches local (may have been rebased)
-  context.engine.pushBranch(branch.branchName, true);
-
   // Re-validate approval status with fresh data
   if (
     freshPrInfo.reviewDecision !== 'APPROVED' &&
@@ -353,6 +342,7 @@ async function mergeSinglePR(
     );
   }
 
+  // If PR is behind trunk (first PR case), sync and push
   if (freshPrInfo.mergeStateStatus === 'BEHIND') {
     context.splog.info(
       `PR #${branch.prNumber} (${branch.branchName}): Restacking to ${trunk}...`
@@ -403,11 +393,34 @@ async function mergeSinglePR(
   }
 }
 
+function submitRemainingBranches(
+  opts: { openPRs: BranchMergeInfo[]; startIndex: number; trunk: string },
+  context: TContext
+): void {
+  for (let j = opts.startIndex; j < opts.openPRs.length; j++) {
+    const pr = opts.openPRs[j];
+    if (!context.engine.branchExists(pr.branchName)) {
+      continue;
+    }
+    // Update PR base to trunk if needed
+    const prInfo = getPRInfo(pr.prNumber);
+    if (prInfo.baseRefName !== opts.trunk) {
+      context.splog.info(
+        `PR #${pr.prNumber} (${pr.branchName}): Updating base to ${opts.trunk}...`
+      );
+      updatePRBase(pr.prNumber, opts.trunk);
+    }
+    // Push the rebased branch
+    context.engine.pushBranch(pr.branchName, true);
+  }
+}
+
 async function mergeStack(
   openPRs: BranchMergeInfo[],
   opts: MergeOpts,
   context: TContext
 ): Promise<void> {
+  const trunk = context.engine.trunk;
   context.splog.info(`Merging stack (${openPRs.length} PRs)...\n`);
 
   for (let i = 0; i < openPRs.length; i++) {
@@ -418,7 +431,8 @@ async function mergeStack(
     if (i < openPRs.length - 1) {
       context.splog.info(`\nRestacking remaining branches...`);
       await syncAndRestack(context);
-      // Don't push here - mergeSinglePR will update PR base and push
+      // Push all remaining branches and update their PR bases
+      submitRemainingBranches({ openPRs, startIndex: i + 1, trunk }, context);
 
       const nextBranch = openPRs[i + 1];
       context.splog.info(

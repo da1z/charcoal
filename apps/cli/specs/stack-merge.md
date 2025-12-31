@@ -146,7 +146,7 @@ No validation of checks/approvals in dry-run, just lists the merge order.
 
 After all PRs are successfully merged:
 
-- Automatically run `repo sync --no-pull` to delete merged local branches
+- Automatically run `repo sync` to pull trunk and delete merged local branches
 - This handles branch cleanup without requiring user intervention
 
 ## Frozen Branch Handling
