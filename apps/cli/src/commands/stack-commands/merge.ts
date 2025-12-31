@@ -7,6 +7,7 @@ import { SCOPE } from '../../lib/engine/scope_spec';
 import { KilledError, PreconditionsFailedError } from '../../lib/errors';
 import { syncAction } from '../../actions/sync/sync';
 import { syncPrInfo } from '../../actions/sync_pr_info';
+import { uncommittedTrackedChangesPrecondition } from '../../lib/preconditions';
 
 const args = {
   'dry-run': {
@@ -135,6 +136,10 @@ function mergePR(prNumber: number, method: MergeOpts['method']): void {
     `--${method}`,
     '--delete-branch=false',
   ]);
+}
+
+function updatePRBase(prNumber: number, base: string): void {
+  execFileSync('gh', ['pr', 'edit', `${prNumber}`, '--base', base]);
 }
 
 async function sleep(ms: number): Promise<void> {
@@ -307,6 +312,14 @@ async function mergeSinglePR(
       `PR #${branch.prNumber} (${branch.branchName}): Already merged, skipping.`
     );
     return true;
+  }
+
+  // Update PR base to trunk if it's targeting a different branch
+  if (freshPrInfo.baseRefName !== trunk) {
+    context.splog.info(
+      `PR #${branch.prNumber} (${branch.branchName}): Updating base from ${freshPrInfo.baseRefName} to ${trunk}...`
+    );
+    updatePRBase(branch.prNumber, trunk);
   }
 
   // Re-validate approval status with fresh data
@@ -487,6 +500,7 @@ export const handler = async (argv: argsT): Promise<void> => {
       return;
     }
 
+    uncommittedTrackedChangesPrecondition();
     validateApprovals(openPRs);
     await mergeStack(openPRs, opts, context);
   });
