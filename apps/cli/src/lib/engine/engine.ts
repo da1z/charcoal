@@ -44,6 +44,10 @@ export type TEngine = {
   trackBranch: (branchName: string, parentBranchName: string) => void;
   untrackBranch: (branchName: string) => void;
 
+  isBranchFrozen: (branchName: string) => boolean;
+  freezeBranch: (branchName: string) => void;
+  unfreezeBranch: (branchName: string) => void;
+
   currentBranch: string | undefined;
   currentBranchPrecondition: string;
 
@@ -129,6 +133,7 @@ export type TEngine = {
   isBranchEmpty: (branchName: string) => boolean;
   populateRemoteShas: () => Promise<void>;
   branchMatchesRemote: (branchName: string) => boolean;
+  branchExistsOnRemote: (branchName: string) => boolean;
 
   pushBranch: (branchName: string, forcePush: boolean) => void;
   pullTrunk: () => 'PULL_DONE' | 'PULL_UNNEEDED' | 'PULL_CONFLICT';
@@ -362,6 +367,7 @@ export function composeEngine({
       parentBranchName: newCachedMeta.parentBranchName,
       parentBranchRevision: newCachedMeta.parentBranchRevision,
       prInfo: newCachedMeta.prInfo,
+      frozen: newCachedMeta.frozen,
     });
 
     splog.debug(
@@ -501,6 +507,25 @@ export function composeEngine({
         }
         childrenToUntrack.concat(childCachedMeta.children);
       }
+    },
+    isBranchFrozen: (branchName: string): boolean => {
+      assertBranch(branchName);
+      const meta = cache.branches[branchName];
+      return meta?.frozen === true;
+    },
+    freezeBranch: (branchName: string) => {
+      const cachedMeta = assertBranchIsValidAndNotTrunkAndGetMeta(branchName);
+      if (cachedMeta.frozen) {
+        return;
+      }
+      updateMeta(branchName, { ...cachedMeta, frozen: true });
+    },
+    unfreezeBranch: (branchName: string) => {
+      const cachedMeta = assertBranchIsValidAndNotTrunkAndGetMeta(branchName);
+      if (!cachedMeta.frozen) {
+        return;
+      }
+      updateMeta(branchName, { ...cachedMeta, frozen: undefined });
     },
     get currentBranch() {
       return cache.currentBranch;
@@ -907,6 +932,9 @@ export function composeEngine({
       const cachedMeta = assertBranchIsValidOrTrunkAndGetMeta(branchName);
       const remoteParentRevision = git.getRemoteSha(branchName);
       return cachedMeta.branchRevision === remoteParentRevision;
+    },
+    branchExistsOnRemote: (branchName: string) => {
+      return git.getRemoteSha(branchName) !== undefined;
     },
     pushBranch: (branchName: string, forcePush: boolean) => {
       assertBranchIsValidAndNotTrunkAndGetMeta(branchName);
