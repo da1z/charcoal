@@ -45,10 +45,8 @@ export async function syncAction(
               'Try the `--force` flag to delete merged branches without prompting for each.',
             ]),
         ...(opts.restack
-          ? []
-          : [
-              'Try the `--restack` flag to automatically restack the current stack as well as any stacks with deleted branches.',
-            ]),
+          ? ['You can skip restacking with the `--no-restack` flag.']
+          : []),
       ].join('\n')
     );
     if (!opts.restack) {
@@ -62,9 +60,6 @@ export async function syncAction(
       .forEach((branchName) => branchesToRestack.push(branchName));
   }
   if (!opts.restack) {
-    context.splog.tip(
-      'Try the `--restack` flag to automatically restack the current stack.'
-    );
     return;
   }
 
