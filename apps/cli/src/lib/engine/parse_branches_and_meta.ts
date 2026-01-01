@@ -76,6 +76,7 @@ export function parseBranchesAndMeta(
       parentBranchName,
       parentBranchRevision,
       prInfo,
+      frozen,
     } = current;
 
     if (branchName === args.trunkName) {
@@ -101,6 +102,7 @@ export function parseBranchesAndMeta(
         validationResult: 'BAD_PARENT_NAME',
         branchRevision,
         prInfo,
+        frozen,
         children: [],
       };
       continue;
@@ -127,6 +129,7 @@ export function parseBranchesAndMeta(
         parentBranchRevision,
         branchRevision,
         prInfo,
+        frozen,
         children: [],
       };
       continue;
@@ -147,6 +150,7 @@ export function parseBranchesAndMeta(
         parentBranchName,
         branchRevision,
         prInfo,
+        frozen,
         children: [],
       },
       ...result,

@@ -937,7 +937,12 @@ export function composeEngine({
       return git.getRemoteSha(branchName) !== undefined;
     },
     pushBranch: (branchName: string, forcePush: boolean) => {
-      assertBranchIsValidAndNotTrunkAndGetMeta(branchName);
+      const meta = assertBranchIsValidAndNotTrunkAndGetMeta(branchName);
+      if (meta.frozen) {
+        throw new PreconditionsFailedError(
+          `Cannot push frozen branch ${branchName}. Unfreeze with 'gt branch unfreeze ${branchName}' first.`
+        );
+      }
       git.pushBranch({ remote, branchName, noVerify, forcePush });
     },
     pullTrunk: () => {
