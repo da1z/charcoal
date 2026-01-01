@@ -130,11 +130,16 @@ function getCheckStatus(prNumber: number): CheckInfo {
 }
 
 function mergePR(prNumber: number, method?: MergeOpts['method']): void {
-  const args = ['pr', 'merge', `${prNumber}`, '--delete-branch=false'];
-  if (method) {
-    args.push(`--${method}`);
-  }
-  execFileSync('gh', args);
+  // gh pr merge requires explicit method in non-interactive mode
+  // Default to squash if not specified
+  const mergeMethod = method || 'squash';
+  execFileSync('gh', [
+    'pr',
+    'merge',
+    `${prNumber}`,
+    `--${mergeMethod}`,
+    '--delete-branch=false',
+  ]);
 }
 
 async function sleep(ms: number): Promise<void> {
