@@ -6,6 +6,7 @@ import { TContext } from '../../lib/context';
 import { SCOPE } from '../../lib/engine/scope_spec';
 import { KilledError, PreconditionsFailedError } from '../../lib/errors';
 import { syncAction } from '../../actions/sync/sync';
+import { submitAction } from '../../actions/submit/submit_action';
 import { syncPrInfo } from '../../actions/sync_pr_info';
 import { uncommittedTrackedChangesPrecondition } from '../../lib/preconditions';
 
@@ -25,10 +26,9 @@ const args = {
     default: 15,
   },
   method: {
-    describe: 'Merge method to use',
+    describe: 'Override merge method (uses repository default if not specified)',
     type: 'string',
     choices: ['squash', 'merge', 'rebase'],
-    default: 'squash',
   },
 } as const;
 
@@ -75,7 +75,7 @@ type MergeOpts = {
   timeout: number;
   dryRun: boolean;
   until?: string;
-  method: 'squash' | 'merge' | 'rebase';
+  method?: 'squash' | 'merge' | 'rebase';
 };
 
 function getPRInfo(prNumber: number): PRInfo {
@@ -128,18 +128,12 @@ function getCheckStatus(prNumber: number): CheckInfo {
   }
 }
 
-function mergePR(prNumber: number, method: MergeOpts['method']): void {
-  execFileSync('gh', [
-    'pr',
-    'merge',
-    `${prNumber}`,
-    `--${method}`,
-    '--delete-branch=false',
-  ]);
-}
-
-function updatePRBase(prNumber: number, base: string): void {
-  execFileSync('gh', ['pr', 'edit', `${prNumber}`, '--base', base]);
+function mergePR(prNumber: number, method?: MergeOpts['method']): void {
+  const args = ['pr', 'merge', `${prNumber}`, '--delete-branch=false'];
+  if (method) {
+    args.push(`--${method}`);
+  }
+  execFileSync('gh', args);
 }
 
 async function sleep(ms: number): Promise<void> {
@@ -208,7 +202,7 @@ type WaitOpts = {
   timeoutMinutes: number;
 };
 
-async function waitForChecks(
+async function waitUntilMergeable(
   opts: WaitOpts,
   context: TContext
 ): Promise<'success' | 'failure' | 'timeout'> {
@@ -218,17 +212,26 @@ async function waitForChecks(
   const pollIntervalMs = 30 * 1000;
 
   while (Date.now() - startTime < timeoutMs) {
-    const checkInfo = getCheckStatus(prNumber);
+    const prInfo = getPRInfo(prNumber);
 
-    // If no checks registered, check if PR is actually mergeable (no checks required)
+    // PR is mergeable when GitHub's mergeStateStatus is CLEAN
+    // This respects all branch protection rules (required checks, approvals, etc.)
+    if (prInfo.mergeStateStatus === 'CLEAN') {
+      return 'success';
+    }
+
+    // BLOCKED means branch protection rules not satisfied (checks failing or missing approvals)
+    // DIRTY means merge conflicts exist
+    if (
+      prInfo.mergeStateStatus === 'BLOCKED' ||
+      prInfo.mergeStateStatus === 'DIRTY'
+    ) {
+      return 'failure';
+    }
+
+    // Log status for user visibility
+    const checkInfo = getCheckStatus(prNumber);
     if (checkInfo.total === 0) {
-      const prInfo = getPRInfo(prNumber);
-      if (prInfo.mergeStateStatus === 'CLEAN') {
-        context.splog.info(
-          `PR #${prNumber} (${branchName}): No checks required, ready to merge.`
-        );
-        return 'success';
-      }
       context.splog.info(
         `PR #${prNumber} (${branchName}): Waiting for checks to start...`
       );
@@ -236,13 +239,6 @@ async function waitForChecks(
       context.splog.info(
         `PR #${prNumber} (${branchName}): Waiting for checks (${checkInfo.completed}/${checkInfo.total} complete)...`
       );
-
-      if (checkInfo.state === 'success') {
-        return 'success';
-      }
-      if (checkInfo.state === 'failure') {
-        return 'failure';
-      }
     }
 
     await sleep(pollIntervalMs);
@@ -351,9 +347,9 @@ async function mergeSinglePR(
     context.engine.pushBranch(branch.branchName, true);
   }
 
-  let checksResult: 'success' | 'failure' | 'timeout' = 'failure';
-  while (checksResult !== 'success') {
-    checksResult = await waitForChecks(
+  let mergeableResult: 'success' | 'failure' | 'timeout' = 'failure';
+  while (mergeableResult !== 'success') {
+    mergeableResult = await waitUntilMergeable(
       {
         prNumber: branch.prNumber,
         branchName: branch.branchName,
@@ -362,10 +358,10 @@ async function mergeSinglePR(
       context
     );
 
-    if (checksResult === 'failure') {
+    if (mergeableResult === 'failure') {
       const msg = `Checks failed for PR #${branch.prNumber} (${branch.branchName}). What would you like to do?`;
       await promptRetryOrAbort(msg, context);
-    } else if (checksResult === 'timeout') {
+    } else if (mergeableResult === 'timeout') {
       const msg = `Timeout waiting for checks on PR #${branch.prNumber} (${branch.branchName}). What would you like to do?`;
       await promptRetryOrAbort(msg, context);
     }
@@ -393,34 +389,11 @@ async function mergeSinglePR(
   }
 }
 
-function submitRemainingBranches(
-  opts: { openPRs: BranchMergeInfo[]; startIndex: number; trunk: string },
-  context: TContext
-): void {
-  for (let j = opts.startIndex; j < opts.openPRs.length; j++) {
-    const pr = opts.openPRs[j];
-    if (!context.engine.branchExists(pr.branchName)) {
-      continue;
-    }
-    // Update PR base to trunk if needed
-    const prInfo = getPRInfo(pr.prNumber);
-    if (prInfo.baseRefName !== opts.trunk) {
-      context.splog.info(
-        `PR #${pr.prNumber} (${pr.branchName}): Updating base to ${opts.trunk}...`
-      );
-      updatePRBase(pr.prNumber, opts.trunk);
-    }
-    // Push the rebased branch
-    context.engine.pushBranch(pr.branchName, true);
-  }
-}
-
 async function mergeStack(
   openPRs: BranchMergeInfo[],
   opts: MergeOpts,
   context: TContext
 ): Promise<void> {
-  const trunk = context.engine.trunk;
   context.splog.info(`Merging stack (${openPRs.length} PRs)...\n`);
 
   for (let i = 0; i < openPRs.length; i++) {
@@ -428,11 +401,39 @@ async function mergeStack(
     // mergeSinglePR always returns true on success or throws KilledError on abort
     await mergeSinglePR(branch, opts, context);
 
+    // After each merge: sync + submit
+    context.splog.info(`\nRunning sync...`);
+    await syncAction(
+      {
+        pull: true,
+        force: true,
+        delete: true,
+        showDeleteProgress: true,
+        restack: true,
+      },
+      context
+    );
+
+    // Submit remaining branches (push + update PR bases)
     if (i < openPRs.length - 1) {
-      context.splog.info(`\nRestacking remaining branches...`);
-      await syncAndRestack(context);
-      // Push all remaining branches and update their PR bases
-      submitRemainingBranches({ openPRs, startIndex: i + 1, trunk }, context);
+      context.splog.info(`\nRunning stack submit...`);
+      await submitAction(
+        {
+          scope: SCOPE.STACK,
+          editPRFieldsInline: false,
+          draft: false,
+          publish: false,
+          dryRun: false,
+          updateOnly: true,
+          reviewers: undefined,
+          confirm: false,
+          forcePush: true,
+          select: false,
+          always: false,
+          branch: undefined,
+        },
+        context
+      );
 
       const nextBranch = openPRs[i + 1];
       context.splog.info(
@@ -444,18 +445,6 @@ async function mergeStack(
   }
 
   context.splog.info(`${chalk.green('All PRs merged successfully!')}`);
-  context.splog.info(`Running repo sync to clean up...`);
-
-  await syncAction(
-    {
-      pull: true,
-      force: true,
-      delete: true,
-      showDeleteProgress: true,
-      restack: false,
-    },
-    context
-  );
 }
 
 function printDryRun(
@@ -478,7 +467,7 @@ export const handler = async (argv: argsT): Promise<void> => {
       timeout: argv.timeout,
       dryRun: argv['dry-run'],
       until: argv.until,
-      method: argv.method,
+      method: argv.method as MergeOpts['method'],
     };
 
     const downstack = getDownstack(context, opts);
@@ -521,6 +510,21 @@ export const handler = async (argv: argsT): Promise<void> => {
     }
 
     uncommittedTrackedChangesPrecondition();
+
+    // Auto-sync first to clean up any already-merged PRs and ensure clean state
+    context.splog.info('Running initial sync...');
+    await syncAction(
+      {
+        pull: true,
+        force: true,
+        delete: true,
+        showDeleteProgress: false,
+        restack: true,
+      },
+      context
+    );
+    context.splog.info(chalk.green('✓ Repository synced\n'));
+
     validateApprovals(openPRs);
     await mergeStack(openPRs, opts, context);
   });
