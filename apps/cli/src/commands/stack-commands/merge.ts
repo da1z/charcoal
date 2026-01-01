@@ -26,7 +26,8 @@ const args = {
     default: 15,
   },
   method: {
-    describe: 'Override merge method (uses repository default if not specified)',
+    describe:
+      'Override merge method (uses repository default if not specified)',
     type: 'string',
     choices: ['squash', 'merge', 'rebase'],
   },
