@@ -1,3 +1,3 @@
 #!/bin/bash
 
-npm uninstall --location=global @danerwilliams/charcoal
+npm uninstall --location=global @da1z/pancake

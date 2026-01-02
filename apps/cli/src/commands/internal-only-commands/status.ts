@@ -1,4 +1,4 @@
-import { ChangedFile, Status } from '@danerwilliams/gti-cli-shared-types';
+import { ChangedFile, Status } from '@da1z/pancake-shared-types';
 import yargs from 'yargs';
 import { TStatusFile } from '../../lib/git/changed_files';
 import { graphite } from '../../lib/runner';

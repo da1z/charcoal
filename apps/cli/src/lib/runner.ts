@@ -131,7 +131,7 @@ async function graphiteHelper(
       !context.repoConfig.graphiteInitialized()
     ) {
       context.splog.info(
-        `Charcoal has not been initialized, attempting to setup now...`
+        `Pancake has not been initialized, attempting to setup now...`
       );
       context.splog.newline();
       await init({}, context);
@@ -144,7 +144,7 @@ async function graphiteHelper(
       context.engine.rebaseInProgress()
     ) {
       throw new DetachedError(
-        `Did you mean to run ${chalk.cyan(`gt continue`)}?`
+        `Did you mean to run ${chalk.cyan(`pk continue`)}?`
       );
     }
     throw err;
@@ -153,7 +153,7 @@ async function graphiteHelper(
       context.engine.persist();
     } catch (persistError) {
       context.engine.clear();
-      context.splog.debug(`Failed to persist Charcoal cache`);
+      context.splog.debug(`Failed to persist Pancake cache`);
     }
     handler.cacheLock.release();
   }

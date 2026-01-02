@@ -163,7 +163,7 @@ function validatePreconditions(
     if (!prInfo?.number) {
       throw new PreconditionsFailedError(
         `Branch ${chalk.yellow(branchName)} does not have an associated PR. ` +
-          `Run ${chalk.cyan('gt stack submit')} first.`
+          `Run ${chalk.cyan('pk stack submit')} first.`
       );
     }
 
@@ -496,7 +496,7 @@ export const handler = async (argv: argsT): Promise<void> => {
       context.splog.warn(
         `Stopped at frozen branch ${chalk.yellow(stoppedAtFrozen)}. ` +
           `Unfreeze with ${chalk.cyan(
-            `gt branch unfreeze ${stoppedAtFrozen}`
+            `pk branch unfreeze ${stoppedAtFrozen}`
           )} to continue.`
       );
     }
