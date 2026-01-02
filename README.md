@@ -28,6 +28,20 @@ Options:
 - `--timeout <minutes>` - Timeout per PR for checks to complete (default: 15)
 - `--method <squash|merge|rebase>` - Override merge method (uses repo default if not specified)
 
+### Branch Freeze
+
+Freeze branches to prevent accidental modifications in collaborative workflows:
+
+```bash
+gt branch freeze [branch]   # Freeze current or specified branch
+gt branch unfreeze [branch] # Unfreeze a frozen branch
+```
+
+Frozen branches cannot be:
+- Restacked, pushed, deleted, renamed, folded, or squashed
+
+This is useful when multiple people are working on a stack and you want to prevent changes to branches that are under review or have been approved. The `stack merge` command respects frozen branches and will stop merging at a frozen branch.
+
 ### Restack by Default with Sync
 
 `gt repo sync` now restacks branches by default, keeping your stack up to date with trunk automatically.
