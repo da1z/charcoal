@@ -1,4 +1,4 @@
-import { ChangedFiles } from '@danerwilliams/gti-cli-shared-types';
+import { ChangedFiles } from '@da1z/pancake-shared-types';
 import yargs from 'yargs';
 import { graphite } from '../../lib/runner';
 

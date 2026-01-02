@@ -16,16 +16,16 @@ export async function init(
 
   context.splog.info(
     context.repoConfig.graphiteInitialized()
-      ? `Reinitializing Charcoal...`
-      : `Welcome to Charcoal!`
+      ? `Reinitializing Pancake...`
+      : `Welcome to Pancake!`
   );
   context.splog.newline();
 
   if (allBranchNames.length === 0) {
     throw new PreconditionsFailedError(
       [
-        `No branches found in current repo; cannot initialize Charcoal.`,
-        `Please create your first commit and then re-run your Charcoal command.`,
+        `No branches found in current repo; cannot initialize Pancake.`,
+        `Please create your first commit and then re-run your Pancake command.`,
       ].join('\n')
     );
   }
@@ -96,9 +96,9 @@ function findCommonlyNamedTrunk(context: TContext): string | undefined {
 async function branchOnboardingFlow(context: TContext) {
   context.splog.tip(
     [
-      "If you have an existing branch or stack that you'd like to start working on with Charcoal, you can begin tracking it now!",
-      'To add other non-Charcoal branches to Charcoal later, check out `gt branch track`.',
-      'If you only want to use Charcoal for new branches, feel free to exit now and use `gt branch create`.',
+      "If you have an existing branch or stack that you'd like to start working on with Pancake, you can begin tracking it now!",
+      'To add other non-Pancake branches to Pancake later, check out `pk branch track`.',
+      'If you only want to use Pancake for new branches, feel free to exit now and use `pk branch create`.',
     ].join('\n')
   );
   if (

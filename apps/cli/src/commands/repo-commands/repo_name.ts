@@ -7,7 +7,7 @@ const args = {
     type: 'string',
     alias: 's',
     describe:
-      "Override the value of the repo's name in the Charcoal config. This is expected to match the name of the repo on GitHub and should only be set in cases where Charcoal is incorrectly inferring the repo name.",
+      "Override the value of the repo's name in the Pancake config. This is expected to match the name of the repo on GitHub and should only be set in cases where Pancake is incorrectly inferring the repo name.",
   },
 } as const;
 
@@ -16,7 +16,7 @@ type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
 export const command = 'name';
 export const canonical = 'repo name';
 export const description =
-  "The current repo's name stored in Charcoal. e.g. in 'danerwilliams/charcoal', this is 'charcoal'.";
+  "The current repo's name stored in Pancake. e.g. in 'da1z/pancake', this is 'pancake'.";
 export const builder = args;
 export const handler = async (argv: argsT): Promise<void> => {
   return graphite(argv, canonical, async (context) => {

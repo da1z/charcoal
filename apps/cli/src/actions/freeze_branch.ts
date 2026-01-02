@@ -27,8 +27,8 @@ export async function freezeBranchAction(
           branchName
         )} - it has not been pushed to remote yet.`,
         `Freezing is intended for branches in collaborative workflows that exist on remote.`,
-        `Use ${chalk.cyan('gt stack submit')} or ${chalk.cyan(
-          'gt branch submit'
+        `Use ${chalk.cyan('pk stack submit')} or ${chalk.cyan(
+          'pk branch submit'
         )} to push first.`,
       ].join('\n')
     );

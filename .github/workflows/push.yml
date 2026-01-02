@@ -33,7 +33,7 @@ jobs:
       - name: Git Version
         run: git --version
       - name: Test
-        run: yarn workspace @danerwilliams/charcoal run test
+        run: yarn workspace @da1z/pancake run test
 
   superlinter:
     name: "Run superlinter"
@@ -61,13 +61,13 @@ jobs:
         os: [macos, ubuntu]
         include:
           - os: macos
-            build: yarn workspace @danerwilliams/charcoal run build-pkg -t node18-macos -o "gt-macos-x86-${{ github.sha }}"
-            artifact-name: gt-macos-x86-${{ github.sha }}
-            artifact-path: apps/cli/gt-macos-x86-${{ github.sha }}
+            build: yarn workspace @da1z/pancake run build-pkg -t node18-macos -o "pk-macos-x86-${{ github.sha }}"
+            artifact-name: pk-macos-x86-${{ github.sha }}
+            artifact-path: apps/cli/pk-macos-x86-${{ github.sha }}
           - os: ubuntu
-            build: yarn workspace @danerwilliams/charcoal run build-pkg -t node18-linux -o "gt-linux-${{ github.sha }}"
-            artifact-name: gt-linux-${{ github.sha }}
-            artifact-path: apps/cli/gt-linux-${{ github.sha }}
+            build: yarn workspace @da1z/pancake run build-pkg -t node18-linux -o "pk-linux-${{ github.sha }}"
+            artifact-name: pk-linux-${{ github.sha }}
+            artifact-path: apps/cli/pk-linux-${{ github.sha }}
     runs-on: ${{ matrix.os }}-latest
     steps:
       - name: Checkout code
@@ -97,19 +97,19 @@ jobs:
       - name: Download mac x86
         uses: actions/download-artifact@v4
         with:
-          name: gt-macos-x86-${{ github.sha }}
+          name: pk-macos-x86-${{ github.sha }}
       - name: Download linux
         uses: actions/download-artifact@v4
         with:
-          name: gt-linux-${{ github.sha }}
+          name: pk-linux-${{ github.sha }}
       - name: Rename files
         run: |
-          mv gt-macos-x86-${{ github.sha }} gt-macos-x86;
-          mv gt-linux-${{ github.sha }} gt-linux
+          mv pk-macos-x86-${{ github.sha }} pk-macos-x86;
+          mv pk-linux-${{ github.sha }} pk-linux
       - name: Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "gt-macos-x86,gt-linux"
+          artifacts: "pk-macos-x86,pk-linux"
           draft: false
           prerelease: true
           allowUpdates: true

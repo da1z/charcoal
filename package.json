@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "charcoal",
+  "name": "pancake",
   "workspaces": {
     "packages": [
       "./apps/cli",

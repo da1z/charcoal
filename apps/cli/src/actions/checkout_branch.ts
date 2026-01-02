@@ -36,12 +36,12 @@ function printBranchInfo(branchName: string, context: TContext) {
     !context.engine.isTrunk(branchName) &&
     !context.engine.isBranchTracked(branchName)
   ) {
-    context.splog.info(`This branch is not tracked by Charcoal.`);
+    context.splog.info(`This branch is not tracked by Pancake.`);
   } else if (!context.engine.isBranchFixed(branchName)) {
     context.splog.info(
       `This branch has fallen behind ${chalk.blueBright(
         context.engine.getParentPrecondition(branchName)
-      )} - you may want to ${chalk.cyan(`gt upstack restack`)}.`
+      )} - you may want to ${chalk.cyan(`pk upstack restack`)}.`
     );
   } else {
     const nearestAncestorNeedingRestack = context.engine
@@ -55,7 +55,7 @@ function printBranchInfo(branchName: string, context: TContext) {
           nearestAncestorNeedingRestack
         )} has fallen behind ${chalk.blueBright(
           context.engine.getParentPrecondition(nearestAncestorNeedingRestack)
-        )} - you may want to ${chalk.cyan(`gt stack restack`)}.`
+        )} - you may want to ${chalk.cyan(`pk stack restack`)}.`
       );
     }
   }
