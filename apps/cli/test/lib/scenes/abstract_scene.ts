@@ -1,4 +1,5 @@
 import fs from 'fs-extra';
+import path from 'path';
 import tmp from 'tmp';
 import {
   initContext,
@@ -9,6 +10,20 @@ import { composeGit } from '../../../src/lib/git/git';
 import { cuteString } from '../../../src/lib/utils/cute_string';
 import { GitRepo } from '../../../src/lib/utils/git_repo';
 
+function createTmpDir(): tmp.DirResult {
+  const baseDir = process.env.PK_TEST_DIR;
+  if (baseDir) {
+    const absoluteDir = path.resolve(baseDir);
+    fs.ensureDirSync(absoluteDir);
+    const name = fs.mkdtempSync(path.join(absoluteDir, 'tmp-'));
+    return {
+      name,
+      removeCallback: () => fs.removeSync(name),
+    };
+  }
+  return tmp.dirSync();
+}
+
 export abstract class AbstractScene {
   tmpDir: tmp.DirResult;
   repo: GitRepo;
@@ -16,7 +31,7 @@ export abstract class AbstractScene {
   oldDir: string;
 
   constructor() {
-    this.tmpDir = tmp.dirSync();
+    this.tmpDir = createTmpDir();
     this.dir = this.tmpDir.name;
     this.repo = new GitRepo(this.dir);
     this.oldDir = process.cwd();
@@ -25,7 +40,7 @@ export abstract class AbstractScene {
   abstract toString(): string;
 
   public setup(): void {
-    this.tmpDir = tmp.dirSync();
+    this.tmpDir = createTmpDir();
     this.dir = this.tmpDir.name;
     this.repo = new GitRepo(this.dir);
     fs.writeFileSync(

@@ -20,3 +20,4 @@ pkg/
 # we use yarn, not npm
 package-lock.json
 .claude/settings.local.json
+.test-tmp

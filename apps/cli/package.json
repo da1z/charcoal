@@ -8,9 +8,6 @@
   "repository": "github:da1z/pancake",
   "dependencies": {
     "@da1z/pancake-shared-types": "workspace:*",
-    "@withgraphite/graphite-cli-routes": "^0.31.0",
-    "@withgraphite/retype": "^0.3.11",
-    "@withgraphite/retyped-routes": "^0.3.1",
     "chalk": "^4.1.2",
     "fast-json-stable-hash": "^1.0.3",
     "fs-extra": "^10.1.0",
@@ -18,7 +15,8 @@
     "semver": "^7.3.7",
     "strip-ansi": "^6.0.1",
     "tmp": "^0.2.1",
-    "yargs": "^17.5.1"
+    "yargs": "^17.5.1",
+    "zod": "^3.24.1"
   },
   "pkg": {
     "scripts": "dist/src/**/*.js",
@@ -44,10 +42,10 @@
     "build-pkg": "pkg dist/src/index.js -c package.json --public-packages \"*\"",
     "dev": "./scripts/installation/develop.sh",
     "cli": "node ./dist/src/index.js",
-    "test": "tsc && yarn mocha \"dist/test/**/*.test.js\"  --parallel --jobs 8",
+    "test": "tsc && PK_TEST_DIR=.test-tmp yarn mocha \"dist/test/**/*.test.js\"  --parallel --jobs 8",
     "test-ci": "tsc && nyc --reporter=lcovonly yarn mocha \"dist/test/**/*.test.js\"  --parallel --jobs 8",
-    "test-one": "tsc && yarn mocha",
-    "test-grep": "tsc && yarn mocha \"dist/test/**/*.test.js\" -g"
+    "test-one": "tsc && PK_TEST_DIR=.test-tmp yarn mocha",
+    "test-grep": "tsc && PK_TEST_DIR=.test-tmp yarn mocha \"dist/test/**/*.test.js\" -g"
   },
   "nyc": {
     "exclude": ".yarn/**/*"
