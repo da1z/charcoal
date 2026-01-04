@@ -4,74 +4,47 @@ Contributions are welcome! Please first open an issue so that we can discuss bef
 
 ## Getting Started
 
-[Install nvm](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating) to ensure you're using the right node version. Once that is installed, from the repository directory run:
+[Install Bun](https://bun.sh/docs/installation) to build and test the project.
 
-```
-nvm use
-```
+Install dependencies and build:
 
-You'll need to install yarn on your machine
-
-```
-npm install --global yarn
-```
-
-You'll also need to install turbo
-
-```
-npm install --global turbo
-```
-
-Build the monorepo
-
-```
-yarn install
-turbo run build
-```
-
-Build the CLI
-
-```
-cd apps/cli
-yarn install
-yarn build
+```bash
+bun install
+bun run build
 ```
 
 ## Running Tests
 
-```
-cd apps/cli
-DEBUG=1 yarn test --full-trace
+Run all tests:
+
+```bash
+bun run test
 ```
 
-Running a subset of tests
+Run tests matching a pattern:
 
-```
-cd apps/cli
-DEBUG=1 yarn test --full-trace -g "test pattern"
+```bash
+bun run test-grep "pattern"
 ```
 
-Running one test
+Run a specific test file:
 
-```
-cd apps/cli
-DEBUG=1 yarn test-one "<path to .js test file in dist folder>"
+```bash
+bun run test-one test/commands/branch/branch_create.test.ts
 ```
 
 ## Run CLI from Local Build
 
-```
-cd apps/cli
-yarn cli <command> # (to run `gt <command>`)
+```bash
+bun run cli <command>  # Run pk <command> from source
 ```
 
-Linking `gt` to a locally built version (includes a build)
+Link `pk` globally for development (includes a build):
 
-```
-cd apps/cli
-yarn dev
+```bash
+bun run dev
 # then to run commands:
-gt <command>
+pk <command>
 ```
 
 ## Generating the MacOS ARM Binary
