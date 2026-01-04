@@ -8,7 +8,11 @@ const schema = t.shape({
   branchPrefix: t.optional(t.string),
   branchDate: t.optional(t.boolean),
   branchReplacement: t.optional(
-    t.unionMany([t.literal('_'), t.literal('-'), t.literal('')])
+    t.unionMany([
+      t.literal('_' as const),
+      t.literal('-' as const),
+      t.literal('' as const),
+    ])
   ),
   tips: t.optional(t.boolean),
   editor: t.optional(t.string),
@@ -139,7 +143,7 @@ export const userConfigFactory = spiffy({
         const command = `${getEditor()} ${editFilePath}`;
         try {
           execSync(command, { stdio: 'inherit', encoding: 'utf-8' });
-        } catch (e) {
+        } catch (e: any) {
           throw new CommandFailedError({ command, args: [editFilePath], ...e });
         }
       },

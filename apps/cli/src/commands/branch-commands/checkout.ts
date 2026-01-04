@@ -1,4 +1,4 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { checkoutBranch } from '../../actions/checkout_branch';
 import { graphite } from '../../lib/runner';
 
@@ -18,7 +18,7 @@ const args = {
     alias: 'u',
   },
 } as const;
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
 export const command = 'checkout [branch]';
 export const canonical = 'branch checkout';

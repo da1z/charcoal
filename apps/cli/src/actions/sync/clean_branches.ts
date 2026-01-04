@@ -1,5 +1,5 @@
 import { default as chalk } from 'chalk';
-import { TContext } from '../../lib/context';
+import type { TContext } from '../../lib/context';
 import { deleteBranchAction, isSafeToDelete } from '../delete_branch';
 
 /**

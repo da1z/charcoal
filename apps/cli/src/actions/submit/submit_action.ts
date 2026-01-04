@@ -1,6 +1,6 @@
 import chalk from 'chalk';
-import { TContext } from '../../lib/context';
-import { TScopeSpec } from '../../lib/engine/scope_spec';
+import type { TContext } from '../../lib/context';
+import type { TScopeSpec } from '../../lib/engine/scope_spec';
 import { ExitFailedError, KilledError } from '../../lib/errors';
 import { CommandFailedError } from '../../lib/git/runner';
 import { getPRInfoForBranches } from './prepare_branches';

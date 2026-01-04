@@ -1,4 +1,4 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { graphiteWithoutRepo } from '../../lib/runner';
 import { getBranchDateEnabled } from '../../lib/utils/branch_name';
 
@@ -17,7 +17,7 @@ const args = {
   },
 } as const;
 
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
 export const command = 'branch-date';
 export const canonical = 'user branch-date';

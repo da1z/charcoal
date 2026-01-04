@@ -1,6 +1,6 @@
-import fs from 'fs-extra';
+import fs from 'node:fs';
 import tmp from 'tmp';
-import { TContext } from '../../lib/context';
+import type { TContext } from '../../lib/context';
 import { getPRTemplate } from '../../lib/utils/pr_templates';
 
 export async function getPRBody(

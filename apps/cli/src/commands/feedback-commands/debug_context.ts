@@ -1,6 +1,6 @@
 import chalk from 'chalk';
-import fs from 'fs-extra';
-import yargs from 'yargs';
+import fs from 'node:fs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { captureState, recreateState } from '../../lib/debug_context';
 import { graphite } from '../../lib/runner';
 
@@ -20,7 +20,7 @@ const args = {
       'Accepts a file containing a json block created by `pk feedback state`. Recreates a debug repo in a temp folder with a commit tree matching the state JSON.',
   },
 } as const;
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
 export const command = 'debug-context';
 export const canonical = 'feedback debug-context';

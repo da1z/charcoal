@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { TContext } from '../lib/context';
+import type { TContext } from '../lib/context';
 import { RebaseConflictError } from '../lib/errors';
 import { assertUnreachable } from '../lib/utils/assert_unreachable';
 import { persistContinuation } from './persist_continuation';

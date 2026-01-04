@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { TContext } from '../lib/context';
+import type { TContext } from '../lib/context';
 import { logForConflictStatus } from './log';
 
 export function printConflictStatus(

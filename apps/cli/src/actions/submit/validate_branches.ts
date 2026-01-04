@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { TContext } from '../../lib/context';
+import type { TContext } from '../../lib/context';
 import { ExitFailedError, KilledError } from '../../lib/errors';
 import { syncPrInfo } from '../sync_pr_info';
 

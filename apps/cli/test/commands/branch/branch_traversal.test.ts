@@ -1,7 +1,7 @@
-import { expect } from 'chai';
+import { describe, it, expect } from 'bun:test';
 import { allScenes } from '../../lib/scenes/all_scenes';
-import { BasicScene } from '../../lib/scenes/basic_scene';
-import { TrailingProdScene } from '../../lib/scenes/trailing_prod_scene';
+import type { BasicScene } from '../../lib/scenes/basic_scene';
+import type { TrailingProdScene } from '../../lib/scenes/trailing_prod_scene';
 import { configureTest } from '../../lib/utils/configure_test';
 
 function setupStack(scene: BasicScene | TrailingProdScene) {
@@ -14,8 +14,8 @@ function setupStack(scene: BasicScene | TrailingProdScene) {
 }
 
 for (const scene of allScenes) {
-  describe(`(${scene}): next and prev`, function () {
-    configureTest(this, scene);
+  describe(`(${scene}): next and prev`, () => {
+    configureTest(scene);
 
     it('Can move to next branch', () => {
       scene.repo.createChange('a', 'a');
@@ -23,7 +23,7 @@ for (const scene of allScenes) {
       scene.repo.checkoutBranch('main');
 
       scene.repo.runCliCommand([`branch`, `up`, `--no-interactive`]);
-      expect(scene.repo.currentBranchName()).to.equal('a');
+      expect(scene.repo.currentBranchName()).toBe('a');
     });
 
     it('Can move to prev branch', () => {
@@ -33,7 +33,7 @@ for (const scene of allScenes) {
       scene.repo.runCliCommand([`branch`, `create`, `b`, `-m`, `b`]);
 
       scene.repo.runCliCommand([`branch`, `down`, `--no-interactive`]);
-      expect(scene.repo.currentBranchName()).to.equal('a');
+      expect(scene.repo.currentBranchName()).toBe('a');
     });
 
     it('Branch down goes up to trunk', () => {
@@ -42,7 +42,7 @@ for (const scene of allScenes) {
       scene.repo.checkoutBranch('a');
 
       scene.repo.runCliCommand([`branch`, `down`, `--no-interactive`]);
-      expect(scene.repo.currentBranchName()).to.equal('main');
+      expect(scene.repo.currentBranchName()).toBe('main');
     });
 
     it('Can move to next branch with numSteps = 2', () => {
@@ -50,14 +50,14 @@ for (const scene of allScenes) {
       scene.repo.checkoutBranch('a');
 
       scene.repo.runCliCommand([`branch`, `up`, `2`, `--no-interactive`]);
-      expect(scene.repo.currentBranchName()).to.equal('c');
+      expect(scene.repo.currentBranchName()).toBe('c');
     });
 
     it('Can move to prev branch with numSteps = 2', () => {
       setupStack(scene);
 
       scene.repo.runCliCommand([`branch`, `down`, `2`, `--no-interactive`]);
-      expect(scene.repo.currentBranchName()).to.equal('a');
+      expect(scene.repo.currentBranchName()).toBe('a');
     });
 
     it('Can move to top of the stack', () => {
@@ -65,14 +65,14 @@ for (const scene of allScenes) {
       scene.repo.checkoutBranch('a');
 
       scene.repo.runCliCommand([`branch`, `top`, `--no-interactive`]);
-      expect(scene.repo.currentBranchName()).to.equal('c');
+      expect(scene.repo.currentBranchName()).toBe('c');
     });
 
     it('Can move to bottom of the stack', () => {
       setupStack(scene);
 
       scene.repo.runCliCommand([`branch`, `bottom`, `--no-interactive`]);
-      expect(scene.repo.currentBranchName()).to.equal('a');
+      expect(scene.repo.currentBranchName()).toBe('a');
     });
 
     it('branch down moves to prev', () => {
@@ -82,7 +82,7 @@ for (const scene of allScenes) {
       scene.repo.runCliCommand([`branch`, `create`, `b`, `-m`, `b`]);
 
       scene.repo.runCliCommand([`branch`, `down`, `--no-interactive`]);
-      expect(scene.repo.currentBranchName()).to.equal('a');
+      expect(scene.repo.currentBranchName()).toBe('a');
     });
 
     it('branch up moves to next', () => {
@@ -91,7 +91,7 @@ for (const scene of allScenes) {
       scene.repo.checkoutBranch('main');
 
       scene.repo.runCliCommand([`branch`, `up`, `--no-interactive`]);
-      expect(scene.repo.currentBranchName()).to.equal('a');
+      expect(scene.repo.currentBranchName()).toBe('a');
     });
   });
 }

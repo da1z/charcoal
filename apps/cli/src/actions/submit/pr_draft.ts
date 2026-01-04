@@ -1,4 +1,4 @@
-import { TContext } from '../../lib/context';
+import type { TContext } from '../../lib/context';
 
 export async function getPRDraftStatus(context: TContext): Promise<boolean> {
   if (!context.interactive) {

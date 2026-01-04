@@ -1,4 +1,4 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { editDownstack } from '../../actions/edit/edit_downstack';
 import { graphite } from '../../lib/runner';
 
@@ -10,7 +10,7 @@ const args = {
     type: 'string',
   },
 } as const;
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
 export const command = 'edit';
 export const canonical = 'downstack edit';

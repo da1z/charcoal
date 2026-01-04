@@ -1,4 +1,4 @@
-import { SpawnSyncOptions } from 'child_process';
+import type { SpawnSyncOptions } from 'child_process';
 import { runGitCommand } from './runner';
 
 import { rebaseInProgress } from './rebase_in_progress';

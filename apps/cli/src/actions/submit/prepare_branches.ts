@@ -1,13 +1,13 @@
 import chalk from 'chalk';
-import { TContext } from '../../lib/context';
-import { TBranchPRInfo } from '../../lib/engine/metadata_ref';
+import type { TContext } from '../../lib/context';
+import type { TBranchPRInfo } from '../../lib/engine/metadata_ref';
 import { editPRBody, getPRBody } from './pr_body';
 import { getPRDraftStatus } from './pr_draft';
 import { getPRTitle } from './pr_title';
 import { getReviewers } from './reviewers';
-import { TPRSubmissionInfo } from './submit_prs';
+import type { TPRSubmissionInfo } from './submit_prs';
 import { PreconditionsFailedError } from '../../lib/errors';
-import { getGithubAuthorizationStatus } from '../../commands/auth';
+import { getGithubAuthorizationStatus } from '../../lib/utils/gh_auth';
 
 type TPRSubmissionAction = { branchName: string } & (
   | { update: false }
@@ -335,7 +335,7 @@ function cliAuthPrecondition(context: TContext): boolean {
 
   if (isGithubIntegrationEnabled && !isGhAuthorized) {
     throw new PreconditionsFailedError(
-      `Please authenticate your CLI with Github by running pk auth and then retry. To ignore this message in the future and use Pancake without Github integration, run pk repo disable-github.`
+      `Please authenticate with GitHub by running 'gh auth login' and then retry. To ignore this message in the future and use Pancake without GitHub integration, run 'pk repo disable-github'.`
     );
   }
 

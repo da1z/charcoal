@@ -1,9 +1,9 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { unbranch } from '../../actions/unbranch';
 import { graphite } from '../../lib/runner';
 
 const args = {} as const;
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
 export const aliases = ['ub'];
 export const command = 'unbranch';

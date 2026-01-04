@@ -1,11 +1,15 @@
 import { spawnSync } from 'child_process';
-import fs from 'fs-extra';
+import fs from 'node:fs';
 import path from 'path';
-import { USER_CONFIG_OVERRIDE_ENV } from '../context';
+import { USER_CONFIG_OVERRIDE_ENV } from '../../../src/lib/context';
 
 const TEXT_FILE_NAME = 'test.txt';
 
-// This class should only be used by tests and `pk demo`
+// Path to CLI entry point (TypeScript source - bun runs it directly)
+// From test/lib/utils/ -> ../../../src/index.ts
+const CLI_PATH = path.join(import.meta.dir, '..', '..', '..', 'src', 'index.ts');
+
+// This class is only used by tests
 export class GitRepo {
   dir: string;
   userConfigPath: string;
@@ -32,25 +36,18 @@ export class GitRepo {
   }
 
   runCliCommand(command: string[], opts?: { cwd?: string }): void {
-    const result = spawnSync(
-      process.argv[0],
-      [
-        path.join(__dirname, `..`, `..`, `..`, `..`, `dist`, `src`, `index.js`),
-        ...command,
-      ],
-      {
-        stdio: process.env.DEBUG ? 'inherit' : 'pipe',
-        cwd: opts?.cwd || this.dir,
-        env: {
-          ...process.env,
-          [USER_CONFIG_OVERRIDE_ENV]: this.userConfigPath,
-          GRAPHITE_DISABLE_TELEMETRY: '1',
-          GRAPHITE_DISABLE_UPGRADE_PROMPT: '1',
-          GRAPHITE_DISABLE_SURVEY: '1',
-          GRAPHITE_PROFILE: undefined,
-        },
-      }
-    );
+    const result = spawnSync('bun', [CLI_PATH, ...command], {
+      stdio: process.env.DEBUG ? 'inherit' : 'pipe',
+      cwd: opts?.cwd || this.dir,
+      env: {
+        ...process.env,
+        [USER_CONFIG_OVERRIDE_ENV]: this.userConfigPath,
+        GRAPHITE_DISABLE_TELEMETRY: '1',
+        GRAPHITE_DISABLE_UPGRADE_PROMPT: '1',
+        GRAPHITE_DISABLE_SURVEY: '1',
+        GRAPHITE_PROFILE: undefined,
+      },
+    });
     if (result.status) {
       throw new Error(
         [
@@ -75,32 +72,16 @@ export class GitRepo {
 
   runCliCommandAndGetOutput(args: string[]): string {
     return (
-      spawnSync(
-        process.argv[0],
-        [
-          path.join(
-            __dirname,
-            `..`,
-            `..`,
-            `..`,
-            `..`,
-            `dist`,
-            `src`,
-            `index.js`
-          ),
-          ...args,
-        ],
-        {
-          encoding: 'utf-8',
-          cwd: this.dir,
-          env: {
-            ...process.env,
-            [USER_CONFIG_OVERRIDE_ENV]: this.userConfigPath,
-            GRAPHITE_DISABLE_TELEMETRY: '1',
-            GRAPHITE_DISABLE_UPGRADE_PROMPT: '1',
-          },
-        }
-      ).stdout?.trim() ?? ''
+      spawnSync('bun', [CLI_PATH, ...args], {
+        encoding: 'utf-8',
+        cwd: this.dir,
+        env: {
+          ...process.env,
+          [USER_CONFIG_OVERRIDE_ENV]: this.userConfigPath,
+          GRAPHITE_DISABLE_TELEMETRY: '1',
+          GRAPHITE_DISABLE_UPGRADE_PROMPT: '1',
+        },
+      }).stdout?.trim() ?? ''
     );
   }
 
@@ -132,7 +113,7 @@ export class GitRepo {
   }
 
   createPrecommitHook(contents: string): void {
-    fs.mkdirpSync(`${this.dir}/.git/hooks`);
+    fs.mkdirSync(`${this.dir}/.git/hooks`, { recursive: true });
     fs.writeFileSync(`${this.dir}/.git/hooks/pre-commit`, contents);
     spawnSync('chmod', [`+x`, `${this.dir}/.git/hooks/pre-commit`]);
   }

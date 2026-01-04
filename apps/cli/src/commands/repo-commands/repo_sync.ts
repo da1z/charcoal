@@ -1,4 +1,4 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { syncAction } from '../../actions/sync/sync';
 import { graphite } from '../../lib/runner';
 
@@ -38,7 +38,7 @@ const args = {
     alias: 'r',
   },
 } as const;
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
 export const command = 'sync';
 export const canonical = 'repo sync';

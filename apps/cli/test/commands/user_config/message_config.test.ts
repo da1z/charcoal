@@ -1,11 +1,11 @@
-import { expect } from 'chai';
-import fs from 'fs-extra';
+import { describe, it, expect } from 'bun:test';
+import fs from 'node:fs';
 import { BasicScene } from '../../lib/scenes/basic_scene';
 import { configureTest } from '../../lib/utils/configure_test';
 
 for (const scene of [new BasicScene()]) {
-  describe(`(${scene}): upgrade message`, function () {
-    configureTest(this, scene);
+  describe(`(${scene}): upgrade message`, () => {
+    configureTest(scene);
 
     it('Sanity check - can read previously written message config', () => {
       const contents = 'Hello world!';
@@ -22,17 +22,17 @@ for (const scene of [new BasicScene()]) {
         scene.getContext().messageConfig.data.message?.contents;
       const wirttenCLIVersion =
         scene.getContext().messageConfig.data.message?.cliVersion;
-      expect(writtenContents === contents).to.be.true;
-      expect(wirttenCLIVersion === cliVersion).to.be.true;
+      expect(writtenContents === contents).toBe(true);
+      expect(wirttenCLIVersion === cliVersion).toBe(true);
     });
 
     it('If no message, removes message config file', () => {
       scene.getContext().messageConfig.update((d) => (d.message = undefined));
-      expect(fs.existsSync(scene.getContext().messageConfig.path)).to.be.false;
+      expect(fs.existsSync(scene.getContext().messageConfig.path)).toBe(false);
 
       // can handle removing the file "twice"
       scene.getContext().messageConfig.update((d) => (d.message = undefined));
-      expect(fs.existsSync(scene.getContext().messageConfig.path)).to.be.false;
+      expect(fs.existsSync(scene.getContext().messageConfig.path)).toBe(false);
     });
   });
 }

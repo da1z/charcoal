@@ -2,15 +2,14 @@
   "name": "@da1z/pancake",
   "version": "0.2.4",
   "license": "None",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "main": "dist/index.js",
   "homepage": "https://github.com/da1z/pancake",
   "repository": "github:da1z/pancake",
   "dependencies": {
-    "@da1z/pancake-shared-types": "workspace:*",
+    "@withgraphite/retype": "^0.3.11",
+    "@withgraphite/retyped-routes": "^0.3.1",
     "chalk": "^4.1.2",
     "fast-json-stable-hash": "^1.0.3",
-    "fs-extra": "^10.1.0",
     "prompts": "^2.4.2",
     "semver": "^7.3.7",
     "strip-ansi": "^6.0.1",
@@ -18,50 +17,31 @@
     "yargs": "^17.5.1",
     "zod": "^3.24.1"
   },
-  "pkg": {
-    "scripts": "dist/src/**/*.js",
-    "assets": [
-      "dist/src/commands/**/*",
-      "dist/src/lib/pk.fish"
-    ],
-    "targets": [
-      "node18-macos",
-      "node18-linux"
-    ],
-    "outputPath": "pkg"
-  },
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
-    "prepublishOnly": "yarn build",
-    "postinstall": "node scripts/node_version.js || node dist/scripts/node_version.js",
+    "prepublishOnly": "bun run build",
     "lint": "eslint src --quiet --ext .ts --cache",
-    "check": "tsc --noEmit",
-    "build": "rm -rf dist/ && yarn lint && tsc && cp scripts/node_version.js dist/scripts/node_version.js && cp src/lib/pk.fish dist/src/lib/pk.fish",
-    "build-pkg": "pkg dist/src/index.js -c package.json --public-packages \"*\"",
+    "check": "tsc",
+    "build": "rm -rf dist && bun run lint && bun run check && bun build ./src/index.ts --outdir dist --target node",
+    "build-pkg": "bun build ./src/index.ts --compile --outfile=pkg/pancake-macos --target=bun-darwin-arm64 && bun build ./src/index.ts --compile --outfile=pkg/pancake-linux --target=bun-linux-x64",
     "dev": "./scripts/installation/develop.sh",
-    "cli": "node ./dist/src/index.js",
-    "test": "tsc && PK_TEST_DIR=.test-tmp yarn mocha \"dist/test/**/*.test.js\"  --parallel --jobs 8",
-    "test-ci": "tsc && nyc --reporter=lcovonly yarn mocha \"dist/test/**/*.test.js\"  --parallel --jobs 8",
-    "test-one": "tsc && PK_TEST_DIR=.test-tmp yarn mocha",
-    "test-grep": "tsc && PK_TEST_DIR=.test-tmp yarn mocha \"dist/test/**/*.test.js\" -g"
-  },
-  "nyc": {
-    "exclude": ".yarn/**/*"
+    "cli": "bun ./src/index.ts",
+    "test": "PK_TEST_DIR=.test-tmp bun test --timeout 30000 --ignore 'test/large_repo.test.ts' test/**/*.test.ts",
+    "test-ci": "PK_TEST_DIR=.test-tmp bun test --timeout 30000 --coverage test/**/*.test.ts",
+    "test-one": "PK_TEST_DIR=.test-tmp bun test --timeout 30000",
+    "test-grep": "PK_TEST_DIR=.test-tmp bun test --test-name-pattern"
   },
   "files": [
     "dist"
   ],
   "bin": {
-    "pancake": "dist/src/index.js",
-    "pk": "dist/src/index.js"
+    "pancake": "dist/index.js",
+    "pk": "dist/index.js"
   },
   "devDependencies": {
-    "@types/chai": "^4.3.1",
-    "@types/chai-as-promised": "^7.1.5",
-    "@types/fs-extra": "^9.0.13",
-    "@types/mocha": "^9.1.1",
+    "@types/bun": "latest",
     "@types/node": "^17.0.40",
     "@types/prettier": "^2",
     "@types/prompts": "^2.4.3",
@@ -70,20 +50,12 @@
     "@types/yargs": "^17.0.10",
     "@typescript-eslint/eslint-plugin": "^5.27.1",
     "@typescript-eslint/parser": "^5.27.1",
-    "chai": "^4.3.6",
-    "chai-as-promised": "^7.1.1",
     "eslint": "^8.17.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "3.6.1",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "mocha": "^10.0.0",
-    "nock": "^13.2.6",
-    "nyc": "^15.1.0",
-    "pinst": "^3.0.0",
-    "pkg": "^5.8.1",
     "prettier": "^2.8.3",
-    "ts-node": "^10.8.1",
-    "typescript": "^4.7.3"
+    "typescript": "^5.7.0"
   }
 }

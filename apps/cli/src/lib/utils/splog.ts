@@ -62,7 +62,13 @@ export function composeSplog(
           env: { LESS: 'FRX', LV: '-c', ...process.env },
         });
       } catch (e) {
-        if (e.status !== 0 || e.code !== 'EPIPE') {
+        const execError = e as {
+          status?: number;
+          code?: string;
+          stdout?: string;
+          stderr?: string;
+        };
+        if (execError.status !== 0 || execError.code !== 'EPIPE') {
           console.log(s);
           console.log(
             chalk.yellow(
@@ -75,7 +81,10 @@ export function composeSplog(
           );
           throw new CommandFailedError({
             command: opts.pager,
-            ...e,
+            args: [],
+            status: execError.status ?? 1,
+            stdout: execError.stdout ?? '',
+            stderr: execError.stderr ?? '',
           });
         }
       }

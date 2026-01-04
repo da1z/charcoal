@@ -1,20 +1,21 @@
-import { expect } from 'chai';
-import fs from 'fs-extra';
+import { describe, it, expect } from 'bun:test';
+import fs from 'node:fs';
+import { removeSync } from '../../../src/lib/utils/fs_utils';
 import { TrailingProdScene } from '../../lib/scenes/trailing_prod_scene';
 import { configureTest } from '../../lib/utils/configure_test';
 
 for (const scene of [new TrailingProdScene()]) {
-  describe(`(${scene}): repo init`, function () {
-    configureTest(this, scene);
+  describe(`(${scene}): repo init`, () => {
+    configureTest(scene);
 
     it('Can run repo init', () => {
       const repoConfigPath = `${scene.repo.dir}/.git/.graphite_repo_config`;
-      fs.removeSync(repoConfigPath);
+      removeSync(repoConfigPath);
       scene.repo.runCliCommand([`repo`, `init`, `--trunk`, `main`]);
       const savedConfig = JSON.parse(
         fs.readFileSync(repoConfigPath).toString()
       );
-      expect(savedConfig['trunk']).to.eq('main');
+      expect(savedConfig['trunk']).toBe('main');
     });
 
     it('Falls back to main if non-existent branch is passed in', () => {
@@ -29,7 +30,7 @@ for (const scene of [new TrailingProdScene()]) {
       const savedConfig = JSON.parse(
         fs.readFileSync(repoConfigPath).toString()
       );
-      expect(savedConfig['trunk']).to.eq('main');
+      expect(savedConfig['trunk']).toBe('main');
     });
 
     it('Cannot set an invalid trunk if trunk cannot be inferred', () => {
@@ -42,7 +43,7 @@ for (const scene of [new TrailingProdScene()]) {
           `random`,
           `--no-interactive`,
         ])
-      ).to.throw(Error);
+      ).toThrow(Error);
     });
   });
 }

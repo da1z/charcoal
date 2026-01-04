@@ -1,6 +1,6 @@
-import { BranchInfo } from '@da1z/pancake-shared-types';
-import yargs from 'yargs';
-import { TContext } from '../../lib/context';
+import type { BranchInfo } from '../../shared-types';
+import type { Arguments, InferredOptionTypes } from 'yargs';
+import type { TContext } from '../../lib/context';
 import { UntrackedBranchError } from '../../lib/errors';
 import { getMergeBaseAsync } from '../../lib/git/merge_base';
 import { graphite } from '../../lib/runner';
@@ -12,7 +12,7 @@ export const canonical = 'internal-only log';
 export const description = false;
 export const builder = args;
 
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 export const handler = async (argv: argsT): Promise<void> => {
   return graphite(argv, canonical, async (context) => {
     // Need to do this before checking if you need submit

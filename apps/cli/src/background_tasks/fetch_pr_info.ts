@@ -1,4 +1,4 @@
-import { TContext } from '../lib/context';
+import type { TContext } from '../lib/context';
 import { spawnDetached } from '../lib/utils/spawn';
 
 export function refreshPRInfoInBackground(context: TContext): void {

@@ -1,18 +1,15 @@
 // Why does an open source CLI include telemetry?
 // We the creators want to understand how people are using the tool
 // All metrics logged are listed plain to see, and are non blocking in case the server is unavailable.
-import yargs from 'yargs';
+import type { Arguments } from 'yargs';
 import chalk from 'chalk';
 import { version } from '../../package.json';
 import { init } from '../actions/init';
 import { refreshPRInfoInBackground } from '../background_tasks/fetch_pr_info';
-import {
-  initContext,
-  initContextLite,
-  TContext,
-  TContextLite,
-} from './context';
-import { getCacheLock, TCacheLock } from './engine/cache_lock';
+import type { TContext, TContextLite } from './context';
+import { initContext, initContextLite } from './context';
+import type { TCacheLock } from './engine/cache_lock';
+import { getCacheLock } from './engine/cache_lock';
 import {
   BadTrunkOperationError,
   ConcurrentExecutionError,
@@ -24,12 +21,12 @@ import {
   UntrackedBranchError,
 } from './errors';
 import { composeGit } from './git/git';
-import { TGlobalArguments } from './global_arguments';
+import type { TGlobalArguments } from './global_arguments';
 import { tracer } from './utils/tracer';
 import { CommandFailedError, CommandKilledError } from './git/runner';
 
 export async function graphite(
-  args: yargs.Arguments & TGlobalArguments,
+  args: Arguments & TGlobalArguments,
   canonicalName: string,
   handler: (context: TContext) => Promise<void>
 ): Promise<void> {
@@ -40,7 +37,7 @@ export async function graphite(
 }
 
 export async function graphiteWithoutRepo(
-  args: yargs.Arguments & TGlobalArguments,
+  args: Arguments & TGlobalArguments,
   canonicalName: string,
   handler: (context: TContextLite) => Promise<void>
 ): Promise<void> {
@@ -51,7 +48,7 @@ export async function graphiteWithoutRepo(
 }
 
 async function graphiteInternal(
-  args: yargs.Arguments & TGlobalArguments,
+  args: Arguments & TGlobalArguments,
   canonicalName: string,
   handler: TGraphiteCommandHandler
 ): Promise<void> {
@@ -103,10 +100,11 @@ async function graphiteInternal(
     );
   } catch (err) {
     handleGraphiteError(err, contextLite);
-    contextLite.splog.debug(err.stack);
+    const error = err as Error;
+    contextLite.splog.debug(error.stack ?? '');
     // print errors when debugging tests
     if (process.env.DEBUG) {
-      process.stdout.write(err.stack.toString());
+      process.stdout.write(error.stack ?? '');
     }
     process.exitCode = 1;
   }
@@ -140,7 +138,7 @@ async function graphiteHelper(
     await handler.run(context);
   } catch (err) {
     if (
-      err.constructor === DetachedError &&
+      (err as Error).constructor === DetachedError &&
       context.engine.rebaseInProgress()
     ) {
       throw new DetachedError(

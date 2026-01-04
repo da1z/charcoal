@@ -1,3 +1,4 @@
+import { describe, it } from 'bun:test';
 import { PublicRepoScene } from './lib/scenes/public_repo_scene';
 import { configureTest } from './lib/utils/configure_test';
 
@@ -13,15 +14,23 @@ for (const scene of [
     timeout: 10000,
   }),
 ]) {
-  describe(`(${scene}): Run simple timed commands`, function () {
-    configureTest(this, scene);
+  describe(`(${scene}): Run simple timed commands`, () => {
+    configureTest(scene);
 
-    it('Can run stacks quickly', () => {
-      scene.repo.runCliCommand([`log`, `short`]);
-    }).timeout(scene.timeout);
+    it(
+      'Can run stacks quickly',
+      () => {
+        scene.repo.runCliCommand([`log`, `short`]);
+      },
+      scene.timeout
+    );
 
-    it('Can run log quickly', () => {
-      scene.repo.runCliCommand([`log`]);
-    }).timeout(scene.timeout);
+    it(
+      'Can run log quickly',
+      () => {
+        scene.repo.runCliCommand([`log`]);
+      },
+      scene.timeout
+    );
   });
 }

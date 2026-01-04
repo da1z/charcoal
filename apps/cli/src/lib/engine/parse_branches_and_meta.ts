@@ -1,11 +1,11 @@
 import { PreconditionsFailedError } from '../errors';
 import { getMergeBase } from '../git/merge_base';
-import { TSplog } from '../utils/splog';
-import { TCachedMeta } from './cached_meta';
+import type { TSplog } from '../utils/splog';
+import type { TCachedMeta } from './cached_meta';
+import type { TMeta } from './metadata_ref';
 import {
   deleteMetadataRef,
   readMetadataRef,
-  TMeta,
   writeMetadataRef,
 } from './metadata_ref';
 

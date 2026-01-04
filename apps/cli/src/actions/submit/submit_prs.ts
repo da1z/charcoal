@@ -1,20 +1,32 @@
-import { API_ROUTES } from '@withgraphite/graphite-cli-routes';
-import * as t from '@withgraphite/retype';
 import chalk from 'chalk';
-import { TContext } from '../../lib/context';
-import { ExitFailedError } from '../../lib/errors';
-import { Unpacked } from '../../lib/utils/ts_helpers';
 import { execFileSync } from 'child_process';
+import type { TContext } from '../../lib/context';
+import { ExitFailedError } from '../../lib/errors';
+import type { Unpacked } from '../../lib/utils/ts_helpers';
 
-export type TPRSubmissionInfo = t.UnwrapSchemaMap<
-  typeof API_ROUTES.submitPullRequests.params
->['prs'];
+// PR submission types (previously derived from @withgraphite/graphite-cli-routes)
+export type TPRSubmissionInfo = Array<{
+  head: string;
+  headSha?: string;
+  base: string;
+  baseSha?: string;
+  title?: string;
+  body?: string;
+  action: 'create' | 'update';
+  prNumber?: number;
+  draft?: boolean;
+  reviewers?: string[];
+}>;
 
 type TSubmittedPRRequest = Unpacked<TPRSubmissionInfo>;
 
-type TSubmittedPRResponse = Unpacked<
-  t.UnwrapSchemaMap<typeof API_ROUTES.submitPullRequests.response>['prs']
->;
+type TSubmittedPRResponse = {
+  head: string;
+  status: 'created' | 'updated' | 'error';
+  prNumber?: number;
+  prURL?: string;
+  error?: string;
+};
 
 type TSubmittedPR = {
   request: TSubmittedPRRequest;
@@ -91,7 +103,7 @@ async function submitPrToGithub({
   request: TSubmittedPRRequest;
 }): Promise<TSubmittedPRResponse> {
   try {
-    const prInfo = await JSON.parse(
+    const prInfo = JSON.parse(
       execFileSync('gh', [
         'pr',
         'view',

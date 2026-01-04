@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import type chalk from 'chalk';
 
 export const GRAPHITE_COLORS: Parameters<typeof chalk.rgb>[] = [
   [76, 203, 241],

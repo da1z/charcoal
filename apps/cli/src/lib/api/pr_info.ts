@@ -1,6 +1,3 @@
-import { API_ROUTES } from '@withgraphite/graphite-cli-routes';
-
-import t from '@withgraphite/retype';
 import { execFileSync } from 'child_process';
 
 type TBranchNameWithPrNumber = {
@@ -8,9 +5,18 @@ type TBranchNameWithPrNumber = {
   prNumber: number | undefined;
 };
 
-export type TPRInfoToUpsert = t.UnwrapSchemaMap<
-  typeof API_ROUTES.pullRequestInfo.response
->['prs'];
+// PR info types (previously derived from @withgraphite/graphite-cli-routes)
+export type TPRInfoToUpsert = Array<{
+  prNumber: number;
+  headRefName: string;
+  baseRefName: string;
+  title: string;
+  body: string;
+  state: 'OPEN' | 'CLOSED' | 'MERGED';
+  reviewDecision?: 'APPROVED' | 'REVIEW_REQUIRED' | 'CHANGES_REQUESTED';
+  url: string;
+  isDraft: boolean;
+}>;
 
 export async function getPrInfoForBranches(
   branchNamesWithExistingPrInfo: TBranchNameWithPrNumber[]
@@ -36,7 +42,7 @@ export async function getPrInfoForBranches(
     // Gh CLI allows for looking up by pr number of branch name
     for (const prId of [...existingPrInfo.keys(), ...branchesWithoutPrInfo]) {
       try {
-        const pr = await JSON.parse(
+        const pr = JSON.parse(
           execFileSync('gh', [
             'pr',
             'view',

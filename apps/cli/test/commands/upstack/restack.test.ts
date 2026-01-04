@@ -1,12 +1,12 @@
-import { expect } from 'chai';
+import { describe, it, expect } from 'bun:test';
 import { allScenes } from '../../lib/scenes/all_scenes';
 import { configureTest } from '../../lib/utils/configure_test';
 import { expectCommits } from '../../lib/utils/expect_commits';
 
 for (const scene of allScenes) {
   // eslint-disable-next-line max-lines-per-function
-  describe(`(${scene}): upstack restack`, function () {
-    configureTest(this, scene);
+  describe(`(${scene}): upstack restack`, () => {
+    configureTest(scene);
 
     it('Can restack a stack of three branches', () => {
       scene.repo.createChange('2', 'a');
@@ -26,11 +26,11 @@ for (const scene of allScenes) {
       scene.repo.createChangeAndCommit('1.5', 'main');
       expect(
         scene.repo.listCurrentBranchCommitMessages().slice(0, 2).join(', ')
-      ).to.equal('1.5, 1');
+      ).toBe('1.5, 1');
 
       scene.repo.runCliCommand(['upstack', 'restack']);
 
-      expect(scene.repo.currentBranchName()).to.equal('main');
+      expect(scene.repo.currentBranchName()).toBe('main');
 
       scene.repo.checkoutBranch('c');
       expectCommits(scene.repo, '4, 3.5, 3, 2.5, 2, 1.5, 1');
@@ -46,24 +46,24 @@ for (const scene of allScenes) {
       scene.repo.checkoutBranch('main');
       scene.repo.createChangeAndCommit('1.5');
 
-      expect(() => scene.repo.runCliCommand(['upstack', 'restack'])).to.throw();
-      expect(scene.repo.rebaseInProgress()).to.eq(true);
+      expect(() => scene.repo.runCliCommand(['upstack', 'restack'])).toThrow();
+      expect(scene.repo.rebaseInProgress()).toBe(true);
 
       scene.repo.resolveMergeConflicts();
 
-      expect(() => scene.repo.runCliCommand(['continue', '-q'])).to.throw();
-      expect(scene.repo.rebaseInProgress()).to.eq(true);
+      expect(() => scene.repo.runCliCommand(['continue', '-q'])).toThrow();
+      expect(scene.repo.rebaseInProgress()).toBe(true);
 
       scene.repo.markMergeConflictsAsResolved();
       scene.repo.runCliCommand(['continue', '-q']);
 
-      expect(scene.repo.rebaseInProgress()).to.eq(false);
-      expect(scene.repo.currentBranchName()).to.eq('main');
+      expect(scene.repo.rebaseInProgress()).toBe(false);
+      expect(scene.repo.currentBranchName()).toBe('main');
 
       scene.repo.checkoutBranch('b');
       expect(
         scene.repo.listCurrentBranchCommitMessages().slice(0, 4).join(', ')
-      ).to.equal('3, 2, 1.5, 1');
+      ).toBe('3, 2, 1.5, 1');
     });
 
     it('Can restack one specific stack', () => {
@@ -80,7 +80,7 @@ for (const scene of allScenes) {
 
       scene.repo.checkoutBranch('b');
 
-      expect(scene.repo.currentBranchName()).to.eq('b');
+      expect(scene.repo.currentBranchName()).toBe('b');
       expectCommits(scene.repo, 'b, 1.5, a, 1');
     });
 
@@ -101,7 +101,7 @@ for (const scene of allScenes) {
 
       scene.repo.runCliCommand(['upstack', 'restack']);
 
-      expect(scene.repo.currentBranchName()).to.eq('b');
+      expect(scene.repo.currentBranchName()).toBe('b');
       expectCommits(scene.repo, 'b, 2.5, a, 1');
     });
   });

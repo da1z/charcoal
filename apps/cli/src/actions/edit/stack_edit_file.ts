@@ -1,6 +1,6 @@
-import fs from 'fs-extra';
+import fs from 'node:fs';
 import path from 'path';
-import { TContext } from '../../lib/context';
+import type { TContext } from '../../lib/context';
 
 const FILE_NAME = 'graphite_stack_edit';
 const FILE_FOOTER = [

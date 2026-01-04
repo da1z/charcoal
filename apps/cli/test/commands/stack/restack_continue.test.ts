@@ -1,12 +1,12 @@
-import { expect } from 'chai';
+import { describe, it, expect } from 'bun:test';
 import { allScenes } from '../../lib/scenes/all_scenes';
 import { configureTest } from '../../lib/utils/configure_test';
 import { expectCommits } from '../../lib/utils/expect_commits';
 
 for (const scene of allScenes) {
   // eslint-disable-next-line max-lines-per-function
-  describe(`(${scene}): restack continue`, function () {
-    configureTest(this, scene);
+  describe(`(${scene}): restack continue`, () => {
+    configureTest(scene);
 
     it('Can abort a restack with a merge conflict', () => {
       scene.repo.createChange('a');
@@ -20,14 +20,14 @@ for (const scene of allScenes) {
 
       expect(() =>
         scene.repo.runCliCommand(['stack', 'restack', '-q'])
-      ).to.throw();
-      expect(scene.repo.rebaseInProgress()).to.be.true;
+      ).toThrow();
+      expect(scene.repo.rebaseInProgress()).toBe(true);
 
       scene.repo.runGitCommand(['rebase', '--abort']);
 
-      expect(scene.repo.rebaseInProgress()).to.be.false;
-      expect(scene.getContext().engine.currentBranchPrecondition).to.equal('b');
-      expect(scene.repo.currentBranchName()).to.equal('b');
+      expect(scene.repo.rebaseInProgress()).toBe(false);
+      expect(scene.getContext().engine.currentBranchPrecondition).toBe('b');
+      expect(scene.repo.currentBranchName()).toBe('b');
 
       scene.repo.checkoutBranch('b');
       expectCommits(scene.repo, 'b, a, 1');
@@ -45,8 +45,8 @@ for (const scene of allScenes) {
 
       expect(() =>
         scene.repo.runCliCommand(['stack', 'restack', '-q'])
-      ).to.throw();
-      expect(scene.repo.rebaseInProgress()).to.be.true;
+      ).toThrow();
+      expect(scene.repo.rebaseInProgress()).toBe(true);
 
       scene.repo.resolveMergeConflicts();
       scene.repo.markMergeConflictsAsResolved();
@@ -55,9 +55,9 @@ for (const scene of allScenes) {
       // Continue should finish the work that stack restack started, not only
       // completing the rebase but also re-checking out the original
       // branch.
-      expect(scene.repo.currentBranchName()).to.equal('a');
+      expect(scene.repo.currentBranchName()).toBe('a');
       expectCommits(scene.repo, 'a, 1');
-      expect(scene.repo.rebaseInProgress()).to.be.false;
+      expect(scene.repo.rebaseInProgress()).toBe(false);
 
       scene.repo.checkoutBranch('b');
       expectCommits(scene.repo, 'b, a, 1');
@@ -83,14 +83,14 @@ for (const scene of allScenes) {
 
       expect(() =>
         scene.repo.runCliCommand(['stack', 'restack', '-q'])
-      ).to.throw();
-      expect(scene.repo.rebaseInProgress()).to.be.true;
+      ).toThrow();
+      expect(scene.repo.rebaseInProgress()).toBe(true);
 
       scene.repo.resolveMergeConflicts();
       scene.repo.markMergeConflictsAsResolved();
 
-      expect(() => scene.repo.runCliCommand(['continue'])).to.throw();
-      expect(scene.repo.rebaseInProgress()).to.be.true;
+      expect(() => scene.repo.runCliCommand(['continue'])).toThrow();
+      expect(scene.repo.rebaseInProgress()).toBe(true);
 
       scene.repo.resolveMergeConflicts();
       scene.repo.markMergeConflictsAsResolved();
@@ -99,8 +99,8 @@ for (const scene of allScenes) {
       // Note that even though multiple continues have been run, the original
       // context - that the original stack restack was kicked off at 'a' - should
       // not be lost.
-      expect(scene.repo.currentBranchName()).to.equal('a');
-      expect(scene.repo.rebaseInProgress()).to.be.false;
+      expect(scene.repo.currentBranchName()).toBe('a');
+      expect(scene.repo.rebaseInProgress()).toBe(false);
 
       expectCommits(scene.repo, 'a, 1');
 

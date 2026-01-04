@@ -21,3 +21,4 @@ pkg/
 package-lock.json
 .claude/settings.local.json
 .test-tmp
+apps/cli/.turbo/*

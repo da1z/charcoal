@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import { GitRepo } from '../../../src/lib/utils/git_repo';
+import type { GitRepo } from './git_repo';
 
 export function fakeGitSquashAndMerge(
   repo: GitRepo,

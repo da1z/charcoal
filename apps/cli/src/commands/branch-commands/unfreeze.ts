@@ -1,4 +1,4 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { unfreezeBranchAction } from '../../actions/unfreeze_branch';
 import { graphite } from '../../lib/runner';
 
@@ -11,7 +11,7 @@ const args = {
     hidden: true,
   },
 } as const;
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
 export const command = 'unfreeze [branch]';
 export const canonical = 'branch unfreeze';

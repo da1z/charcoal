@@ -1,4 +1,4 @@
-import { TContext } from '../lib/context';
+import type { TContext } from '../lib/context';
 import { SCOPE } from '../lib/engine/scope_spec';
 import { ExitFailedError } from '../lib/errors';
 import { newBranchName } from '../lib/utils/branch_name';

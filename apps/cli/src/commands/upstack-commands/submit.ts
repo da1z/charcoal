@@ -1,7 +1,7 @@
 import { submitAction } from '../../actions/submit/submit_action';
 import { SCOPE } from '../../lib/engine/scope_spec';
 import { graphite } from '../../lib/runner';
-import { argsT } from '../shared-commands/submit';
+import type { argsT } from '../shared-commands/submit';
 
 export { aliases, args, builder, command } from '../shared-commands/submit';
 export const description =

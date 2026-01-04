@@ -1,8 +1,8 @@
 import { execSync } from 'child_process';
-import fs from 'fs-extra';
+import fs from 'node:fs';
 import tmp from 'tmp';
 import { cuteString } from '../../../src/lib/utils/cute_string';
-import { GitRepo } from '../../../src/lib/utils/git_repo';
+import { GitRepo } from '../utils/git_repo';
 import { AbstractScene } from './abstract_scene';
 
 export class PublicRepoScene extends AbstractScene {
@@ -20,7 +20,7 @@ export class PublicRepoScene extends AbstractScene {
   public toString(): string {
     return this.name;
   }
-  public setup(): void {
+  public override setup(): void {
     this.tmpDir = tmp.dirSync();
     this.dir = this.tmpDir.name;
     this.repo = new GitRepo(this.dir, { repoUrl: this.repoUrl });

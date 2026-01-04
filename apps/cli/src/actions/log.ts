@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import stripAnsi from 'strip-ansi';
 import { GRAPHITE_COLORS } from '../lib/colors';
-import { TContext } from '../lib/context';
+import type { TContext } from '../lib/context';
 import { clearPromptResultLine, suggest } from '../lib/utils/prompts_helpers';
 import { getBranchInfo } from './show_branch';
 

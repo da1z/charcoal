@@ -1,10 +1,10 @@
-import { expect } from 'chai';
+import { describe, it, expect } from 'bun:test';
 import { allScenes } from '../../lib/scenes/all_scenes';
 import { configureTest } from '../../lib/utils/configure_test';
 
 for (const scene of allScenes) {
-  describe(`(${scene}): branch track`, function () {
-    configureTest(this, scene);
+  describe(`(${scene}): branch track`, () => {
+    configureTest(scene);
     it('can force track a series of 3 branches', () => {
       // Create our branch
       scene.repo.createAndCheckoutBranch('a');
@@ -16,22 +16,22 @@ for (const scene of allScenes) {
 
       expect(() => {
         scene.repo.runCliCommand(['downstack', 'track', '-f']);
-      }).not.to.throw();
+      }).not.toThrow();
 
       expect(() => {
         scene.repo.runCliCommand([`branch`, `down`]);
-      }).not.to.throw();
-      expect(scene.repo.currentBranchName()).to.eq('b');
+      }).not.toThrow();
+      expect(scene.repo.currentBranchName()).toBe('b');
 
       expect(() => {
         scene.repo.runCliCommand([`branch`, `down`]);
-      }).not.to.throw();
-      expect(scene.repo.currentBranchName()).to.eq('a');
+      }).not.toThrow();
+      expect(scene.repo.currentBranchName()).toBe('a');
 
       expect(() => {
         scene.repo.runCliCommand([`branch`, `down`]);
-      }).not.to.throw();
-      expect(scene.repo.currentBranchName()).to.eq('main');
+      }).not.toThrow();
+      expect(scene.repo.currentBranchName()).toBe('main');
     });
 
     it('can force track a series of 3 branches from main', () => {
@@ -46,22 +46,22 @@ for (const scene of allScenes) {
 
       expect(() => {
         scene.repo.runCliCommand(['downstack', 'track', '-f', 'c']);
-      }).not.to.throw();
+      }).not.toThrow();
 
       expect(() => {
         scene.repo.runCliCommand([`branch`, `up`]);
-      }).not.to.throw();
-      expect(scene.repo.currentBranchName()).to.eq('a');
+      }).not.toThrow();
+      expect(scene.repo.currentBranchName()).toBe('a');
 
       expect(() => {
         scene.repo.runCliCommand([`branch`, `up`]);
-      }).not.to.throw();
-      expect(scene.repo.currentBranchName()).to.eq('b');
+      }).not.toThrow();
+      expect(scene.repo.currentBranchName()).toBe('b');
 
       expect(() => {
         scene.repo.runCliCommand([`branch`, `up`]);
-      }).not.to.throw();
-      expect(scene.repo.currentBranchName()).to.eq('c');
+      }).not.toThrow();
+      expect(scene.repo.currentBranchName()).toBe('c');
     });
   });
 }

@@ -4,27 +4,27 @@ import {
   NoBranchError,
   PreconditionsFailedError,
 } from '../errors';
-import { TCommitOpts } from '../git/commit';
-import { TCommitFormat } from '../git/commit_range';
-import { TGit } from '../git/git';
+import type { TCommitOpts } from '../git/commit';
+import type { TCommitFormat } from '../git/commit_range';
+import type { TGit } from '../git/git';
 import { cuteString } from '../utils/cute_string';
-import { TSplog } from '../utils/splog';
+import type { TSplog } from '../utils/splog';
+import type { TValidCachedMetaExceptTrunk } from './cached_meta';
 import {
   assertCachedMetaIsNotTrunk,
   assertCachedMetaIsValidAndNotTrunk,
   assertCachedMetaIsValidOrTrunk,
-  TValidCachedMetaExceptTrunk,
 } from './cached_meta';
 import { composeCacheLoader } from './cache_loader';
-import { TChangedFile, TStatusFile } from '../git/changed_files';
+import type { TChangedFile, TStatusFile } from '../git/changed_files';
+import type { TBranchPRInfo } from './metadata_ref';
 import {
   deleteMetadataRef,
   getMetadataRefList,
-  TBranchPRInfo,
   writeMetadataRef,
 } from './metadata_ref';
 import { validateOrFixParentBranchRevision } from './parse_branches_and_meta';
-import { TScopeSpec } from './scope_spec';
+import type { TScopeSpec } from './scope_spec';
 import fjsh from 'fast-json-stable-hash';
 
 export type TEngine = {

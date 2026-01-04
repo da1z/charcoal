@@ -1,6 +1,6 @@
-import { TContext } from '../lib/context';
+import type { TContext } from '../lib/context';
 import { SCOPE } from '../lib/engine/scope_spec';
-import { TCommitOpts } from '../lib/git/commit';
+import type { TCommitOpts } from '../lib/git/commit';
 import { restackBranches } from './restack';
 
 export function squashCurrentBranch(

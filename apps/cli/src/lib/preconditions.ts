@@ -1,4 +1,4 @@
-import { TContext } from './context';
+import type { TContext } from './context';
 import { PreconditionsFailedError } from './errors';
 import { detectStagedChanges } from './git/diff';
 import {

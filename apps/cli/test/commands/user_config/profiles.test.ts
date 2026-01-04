@@ -1,10 +1,9 @@
-import { expect } from 'chai';
+import { beforeEach, afterEach, describe, it, expect } from 'bun:test';
+import fs from 'node:fs';
 import tmp from 'tmp';
-import * as fs from 'fs-extra';
-import {
-  TProfile,
-  userConfigFactory,
-} from '../../../src/lib/spiffy/user_config_spf';
+import { emptyDirSync, removeSync } from '../../../src/lib/utils/fs_utils';
+import type { TProfile } from '../../../src/lib/spiffy/user_config_spf';
+import { userConfigFactory } from '../../../src/lib/spiffy/user_config_spf';
 
 // Test cases for userConfigFactory with a focus on the profile helper functions.
 describe('userConfigFactory', () => {
@@ -20,8 +19,8 @@ describe('userConfigFactory', () => {
 
   afterEach(() => {
     Object.assign(process.env, originalEnv);
-    fs.removeSync(configPath);
-    fs.emptyDirSync(tmpDir.name);
+    removeSync(configPath);
+    emptyDirSync(tmpDir.name);
     tmpDir.removeCallback();
   });
 
@@ -73,8 +72,8 @@ describe('userConfigFactory', () => {
       Object.assign(process.env, { ...originalEnv, ...data.envVars });
       fs.writeFileSync(configPath, JSON.stringify(data.profile));
       const userConfig = userConfigFactory.load(configPath);
-      expect(userConfig.getApiServerUrl()).to.equal(data.results.apiServer);
-      expect(userConfig.getAppServerUrl()).to.equal(data.results.appServer);
+      expect(userConfig.getApiServerUrl()).toBe(data.results.apiServer);
+      expect(userConfig.getAppServerUrl()).toBe(data.results.appServer);
     });
   });
 });

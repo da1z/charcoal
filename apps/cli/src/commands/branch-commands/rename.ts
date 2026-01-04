@@ -1,4 +1,4 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { renameCurrentBranch } from '../../actions/rename_branch';
 import { ExitFailedError } from '../../lib/errors';
 import { graphite } from '../../lib/runner';
@@ -19,7 +19,7 @@ const args = {
     default: false,
   },
 } as const;
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
 export const command = 'rename [name]';
 export const aliases = ['rn'];

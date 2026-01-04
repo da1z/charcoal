@@ -1,8 +1,8 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import chalk from 'chalk';
 import { execFileSync } from 'child_process';
 import { graphite } from '../../lib/runner';
-import { TContext } from '../../lib/context';
+import type { TContext } from '../../lib/context';
 import { SCOPE } from '../../lib/engine/scope_spec';
 import { KilledError, PreconditionsFailedError } from '../../lib/errors';
 import { syncAction } from '../../actions/sync/sync';
@@ -33,7 +33,7 @@ const args = {
   },
 } as const;
 
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
 export const aliases = ['m'];
 export const command = 'merge';

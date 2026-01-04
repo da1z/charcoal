@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { describe, it, expect } from 'bun:test';
 import {
   readMetadataRef,
   writeMetadataRef,
@@ -7,11 +7,11 @@ import { allScenes } from '../../lib/scenes/all_scenes';
 import { configureTest } from '../../lib/utils/configure_test';
 
 for (const scene of allScenes) {
-  describe(`(${scene}): stack merge`, function () {
-    configureTest(this, scene);
+  describe(`(${scene}): stack merge`, () => {
+    configureTest(scene);
 
     it('Fails when run from trunk', () => {
-      expect(() => scene.repo.runCliCommand([`stack`, `merge`])).to.throw(
+      expect(() => scene.repo.runCliCommand([`stack`, `merge`])).toThrow(
         /Cannot merge stack from trunk/
       );
     });
@@ -20,7 +20,7 @@ for (const scene of allScenes) {
       scene.repo.createChange('2', 'a');
       scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `2`]);
 
-      expect(() => scene.repo.runCliCommand([`stack`, `merge`])).to.throw(
+      expect(() => scene.repo.runCliCommand([`stack`, `merge`])).toThrow(
         /does not have an associated PR/
       );
     });
@@ -41,7 +41,7 @@ for (const scene of allScenes) {
 
       expect(() =>
         scene.repo.runCliCommand([`stack`, `merge`, `--until`, `nonexistent`])
-      ).to.throw(/is not in the current stack/);
+      ).toThrow(/is not in the current stack/);
     });
 
     it('Stops at frozen branch with warning', () => {
@@ -80,7 +80,7 @@ for (const scene of allScenes) {
         `merge`,
         `--dry-run`,
       ]);
-      expect(output).to.include('Stopped at frozen branch');
+      expect(output).toContain('Stopped at frozen branch');
     });
 
     it('Dry run shows PRs that would be merged', () => {
@@ -115,9 +115,9 @@ for (const scene of allScenes) {
         `--dry-run`,
       ]);
 
-      expect(output).to.include('Would merge the following PRs');
-      expect(output).to.include('PR #101');
-      expect(output).to.include('PR #102');
+      expect(output).toContain('Would merge the following PRs');
+      expect(output).toContain('PR #101');
+      expect(output).toContain('PR #102');
     });
 
     it('Dry run with --until only shows PRs up to that branch', () => {
@@ -166,10 +166,10 @@ for (const scene of allScenes) {
         `b`,
       ]);
 
-      expect(output).to.include('Would merge the following PRs');
-      expect(output).to.include('PR #101');
-      expect(output).to.include('PR #102');
-      expect(output).to.not.include('PR #103');
+      expect(output).toContain('Would merge the following PRs');
+      expect(output).toContain('PR #101');
+      expect(output).toContain('PR #102');
+      expect(output).not.toContain('PR #103');
     });
 
     it('Skips already merged PRs in dry run', () => {
@@ -204,9 +204,9 @@ for (const scene of allScenes) {
         `--dry-run`,
       ]);
 
-      expect(output).to.include('Would merge the following PRs');
-      expect(output).to.not.include('PR #101');
-      expect(output).to.include('PR #102');
+      expect(output).toContain('Would merge the following PRs');
+      expect(output).not.toContain('PR #101');
+      expect(output).toContain('PR #102');
     });
 
     it('Reports when all PRs are already merged', () => {
@@ -229,7 +229,7 @@ for (const scene of allScenes) {
         `--dry-run`,
       ]);
 
-      expect(output).to.include('All PRs in the stack are already merged');
+      expect(output).toContain('All PRs in the stack are already merged');
     });
 
     it('Works with the m alias', () => {
@@ -252,7 +252,7 @@ for (const scene of allScenes) {
         `--dry-run`,
       ]);
 
-      expect(output).to.include('Would merge the following PRs');
+      expect(output).toContain('Would merge the following PRs');
     });
   });
 }

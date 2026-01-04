@@ -1,24 +1,26 @@
-import fs from 'fs-extra';
+import fs from 'node:fs';
 import path from 'path';
 import tmp from 'tmp';
-import {
-  initContext,
-  initContextLite,
-  TContext,
-} from '../../../src/lib/context';
+import type { TContext } from '../../../src/lib/context';
+import { initContext, initContextLite } from '../../../src/lib/context';
 import { composeGit } from '../../../src/lib/git/git';
 import { cuteString } from '../../../src/lib/utils/cute_string';
-import { GitRepo } from '../../../src/lib/utils/git_repo';
+import {
+  emptyDirSync,
+  ensureDirSync,
+  removeSync,
+} from '../../../src/lib/utils/fs_utils';
+import { GitRepo } from '../utils/git_repo';
 
 function createTmpDir(): tmp.DirResult {
   const baseDir = process.env.PK_TEST_DIR;
   if (baseDir) {
     const absoluteDir = path.resolve(baseDir);
-    fs.ensureDirSync(absoluteDir);
+    ensureDirSync(absoluteDir);
     const name = fs.mkdtempSync(path.join(absoluteDir, 'tmp-'));
     return {
       name,
-      removeCallback: () => fs.removeSync(name),
+      removeCallback: () => removeSync(name),
     };
   }
   return tmp.dirSync();
@@ -58,7 +60,7 @@ export abstract class AbstractScene {
   public cleanup(): void {
     process.chdir(this.oldDir);
     if (!process.env.DEBUG) {
-      fs.emptyDirSync(this.dir);
+      emptyDirSync(this.dir);
       this.tmpDir.removeCallback();
     }
   }

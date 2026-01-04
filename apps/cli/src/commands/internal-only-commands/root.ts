@@ -1,5 +1,5 @@
 import path from 'path';
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import {
   currentGitRepoPrecondition,
   getRepoRootPathPrecondition,
@@ -19,7 +19,7 @@ export const canonical = 'internal-only root';
 export const description = false;
 export const builder = args;
 
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 export const handler = async (argv: argsT): Promise<void> => {
   return graphite(argv, canonical, async (context) => {
     const root = argv.dotdir

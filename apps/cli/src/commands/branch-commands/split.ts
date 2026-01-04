@@ -1,4 +1,4 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { splitCurrentBranch } from '../../actions/split';
 import { graphite } from '../../lib/runner';
 
@@ -18,7 +18,7 @@ const args = {
     alias: ['h', 'hunk'],
   },
 } as const;
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
 export const command = 'split';
 export const canonical = 'branch split';

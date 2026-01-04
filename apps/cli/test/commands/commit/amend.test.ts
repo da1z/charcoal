@@ -1,11 +1,11 @@
-import { expect } from 'chai';
+import { describe, it, expect } from 'bun:test';
 import { allScenes } from '../../lib/scenes/all_scenes';
 import { configureTest } from '../../lib/utils/configure_test';
 import { expectCommits } from '../../lib/utils/expect_commits';
 
 for (const scene of allScenes) {
-  describe(`(${scene}): commit amend`, function () {
-    configureTest(this, scene);
+  describe(`(${scene}): commit amend`, () => {
+    configureTest(scene);
 
     it('Can amend a commit', () => {
       scene.repo.createChange('2');
@@ -51,8 +51,8 @@ for (const scene of allScenes) {
       scene.repo.createChange(`Hello world! ${lorem}`);
       expect(() =>
         scene.repo.runCliCommand([`commit`, `amend`, `-m`, `a1`])
-      ).to.throw();
-      expect(scene.repo.rebaseInProgress()).to.be.true;
+      ).toThrow();
+      expect(scene.repo.rebaseInProgress()).toBe(true);
 
       scene.repo.resolveMergeConflicts();
       scene.repo.markMergeConflictsAsResolved();
@@ -87,10 +87,10 @@ for (const scene of allScenes) {
 
     it('Cannot amend an empty commit', () => {
       scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `a`]);
-      expect(scene.repo.currentBranchName()).to.equal('a');
+      expect(scene.repo.currentBranchName()).toBe('a');
       expect(() =>
         scene.repo.runCliCommand([`commit`, `amend`, `-m`, `b`])
-      ).to.throw();
+      ).toThrow();
     });
   });
 }

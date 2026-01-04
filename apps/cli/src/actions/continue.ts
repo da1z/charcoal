@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { TContext } from '../lib/context';
+import type { TContext } from '../lib/context';
 import { NoGraphiteContinue, RebaseConflictError } from '../lib/errors';
 import { clearContinuation, persistContinuation } from './persist_continuation';
 import { printConflictStatus } from './print_conflict_status';

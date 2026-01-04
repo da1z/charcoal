@@ -1,6 +1,6 @@
 import chalk from 'chalk';
-import { TContext } from '../lib/context';
-import { TBranchPRInfo } from '../lib/engine/metadata_ref';
+import type { TContext } from '../lib/context';
+import type { TBranchPRInfo } from '../lib/engine/metadata_ref';
 
 export async function showBranchInfo(
   branchName: string,

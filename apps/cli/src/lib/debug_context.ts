@@ -1,11 +1,11 @@
-import fs from 'fs-extra';
+import fs from 'node:fs';
 import path from 'path';
 import tmp from 'tmp';
-import { TContext } from './context';
+import type { TContext } from './context';
+import type { TMeta } from './engine/metadata_ref';
 import {
   getMetadataRefList,
   readMetadataRef,
-  TMeta,
   writeMetadataRef,
 } from './engine/metadata_ref';
 import {
@@ -17,10 +17,10 @@ import { getCommitTree } from './git/commit_tree';
 import { getShaOrThrow } from './git/get_sha';
 import { runGitCommand } from './git/runner';
 import { getBranchNamesAndRevisions } from './git/sorted_branch_names';
-import { TRepoConfig } from './spiffy/repo_config_spf';
-import { TUserConfig } from './spiffy/user_config_spf';
+import type { TRepoConfig } from './spiffy/repo_config_spf';
+import type { TUserConfig } from './spiffy/user_config_spf';
 import { cuteString } from './utils/cute_string';
-import { TSplog } from './utils/splog';
+import type { TSplog } from './utils/splog';
 
 type TState = {
   commitTree: Record<string, string[]>;

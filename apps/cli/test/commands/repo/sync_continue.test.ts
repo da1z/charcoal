@@ -1,7 +1,4 @@
-import { API_ROUTES } from '@withgraphite/graphite-cli-routes';
-import { expect } from 'chai';
-import nock from 'nock';
-import { DEFAULT_GRAPHITE_API_SERVER } from '../../../src/lib/spiffy/user_config_spf';
+import { describe, it, expect, beforeEach } from 'bun:test';
 import { allScenes } from '../../lib/scenes/all_scenes';
 import { configureTest } from '../../lib/utils/configure_test';
 import { expectBranches } from '../../lib/utils/expect_branches';
@@ -9,21 +6,14 @@ import { fakeGitSquashAndMerge } from '../../lib/utils/fake_squash_and_merge';
 
 for (const scene of allScenes) {
   // eslint-disable-next-line max-lines-per-function
-  describe(`(${scene}): repo sync continue`, function () {
-    configureTest(this, scene);
+  describe(`(${scene}): repo sync continue`, () => {
+    configureTest(scene);
 
     beforeEach(() => {
-      // We need to stub out the endpoint that sends back information on
-      // the GitHub PRs associated with each branch.
-      nock(DEFAULT_GRAPHITE_API_SERVER)
-        .post(API_ROUTES.pullRequestInfo.url)
-        .reply(200, {
-          prs: [],
-        });
-
-      // Querying this endpoint requires a repo owner and name so we set
+      // Querying PR info requires a repo owner and name so we set
       // that here too. Note that these values are meaningless (for now)
       // and just need to exist.
+      // Note: GitHub integration is already disabled by abstract_scene.ts
       scene.repo.runCliCommandAndGetOutput([
         `repo`,
         `owner`,
@@ -36,10 +26,6 @@ for (const scene of allScenes) {
         `-s`,
         `integration_test`,
       ]);
-    });
-
-    afterEach(() => {
-      nock.restore();
     });
 
     it('Can continue a repo sync with one merge conflict', async () => {
@@ -79,8 +65,8 @@ for (const scene of allScenes) {
           `--no-pull`,
           `--restack`,
         ])
-      ).to.throw();
-      expect(scene.repo.rebaseInProgress()).to.be.true;
+      ).toThrow();
+      expect(scene.repo.rebaseInProgress()).toBe(true);
 
       scene.repo.resolveMergeConflicts();
       scene.repo.markMergeConflictsAsResolved();
@@ -127,14 +113,14 @@ for (const scene of allScenes) {
           `--no-pull`,
           `--restack`,
         ])
-      ).to.throw();
-      expect(scene.repo.rebaseInProgress()).to.be.true;
+      ).toThrow();
+      expect(scene.repo.rebaseInProgress()).toBe(true);
 
       scene.repo.resolveMergeConflicts();
       scene.repo.markMergeConflictsAsResolved();
 
-      expect(() => scene.repo.runCliCommand(['continue'])).to.throw();
-      expect(scene.repo.rebaseInProgress()).to.be.true;
+      expect(() => scene.repo.runCliCommand(['continue'])).toThrow();
+      expect(scene.repo.rebaseInProgress()).toBe(true);
 
       scene.repo.resolveMergeConflicts();
       scene.repo.markMergeConflictsAsResolved();

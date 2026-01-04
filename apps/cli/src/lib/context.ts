@@ -1,24 +1,23 @@
-import { composeEngine, TEngine } from './engine/engine';
-import { TGit } from './git/git';
+import type { TEngine } from './engine/engine';
+import { composeEngine } from './engine/engine';
+import type { TGit } from './git/git';
 import { rebaseInProgress } from './git/rebase_in_progress';
-import {
-  continueConfigFactory,
-  TContinueConfig,
-} from './spiffy/continuation_spf';
+import type { TContinueConfig } from './spiffy/continuation_spf';
+import { continueConfigFactory } from './spiffy/continuation_spf';
 import { prInfoConfigFactory } from './spiffy/pr_info_spf';
-import { repoConfigFactory, TRepoConfig } from './spiffy/repo_config_spf';
-import {
-  surveyConfigFactory,
-  TSurveyConfig,
-} from './spiffy/survey_responses_spf';
-import {
-  messageConfigFactory,
-  TMessageConfig,
-} from './spiffy/upgrade_message_spf';
-import { TUserConfig, userConfigFactory } from './spiffy/user_config_spf';
-import { composeSplog, TSplog } from './utils/splog';
+import type { TRepoConfig } from './spiffy/repo_config_spf';
+import { repoConfigFactory } from './spiffy/repo_config_spf';
+import type { TSurveyConfig } from './spiffy/survey_responses_spf';
+import { surveyConfigFactory } from './spiffy/survey_responses_spf';
+import type { TMessageConfig } from './spiffy/upgrade_message_spf';
+import { messageConfigFactory } from './spiffy/upgrade_message_spf';
+import type { TUserConfig } from './spiffy/user_config_spf';
+import { userConfigFactory } from './spiffy/user_config_spf';
+import type { TSplog } from './utils/splog';
+import { composeSplog } from './utils/splog';
 import { NonInteractiveError } from './errors';
-import { gtPrompts, TPrompts } from './utils/prompts_helpers';
+import type { TPrompts } from './utils/prompts_helpers';
+import { gtPrompts } from './utils/prompts_helpers';
 
 export const USER_CONFIG_OVERRIDE_ENV = 'GRAPHITE_USER_CONFIG_PATH' as const;
 

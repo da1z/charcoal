@@ -1,29 +1,30 @@
 {
   "private": true,
   "name": "pancake",
-  "workspaces": {
-    "packages": [
-      "./apps/cli",
-      "./libs/gti-cli-shared-types"
-    ]
+  "packageManager": "bun@1.3.4",
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "check": "turbo check",
+    "test": "turbo test",
+    "test-ci": "turbo test-ci",
+    "test-one": "bun run --filter @da1z/pancake test-one",
+    "cli": "bun run --filter @da1z/pancake cli",
+    "dev": "bun run --filter @da1z/pancake dev"
   },
-  "packageManager": "yarn@3.3.1",
   "devDependencies": {
+    "@total-typescript/tsconfig": "^1.0.4",
     "@typescript-eslint/eslint-plugin": "^5.47.0",
     "@typescript-eslint/parser": "^5.47.0",
-    "@yarnpkg/sdks": "^3.0.0-rc.34",
     "eslint": "^8.30.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "3.6.1",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-simple-import-sort": "^8.0.0",
-    "husky": "^8.0.1",
-    "nyc": "^15.1.0",
     "prettier": "^2.8.1",
-    "pretty-quick": "^3.1.3",
-    "ts-mocha": "^10.0.0",
     "turbo": "^2.3.4",
-    "typescript": "^4.9.4"
+    "typescript": "^5.7.0"
   }
 }

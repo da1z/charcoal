@@ -1,4 +1,4 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { untrackBranch } from '../../actions/untrack_branch';
 import { graphite } from '../../lib/runner';
 
@@ -18,7 +18,7 @@ const args = {
     type: 'boolean',
   },
 } as const;
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
 export const command = 'untrack [branch]';
 export const canonical = 'branch untrack';

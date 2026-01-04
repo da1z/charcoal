@@ -1,6 +1,6 @@
-import { ChangedFile, Status } from '@da1z/pancake-shared-types';
-import yargs from 'yargs';
-import { TStatusFile } from '../../lib/git/changed_files';
+import type { ChangedFile, Status } from '../../shared-types';
+import type { Arguments, InferredOptionTypes } from 'yargs';
+import type { TStatusFile } from '../../lib/git/changed_files';
 import { graphite } from '../../lib/runner';
 
 const args = {} as const;
@@ -10,7 +10,7 @@ export const canonical = 'internal-only status';
 export const description = false;
 export const builder = args;
 
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 export const handler = async (argv: argsT): Promise<void> => {
   return graphite(argv, canonical, async (context) => {
     const statusFiles = context.engine.getStatus();

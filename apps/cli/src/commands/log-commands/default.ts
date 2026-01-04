@@ -1,4 +1,4 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { logAction } from '../../actions/log';
 import { graphite } from '../../lib/runner';
 
@@ -36,7 +36,7 @@ export const description =
 export const builder = args;
 export const canonical = 'log';
 
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 export const handler = async (argv: argsT): Promise<void> =>
   graphite(argv, canonical, async (context) =>
     logAction(

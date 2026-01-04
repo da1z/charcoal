@@ -1,18 +1,18 @@
-import { expect } from 'chai';
+import { describe, it, expect } from 'bun:test';
 import { allScenes } from '../../lib/scenes/all_scenes';
 import { configureTest } from '../../lib/utils/configure_test';
 import { expectCommits } from '../../lib/utils/expect_commits';
 
 for (const scene of allScenes) {
-  describe(`(${scene}): commit create`, function () {
-    configureTest(this, scene);
+  describe(`(${scene}): commit create`, () => {
+    configureTest(scene);
 
     it('Can create a commit', () => {
       scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `a`]);
       scene.repo.createChange('2');
       scene.repo.runCliCommand([`commit`, `create`, `-m`, `2`]);
 
-      expect(scene.repo.currentBranchName()).to.equal('a');
+      expect(scene.repo.currentBranchName()).toBe('a');
       expectCommits(scene.repo, '2, 1');
     });
 
@@ -21,7 +21,7 @@ for (const scene of allScenes) {
       scene.repo.createChange('2');
       scene.repo.runCliCommand([`commit`, `create`, `-m`, `a b c`]);
 
-      expect(scene.repo.currentBranchName()).to.equal('a');
+      expect(scene.repo.currentBranchName()).toBe('a');
       expectCommits(scene.repo, 'a b c');
     });
 
@@ -30,7 +30,7 @@ for (const scene of allScenes) {
 
       expect(() =>
         scene.repo.runCliCommand([`commit`, `create`, `-m`, `a`])
-      ).to.throw(Error);
+      ).toThrow(Error);
     });
 
     it('Automatically restacks upwards', () => {

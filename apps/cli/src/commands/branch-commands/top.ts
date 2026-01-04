@@ -1,10 +1,10 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { switchBranchAction } from '../../actions/branch_traversal';
 import { graphite } from '../../lib/runner';
 
 const args = {} as const;
 
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
 export const command = 'top';
 export const canonical = 'branch top';

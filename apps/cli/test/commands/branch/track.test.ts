@@ -1,12 +1,12 @@
-import { expect } from 'chai';
+import { describe, it, expect } from 'bun:test';
 import { allScenes } from '../../lib/scenes/all_scenes';
 import { configureTest } from '../../lib/utils/configure_test';
 import { expectCommits } from '../../lib/utils/expect_commits';
 
 for (const scene of allScenes) {
   // eslint-disable-next-line max-lines-per-function
-  describe(`(${scene}): branch track`, function () {
-    configureTest(this, scene);
+  describe(`(${scene}): branch track`, () => {
+    configureTest(scene);
     it('Can track and restack the current branch if previously untracked', () => {
       // Create our dangling branch
       scene.repo.createAndCheckoutBranch('a');
@@ -22,7 +22,7 @@ for (const scene of allScenes) {
       scene.repo.checkoutBranch('a');
       expect(() => {
         scene.repo.runCliCommand([`branch`, `track`, `-p`, `main`]);
-      }).to.not.throw();
+      }).not.toThrow();
 
       expectCommits(scene.repo, 'a3, a2, a1, 1');
 
@@ -32,7 +32,7 @@ for (const scene of allScenes) {
 
       // Prove that we have meta now.
       scene.repo.runCliCommand([`branch`, `down`]);
-      expect(scene.repo.currentBranchName()).to.eq('main');
+      expect(scene.repo.currentBranchName()).toBe('main');
     });
     it('Can track a branch, and then insert a branch before and track both as a stack', () => {
       // Create our branch
@@ -42,38 +42,38 @@ for (const scene of allScenes) {
 
       expect(() => {
         scene.repo.runCliCommand([`branch`, `track`, `-p`, `main`]);
-      }).to.not.throw();
+      }).not.toThrow();
 
       expectCommits(scene.repo, 'b, a, 1');
 
       // Prove that we have meta now.
       scene.repo.runCliCommand([`branch`, `down`]);
-      expect(scene.repo.currentBranchName()).to.eq('main');
+      expect(scene.repo.currentBranchName()).toBe('main');
 
       scene.repo.runGitCommand([`branch`, `a`, `b~`]);
       scene.repo.checkoutBranch('a');
 
       expect(() => {
         scene.repo.runCliCommand([`branch`, `track`, `-p`, `main`]);
-      }).to.not.throw();
+      }).not.toThrow();
 
       expectCommits(scene.repo, 'a, 1');
 
       // Prove that we have meta now.
       scene.repo.runCliCommand([`branch`, `down`]);
-      expect(scene.repo.currentBranchName()).to.eq('main');
+      expect(scene.repo.currentBranchName()).toBe('main');
 
       scene.repo.checkoutBranch('b');
 
       expect(() => {
         scene.repo.runCliCommand([`branch`, `track`, `-p`, `a`]);
-      }).to.not.throw();
+      }).not.toThrow();
 
       expectCommits(scene.repo, 'b, a, 1');
 
       // Prove that meta is correctly updated.
       scene.repo.runCliCommand([`branch`, `down`]);
-      expect(scene.repo.currentBranchName()).to.eq('a');
+      expect(scene.repo.currentBranchName()).toBe('a');
     });
     it('Needs a rebase to track a branch that is created and whose parent is amended', () => {
       // Create our branch
@@ -87,26 +87,26 @@ for (const scene of allScenes) {
 
       expect(() => {
         scene.repo.runCliCommand([`branch`, `track`, `-p`, `main`]);
-      }).not.to.throw();
+      }).not.toThrow();
 
       scene.repo.createChangeAndAmend('a1', 'a1');
       scene.repo.checkoutBranch('b');
 
       expect(() => {
         scene.repo.runCliCommand([`branch`, `track`, `-p`, `a`]);
-      }).to.throw();
+      }).toThrow();
 
       scene.repo.runGitCommand(['rebase', 'a']);
 
       expect(() => {
         scene.repo.runCliCommand([`branch`, `track`, `-p`, `a`]);
-      }).to.not.throw();
+      }).not.toThrow();
 
       expectCommits(scene.repo, 'b, a, 1');
 
       // Prove that we have meta now.
       scene.repo.runCliCommand([`branch`, `down`]);
-      expect(scene.repo.currentBranchName()).to.eq('a');
+      expect(scene.repo.currentBranchName()).toBe('a');
     });
 
     it('Tracks the most recent ancestor when `--force` is passed in', () => {
@@ -119,12 +119,12 @@ for (const scene of allScenes) {
 
       expect(() => {
         scene.repo.runCliCommand([`branch`, `track`, `-f`]);
-      }).not.to.throw();
+      }).not.toThrow();
 
       expect(() => {
         scene.repo.runCliCommand([`branch`, `down`]);
-      }).not.to.throw();
-      expect(scene.repo.currentBranchName()).to.eq('main');
+      }).not.toThrow();
+      expect(scene.repo.currentBranchName()).toBe('main');
 
       scene.repo.runCliCommand([`branch`, `up`]);
       scene.repo.createAndCheckoutBranch('b');
@@ -133,12 +133,12 @@ for (const scene of allScenes) {
 
       expect(() => {
         scene.repo.runCliCommand([`branch`, `track`, `-f`]);
-      }).not.to.throw();
+      }).not.toThrow();
 
       expect(() => {
         scene.repo.runCliCommand([`branch`, `down`]);
-      }).not.to.throw();
-      expect(scene.repo.currentBranchName()).to.eq('a');
+      }).not.toThrow();
+      expect(scene.repo.currentBranchName()).toBe('a');
     });
   });
 }

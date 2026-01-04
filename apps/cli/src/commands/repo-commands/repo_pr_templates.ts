@@ -1,10 +1,10 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { graphite } from '../../lib/runner';
 import { getPRTemplateFilepaths } from '../../lib/utils/pr_templates';
 
 const args = {} as const;
 
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
 export const command = 'pr-templates';
 export const canonical = 'repo pr-templates';

@@ -1,4 +1,4 @@
-import { TContext, TContextLite } from '../context';
+import type { TContext, TContextLite } from '../context';
 
 // 255 minus 21 (for 'refs/branch-metadata/')
 const MAX_BRANCH_NAME_BYTE_LENGTH = 234;

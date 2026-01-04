@@ -1,4 +1,4 @@
-import { TContext } from '../../lib/context';
+import type { TContext } from '../../lib/context';
 import { SCOPE } from '../../lib/engine/scope_spec';
 import { performInTmpDir } from '../../lib/utils/perform_in_tmp_dir';
 import { restackBranches } from '../restack';

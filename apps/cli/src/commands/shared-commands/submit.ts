@@ -1,4 +1,4 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 
 export const command = 'submit';
 
@@ -102,4 +102,4 @@ export const args = {
 
 export const builder = args;
 export const aliases = ['s'];
-export type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+export type argsT = Arguments<InferredOptionTypes<typeof args>>;

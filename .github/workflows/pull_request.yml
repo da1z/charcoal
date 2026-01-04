@@ -14,21 +14,20 @@ jobs:
     name: 'Run CLI tests'
     runs-on: ubuntu-latest
     steps:
-      # Basic setup
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           clean: 'false'
           fetch-depth: 0
-      - uses: actions/setup-node@v3
+      - uses: oven-sh/setup-bun@v2
       - name: Install
-        run: yarn install --immutable
+        run: bun install --frozen-lockfile
       - name: Lint
-        run: yarn workspace @da1z/pancake run lint
+        run: bun run lint
       - name: Build
-        run: yarn turbo run build
+        run: bun run build
       - name: Setup git
         run: git config --global user.email "test@gmail.com" && git config --global user.name "test"
       - name: Git Version
         run: git --version
       - name: Test
-        run: yarn workspace @da1z/pancake run test-ci
+        run: bun run test-ci

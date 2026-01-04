@@ -1,12 +1,9 @@
-import { API_ROUTES } from '@withgraphite/graphite-cli-routes';
-import { expect } from 'chai';
-import fs from 'fs-extra';
-import nock from 'nock';
+import { describe, it, expect, beforeEach } from 'bun:test';
+import fs from 'node:fs';
 import {
   readMetadataRef,
   writeMetadataRef,
 } from '../../../src/lib/engine/metadata_ref';
-import { DEFAULT_GRAPHITE_API_SERVER } from '../../../src/lib/spiffy/user_config_spf';
 import { allScenes } from '../../lib/scenes/all_scenes';
 import { configureTest } from '../../lib/utils/configure_test';
 import { expectBranches } from '../../lib/utils/expect_branches';
@@ -15,28 +12,16 @@ import { fakeGitSquashAndMerge } from '../../lib/utils/fake_squash_and_merge';
 
 for (const scene of allScenes) {
   // eslint-disable-next-line max-lines-per-function
-  describe(`(${scene}): repo sync`, function () {
-    configureTest(this, scene);
+  describe(`(${scene}): repo sync`, () => {
+    configureTest(scene);
 
     beforeEach(() => {
-      // We need to stub out the endpoint that sends back information on
-      // the GitHub PRs associated with each branch.
-      nock(DEFAULT_GRAPHITE_API_SERVER)
-        .post(API_ROUTES.pullRequestInfo.url)
-        .reply(200, {
-          prs: [],
-        });
-
-      // Querying this endpoint requires a repo owner and name so we set
+      // Querying PR info requires a repo owner and name so we set
       // that here too. Note that these values are meaningless (for now)
       // and just need to exist.
-
+      // Note: GitHub integration is already disabled by abstract_scene.ts
       scene.repo.runCliCommand([`repo`, `owner`, `-s`, `integration_test`]);
       scene.repo.runCliCommand([`repo`, `name`, `-s`, `integration-test-repo`]);
-    });
-
-    afterEach(() => {
-      nock.restore();
     });
 
     it('Can delete a single merged branch', async () => {
@@ -90,7 +75,7 @@ for (const scene of allScenes) {
     it('Can noop sync if there are no stacks', () => {
       expect(() =>
         scene.repo.runCliCommand([`repo`, `sync`, `-f`, `--no-pull`])
-      ).to.not.throw(Error);
+      ).not.toThrow();
     });
 
     it('Can delete the foundation of a double stack and restack it', async () => {
@@ -162,9 +147,9 @@ for (const scene of allScenes) {
         `${scene.repo.dir}/.git/refs/branch-metadata`
       );
 
-      expect(metadata.includes('a')).to.be.false;
-      expect(metadata.includes('b')).to.be.false;
-      expect(metadata.includes('c')).to.be.true;
+      expect(metadata.includes('a')).toBe(false);
+      expect(metadata.includes('b')).toBe(false);
+      expect(metadata.includes('c')).toBe(true);
     });
   });
 }

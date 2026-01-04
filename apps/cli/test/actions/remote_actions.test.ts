@@ -1,21 +1,18 @@
-import { expect, use } from 'chai';
+import { describe, it, expect } from 'bun:test';
 import { syncAction } from '../../src/actions/sync/sync';
 import { composeGit } from '../../src/lib/git/git';
 import { CloneScene } from '../lib/scenes/clone_scene';
 import { configureTest } from '../lib/utils/configure_test';
-import chaiAsPromised from 'chai-as-promised';
-
-use(chaiAsPromised);
 
 for (const scene of [new CloneScene()]) {
   // eslint-disable-next-line max-lines-per-function
   describe('handle remote actions properly (sync/submit)', function () {
-    configureTest(this, scene);
+    configureTest(scene);
 
     it('can push a branch to remote', async () => {
       scene.repo.createChange('1');
       scene.repo.runCliCommand([`branch`, `create`, `1`, `-am`, `1`]);
-      expect(scene.repo.currentBranchName()).to.equal('1');
+      expect(scene.repo.currentBranchName()).toBe('1');
 
       composeGit().pushBranch({
         remote: 'origin',
@@ -24,7 +21,7 @@ for (const scene of [new CloneScene()]) {
         forcePush: false,
       });
 
-      expect(scene.repo.getRef('refs/heads/1')).to.equal(
+      expect(scene.repo.getRef('refs/heads/1')).toBe(
         scene.originRepo.getRef('refs/heads/1')
       );
     });
@@ -32,11 +29,11 @@ for (const scene of [new CloneScene()]) {
     it('fails to push to a branch with external commits', () => {
       scene.repo.createChange('1');
       scene.repo.runCliCommand([`branch`, `create`, `1`, `-am`, `1`]);
-      expect(scene.repo.currentBranchName()).to.equal('1');
+      expect(scene.repo.currentBranchName()).toBe('1');
 
       scene.originRepo.createChange('2');
       scene.originRepo.runCliCommand([`branch`, `create`, `1`, `-am`, `1`]);
-      expect(scene.originRepo.getRef('refs/heads/1')).to.not.equal(
+      expect(scene.originRepo.getRef('refs/heads/1')).not.toBe(
         scene.repo.getRef('refs/heads/1')
       );
 
@@ -47,7 +44,7 @@ for (const scene of [new CloneScene()]) {
           noVerify: false,
           forcePush: false,
         })
-      ).to.throw();
+      ).toThrow();
     });
 
     it('can pull trunk from remote', async () => {
@@ -64,7 +61,7 @@ for (const scene of [new CloneScene()]) {
         scene.getContext()
       );
 
-      expect(scene.repo.getRef('refs/heads/main')).to.equal(
+      expect(scene.repo.getRef('refs/heads/main')).toBe(
         scene.originRepo.getRef('refs/heads/main')
       );
     });
@@ -83,7 +80,7 @@ for (const scene of [new CloneScene()]) {
           },
           scene.getContext()
         )
-      ).to.eventually.be.rejectedWith('Killed Pancake early.');
+      ).rejects.toThrow('Killed Pancake early.');
     });
 
     it('can reset trunk from remote', async () => {
@@ -101,7 +98,7 @@ for (const scene of [new CloneScene()]) {
         scene.getContext()
       );
 
-      expect(scene.repo.getRef('refs/heads/main')).to.equal(
+      expect(scene.repo.getRef('refs/heads/main')).toBe(
         scene.originRepo.getRef('refs/heads/main')
       );
     });

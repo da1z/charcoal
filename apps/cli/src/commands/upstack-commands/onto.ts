@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { currentBranchOnto } from '../../actions/current_branch_onto';
 import { interactiveBranchSelection } from '../../actions/log';
 import { graphite } from '../../lib/runner';
@@ -27,7 +27,7 @@ export const aliases = ['o'];
 export const description =
   'Rebase the current branch onto the latest commit of the target branch and restack all of its descendants. If no branch is passed in, opens an interactive selector.';
 export const builder = args;
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 export const handler = async (argv: argsT): Promise<void> => {
   return graphite(argv, canonical, async (context) => {
     const originalBranch = argv.source

@@ -1,6 +1,7 @@
-import { getPrInfoForBranches, TPRInfoToUpsert } from '../lib/api/pr_info';
-import { TContext } from '../lib/context';
-import { TEngine } from '../lib/engine/engine';
+import type { TPRInfoToUpsert } from '../lib/api/pr_info';
+import { getPrInfoForBranches } from '../lib/api/pr_info';
+import type { TContext } from '../lib/context';
+import type { TEngine } from '../lib/engine/engine';
 
 export async function syncPrInfo(
   branchNames: string[],

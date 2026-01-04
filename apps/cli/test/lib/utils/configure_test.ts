@@ -1,7 +1,7 @@
-import { AbstractScene } from '../scenes/abstract_scene';
+import { beforeEach, afterEach } from 'bun:test';
+import type { AbstractScene } from '../scenes/abstract_scene';
 
-export function configureTest(suite: Mocha.Suite, scene: AbstractScene): void {
-  suite.timeout(600000);
-  suite.beforeEach(() => scene.setup());
-  suite.afterEach(() => scene.cleanup());
+export function configureTest(scene: AbstractScene): void {
+  beforeEach(() => scene.setup());
+  afterEach(() => scene.cleanup());
 }

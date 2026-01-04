@@ -1,4 +1,4 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { getAction } from '../../actions/sync/get';
 import { graphite } from '../../lib/runner';
 
@@ -18,7 +18,7 @@ const args = {
     alias: 'f',
   },
 } as const;
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
 export const command = 'get [branch]';
 export const canonical = 'downstack get';

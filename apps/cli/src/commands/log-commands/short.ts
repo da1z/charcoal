@@ -1,4 +1,4 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { logAction } from '../../actions/log';
 import { logShortClassic } from '../../actions/log_short_classic';
 import { graphite } from '../../lib/runner';
@@ -45,7 +45,7 @@ export const builder = args;
 export const aliases = ['s'];
 export const canonical = 'log short';
 
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 export const handler = async (argv: argsT): Promise<void> =>
   graphite(argv, canonical, async (context) =>
     argv.classic

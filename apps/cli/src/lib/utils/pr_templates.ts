@@ -1,6 +1,6 @@
-import fs from 'fs-extra';
+import fs from 'node:fs';
 import path from 'path';
-import { TContext } from '../context';
+import type { TContext } from '../context';
 import { currentGitRepoPrecondition } from '../preconditions';
 
 export async function getPRTemplate(

@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { graphiteWithoutRepo } from '../../lib/runner';
 import { setBranchPrefix } from '../../lib/utils/branch_name';
 
@@ -20,7 +20,7 @@ const args = {
   },
 } as const;
 
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
 export const command = 'branch-prefix';
 export const canonical = 'user branch-prefix';

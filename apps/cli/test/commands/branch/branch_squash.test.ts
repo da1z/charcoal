@@ -1,10 +1,11 @@
+import { describe, it } from 'bun:test';
 import { allScenes } from '../../lib/scenes/all_scenes';
 import { configureTest } from '../../lib/utils/configure_test';
 import { expectCommits } from '../../lib/utils/expect_commits';
 
 for (const scene of allScenes) {
-  describe(`(${scene}): fold`, function () {
-    configureTest(this, scene);
+  describe(`(${scene}): fold`, () => {
+    configureTest(scene);
 
     it('Can squash two commits into one and restack a child', () => {
       scene.repo.createChange('a', 'a');

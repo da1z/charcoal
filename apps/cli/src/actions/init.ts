@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { TContext } from '../lib/context';
+import type { TContext } from '../lib/context';
 import { ExitFailedError, PreconditionsFailedError } from '../lib/errors';
 import { suggest } from '../lib/utils/prompts_helpers';
 import { checkoutBranch } from './checkout_branch';

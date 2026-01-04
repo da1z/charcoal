@@ -1,4 +1,4 @@
-import yargs from 'yargs';
+import type { InferredOptionTypes } from 'yargs';
 
 export const globalArgumentsOptions = {
   interactive: {
@@ -29,5 +29,5 @@ export const globalArgumentsOptions = {
 } as const;
 
 export type TGlobalArguments = Partial<
-  yargs.InferredOptionTypes<typeof globalArgumentsOptions>
+  InferredOptionTypes<typeof globalArgumentsOptions>
 >;

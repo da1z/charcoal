@@ -1,10 +1,11 @@
 import chalk from 'chalk';
 import cp from 'child_process';
-import fs from 'fs-extra';
+import fs from 'node:fs';
 import path from 'path';
 import tmp from 'tmp';
-import { TContext } from '../lib/context';
-import { SCOPE, TScopeSpec } from '../lib/engine/scope_spec';
+import type { TContext } from '../lib/context';
+import type { TScopeSpec } from '../lib/engine/scope_spec';
+import { SCOPE } from '../lib/engine/scope_spec';
 
 type TTestStatus =
   | '[pending]'
@@ -85,7 +86,7 @@ function testBranch(
     const out = cp.execSync(opts.command, { encoding: 'utf-8' });
     fs.writeFileSync(outputPath, out);
     opts.state[opts.branchName].status = '[success]';
-  } catch (e) {
+  } catch (e: any) {
     if (e?.signal) {
       fs.writeFileSync(outputPath, [e.stdout, e.stderr, e.signal].join('\n'));
       opts.state[opts.branchName].status = '[killed]';

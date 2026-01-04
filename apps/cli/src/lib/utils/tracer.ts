@@ -120,7 +120,7 @@ class Tracer {
     try {
       result = handler();
     } catch (err) {
-      span.end(result, err);
+      span.end(result, err instanceof Error ? err : undefined);
       throw err;
     }
     span.end(result);
@@ -142,7 +142,7 @@ class Tracer {
     try {
       result = await handler();
     } catch (err) {
-      span.end(result, err);
+      span.end(result, err instanceof Error ? err : undefined);
       throw err;
     }
     span.end(result);

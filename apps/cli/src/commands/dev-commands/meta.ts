@@ -1,13 +1,14 @@
-import fs from 'fs-extra';
+import fs from 'node:fs';
 import path from 'path';
 import tmp from 'tmp';
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import {
   readMetadataRef,
   writeMetadataRef,
 } from '../../lib/engine/metadata_ref';
 import { graphite } from '../../lib/runner';
 import { cuteString } from '../../lib/utils/cute_string';
+import { readJSONSync } from '../../lib/utils/fs_utils';
 
 const args = {
   branch: {
@@ -29,7 +30,7 @@ export const description = false;
 export const builder = args;
 
 // This command allows for direct access to the metadata ref. USE WITH CARE!
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 export const handler = async (argv: argsT): Promise<void> => {
   return graphite(argv, canonical, async (context) => {
     const metaString = cuteString(readMetadataRef(argv.branch));
@@ -40,7 +41,7 @@ export const handler = async (argv: argsT): Promise<void> => {
     const tmpfilePath = path.join(tmp.dirSync().name, 'meta');
     fs.writeFileSync(tmpfilePath, metaString);
     context.userConfig.execEditor(tmpfilePath);
-    writeMetadataRef(argv.branch, fs.readJSONSync(tmpfilePath));
+    writeMetadataRef(argv.branch, readJSONSync(tmpfilePath));
     context.engine.rebuild();
   });
 };

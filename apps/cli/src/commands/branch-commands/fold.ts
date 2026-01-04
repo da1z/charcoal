@@ -1,4 +1,4 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { foldCurrentBranch } from '../../actions/fold_branch';
 import { graphite } from '../../lib/runner';
 
@@ -11,7 +11,7 @@ const args = {
     default: false,
   },
 } as const;
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
 export const aliases = ['f'];
 export const command = 'fold';

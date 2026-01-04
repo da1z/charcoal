@@ -1,6 +1,6 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { graphite } from '../../lib/runner';
-import { RepoInfo } from '@da1z/pancake-shared-types';
+import type { RepoInfo } from '../../shared-types';
 import {
   currentGitRepoPrecondition,
   getRepoRootPathPrecondition,
@@ -13,7 +13,7 @@ export const canonical = 'internal-only repo-info';
 export const description = false;
 export const builder = args;
 
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 export const handler = async (argv: argsT): Promise<void> => {
   return graphite(argv, canonical, async (context) => {
     let remote: RepoInfo['remote'];

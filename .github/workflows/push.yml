@@ -11,38 +11,30 @@ jobs:
   lint_and_fast_tests:
     name: "Run CLI tests"
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [14.x, 15.x, 16.x, 17.x, 18.x, current]
     steps:
-      # Basic setup
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           clean: "false"
           fetch-depth: 0
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
+      - uses: oven-sh/setup-bun@v2
       - name: Install
-        run: yarn install --immutable
+        run: bun install --frozen-lockfile
       - name: Build
-        run: yarn turbo run build
+        run: bun run build
       - name: Setup git
         run: git config --global user.email "test@gmail.com" && git config --global user.name "test"
       - name: Git Version
         run: git --version
       - name: Test
-        run: yarn workspace @da1z/pancake run test
+        run: bun run test-ci
 
   superlinter:
     name: "Run superlinter"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          # Full git history is needed to get a proper list of changed files within `super-linter`
           fetch-depth: 0
 
       - name: Lint Code Base
@@ -58,35 +50,30 @@ jobs:
     name: Upload executable binaries
     strategy:
       matrix:
-        os: [macos, ubuntu]
         include:
-          - os: macos
-            build: yarn workspace @da1z/pancake run build-pkg -t node18-macos -o "pk-macos-x86-${{ github.sha }}"
-            artifact-name: pk-macos-x86-${{ github.sha }}
-            artifact-path: apps/cli/pk-macos-x86-${{ github.sha }}
-          - os: ubuntu
-            build: yarn workspace @da1z/pancake run build-pkg -t node18-linux -o "pk-linux-${{ github.sha }}"
-            artifact-name: pk-linux-${{ github.sha }}
-            artifact-path: apps/cli/pk-linux-${{ github.sha }}
-    runs-on: ${{ matrix.os }}-latest
+          - os: macos-latest
+            target: bun-darwin-x64
+            artifact-name: pk-macos-x64
+          - os: macos-latest
+            target: bun-darwin-arm64
+            artifact-name: pk-macos-arm64
+          - os: ubuntu-latest
+            target: bun-linux-x64
+            artifact-name: pk-linux-x64
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
+        uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
       - name: Install
-        run: yarn install --immutable
-      - name: Build
-        run: yarn turbo run build
+        run: bun install --frozen-lockfile
       - name: Build binary
-        run: ${{ matrix.build }}
+        run: bun build ./apps/cli/src/index.ts --compile --outfile ${{ matrix.artifact-name }} --target ${{ matrix.target }}
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact-name }}
-          path: ${{ matrix.artifact-path }}
+          name: ${{ matrix.artifact-name }}-${{ github.sha }}
+          path: ${{ matrix.artifact-name }}
 
   release:
     name: Release version
@@ -94,22 +81,22 @@ jobs:
     needs: [lint_and_fast_tests, create-binaries]
     runs-on: ubuntu-latest
     steps:
-      - name: Download mac x86
+      - name: Download mac x64
         uses: actions/download-artifact@v4
         with:
-          name: pk-macos-x86-${{ github.sha }}
+          name: pk-macos-x64-${{ github.sha }}
+      - name: Download mac arm64
+        uses: actions/download-artifact@v4
+        with:
+          name: pk-macos-arm64-${{ github.sha }}
       - name: Download linux
         uses: actions/download-artifact@v4
         with:
-          name: pk-linux-${{ github.sha }}
-      - name: Rename files
-        run: |
-          mv pk-macos-x86-${{ github.sha }} pk-macos-x86;
-          mv pk-linux-${{ github.sha }} pk-linux
+          name: pk-linux-x64-${{ github.sha }}
       - name: Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "pk-macos-x86,pk-linux"
+          artifacts: "pk-macos-x64,pk-macos-arm64,pk-linux-x64"
           draft: false
           prerelease: true
           allowUpdates: true

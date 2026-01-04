@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { TContext } from '../lib/context';
+import type { TContext } from '../lib/context';
 import { SCOPE } from '../lib/engine/scope_spec';
 import { RebaseConflictError } from '../lib/errors';
 import { persistContinuation } from './persist_continuation';

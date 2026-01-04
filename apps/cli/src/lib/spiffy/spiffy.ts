@@ -1,10 +1,11 @@
-import * as t from '@withgraphite/retype';
-import fs from 'fs-extra';
+import type * as t from '@withgraphite/retype';
+import fs from 'node:fs';
 import os from 'os';
 import path from 'path';
 import { ExitFailedError } from '../errors';
 import { getRepoRootPathPrecondition } from '../preconditions';
 import { cuteString } from '../utils/cute_string';
+import { removeSync } from '../utils/fs_utils';
 
 /**
  * Spiffy is our utility for Schematized Persisted Files
@@ -33,7 +34,7 @@ export function spiffy<TSpfData, THelperFunctions>(
       const shouldRemoveBecauseEmpty =
         template.options?.removeIfEmpty && cuteString(_data) === cuteString({});
       if (shouldRemoveBecauseEmpty) {
-        fs.removeSync(filePath);
+        removeSync(filePath);
       } else {
         fs.writeFileSync(filePath, cuteString(_data), {
           mode: 0o600,
@@ -47,7 +48,7 @@ export function spiffy<TSpfData, THelperFunctions>(
       delete: (defaultPathOverride?: string) => {
         const curPath = determinePath(defaultPathOverride);
         if (fs.existsSync(curPath)) {
-          fs.removeSync(curPath);
+          removeSync(curPath);
         }
       },
       ...template.helperFunctions(_data, update),
@@ -136,7 +137,7 @@ function readOrInitSpf<TSpfData>({
     return parsedFile;
   } catch {
     if (removeIfInvalid) {
-      fs.removeSync(filePath);
+      removeSync(filePath);
       return initialize();
     } else {
       throw new ExitFailedError(`Malformed data at ${filePath}`);

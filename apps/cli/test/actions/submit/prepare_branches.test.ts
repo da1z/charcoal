@@ -1,17 +1,13 @@
-import { expect, use } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
+import { describe, it, expect } from 'bun:test';
+import fs from 'node:fs';
 import prompts from 'prompts';
 import { getPRInfoForBranches } from '../../../src/actions/submit/prepare_branches';
 import { BasicScene } from '../../lib/scenes/basic_scene';
 import { configureTest } from '../../lib/utils/configure_test';
-import fs from 'fs-extra';
-import { TPRSubmissionInfo } from '../../../src/actions/submit/submit_prs';
-
-use(chaiAsPromised);
 
 const scene = new BasicScene();
-describe(`(${scene}): correctly get PR information for branches`, function () {
-  configureTest(this, scene);
+describe(`(${scene}): correctly get PR information for branches`, () => {
+  configureTest(scene);
 
   // TODO: Add more tests for different scenarios
 
@@ -40,31 +36,25 @@ describe(`(${scene}): correctly get PR information for branches`, function () {
       };
     };
 
-    await expect(
-      getPRInfoForBranches(
-        {
-          branchNames: ['a'],
-          editPRFieldsInline: true,
-          draft: false,
-          publish: true,
-          updateOnly: false,
-          dryRun: false,
-          reviewers: undefined,
-          select: false,
-          always: false,
-        },
-        context
-      )
-    ).to.eventually.satisfy((info: TPRSubmissionInfo) => {
-      if (info.length !== 1) {
-        return false;
-      }
-      const datum = info[0];
-      return (
-        datum.action === 'update' &&
-        datum.title === updatedTitle &&
-        datum.body === updatedBody
-      );
-    });
+    const info = await getPRInfoForBranches(
+      {
+        branchNames: ['a'],
+        editPRFieldsInline: true,
+        draft: false,
+        publish: true,
+        updateOnly: false,
+        dryRun: false,
+        reviewers: undefined,
+        select: false,
+        always: false,
+      },
+      context
+    );
+
+    expect(info.length).toBe(1);
+    const datum = info[0];
+    expect(datum.action).toBe('update');
+    expect(datum.title).toBe(updatedTitle);
+    expect(datum.body).toBe(updatedBody);
   });
 });

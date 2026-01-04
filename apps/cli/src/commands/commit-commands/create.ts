@@ -1,4 +1,4 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { commitCreateAction } from '../../actions/commit_create';
 import { graphite } from '../../lib/runner';
 
@@ -25,7 +25,7 @@ const args = {
   },
 } as const;
 
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
 export const command = 'create';
 export const canonical = 'commit create';

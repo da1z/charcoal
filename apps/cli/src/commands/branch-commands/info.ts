@@ -1,4 +1,4 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { showBranchInfo } from '../../actions/show_branch';
 import { graphite } from '../../lib/runner';
 
@@ -25,7 +25,7 @@ const args = {
     alias: 'b',
   },
 } as const;
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
 export const command = 'info';
 export const canonical = 'branch info';

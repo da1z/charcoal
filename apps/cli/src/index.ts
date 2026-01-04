@@ -7,6 +7,20 @@ import yargs from 'yargs';
 import { globalArgumentsOptions } from './lib/global_arguments';
 import { getYargsInput } from './lib/pre-yargs/preprocess_command';
 
+// Import all commands explicitly (required for bundling)
+import * as branchCmd from './commands/branch';
+import * as commitCmd from './commands/commit';
+import * as continueCmd from './commands/continue';
+import * as devCmd from './commands/dev';
+import * as downstackCmd from './commands/downstack';
+import * as feedbackCmd from './commands/feedback';
+import * as fishCmd from './commands/fish';
+import * as logCmd from './commands/log';
+import * as repoCmd from './commands/repo';
+import * as stackCmd from './commands/stack';
+import * as upstackCmd from './commands/upstack';
+import * as userCmd from './commands/user';
+
 // this line gets rid of warnings about "experimental fetch API" for our users
 // while still showing us warnings when we test with DEBUG=1
 if (!process.env.DEBUG) {
@@ -23,8 +37,27 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 
-void yargs(getYargsInput())
-  .commandDir('commands')
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const commands: any[] = [
+  branchCmd,
+  commitCmd,
+  continueCmd,
+  devCmd,
+  downstackCmd,
+  feedbackCmd,
+  fishCmd,
+  logCmd,
+  repoCmd,
+  stackCmd,
+  upstackCmd,
+  userCmd,
+];
+
+let cli = yargs(getYargsInput());
+for (const cmd of commands) {
+  cli = cli.command(cmd);
+}
+void cli
   .help()
   .usage(
     'Pancake is a command line tool that makes working with stacked changes fast & intuitive.\n\nhttps://docs.graphite.dev/guides/graphite-cli'

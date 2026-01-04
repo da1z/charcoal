@@ -1,9 +1,5 @@
-import {
-  spawn,
-  SpawnOptions,
-  spawnSync,
-  SpawnSyncOptions,
-} from 'child_process';
+import type { SpawnOptions, SpawnSyncOptions } from 'child_process';
+import { spawn, spawnSync } from 'child_process';
 import { cuteString } from '../utils/cute_string';
 import { tracer } from '../utils/tracer';
 

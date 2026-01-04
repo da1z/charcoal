@@ -1,4 +1,4 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { graphiteWithoutRepo } from '../../lib/runner';
 import { getBranchReplacement } from '../../lib/utils/branch_name';
 
@@ -24,7 +24,7 @@ const args = {
   },
 } as const;
 
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
 export const command = 'branch-replacement';
 export const canonical = 'user branch-replacement';
@@ -34,13 +34,19 @@ export const builder = args;
 export const handler = async (argv: argsT): Promise<void> => {
   return graphiteWithoutRepo(argv, canonical, async (context) => {
     if (argv['set-underscore']) {
-      context.userConfig.update((data) => (data.branchReplacement = '_'));
+      context.userConfig.update((data) => {
+        data.branchReplacement = '_';
+      });
       context.splog.info(`Set underscore (_) as the replacement character`);
     } else if (argv['set-dash']) {
-      context.userConfig.update((data) => (data.branchReplacement = '-'));
+      context.userConfig.update((data) => {
+        data.branchReplacement = '-';
+      });
       context.splog.info(`Set dash (-) as the replacement character`);
     } else if (argv['set-empty']) {
-      context.userConfig.update((data) => (data.branchReplacement = ''));
+      context.userConfig.update((data) => {
+        data.branchReplacement = '';
+      });
       context.splog.info(
         `Invalid characters will be removed without being replaced`
       );

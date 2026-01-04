@@ -1,28 +1,28 @@
-import { expect } from 'chai';
+import { describe, it, expect } from 'bun:test';
 import { allScenes } from '../../lib/scenes/all_scenes';
 import { configureTest } from '../../lib/utils/configure_test';
 import { expectBranches } from '../../lib/utils/expect_branches';
 import { expectCommits } from '../../lib/utils/expect_commits';
 
 for (const scene of allScenes) {
-  describe(`(${scene}): fold`, function () {
-    configureTest(this, scene);
+  describe(`(${scene}): fold`, () => {
+    configureTest(scene);
 
     it("Can't fold from trunk or into trunk", () => {
       scene.repo.createChange('a', 'a');
       scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `a`]);
 
-      expect(() => scene.repo.runCliCommand([`branch`, `fold`])).to.throw();
+      expect(() => scene.repo.runCliCommand([`branch`, `fold`])).toThrow();
       expect(() =>
         scene.repo.runCliCommand([`branch`, `fold`, `--keep`])
-      ).to.throw();
+      ).toThrow();
 
       scene.repo.runCliCommand([`branch`, `down`]);
 
-      expect(() => scene.repo.runCliCommand([`branch`, `fold`])).to.throw();
+      expect(() => scene.repo.runCliCommand([`branch`, `fold`])).toThrow();
       expect(() =>
         scene.repo.runCliCommand([`branch`, `fold`, `--keep`])
-      ).to.throw();
+      ).toThrow();
     });
 
     it('Can fold without --keep and restack children accordingly', () => {

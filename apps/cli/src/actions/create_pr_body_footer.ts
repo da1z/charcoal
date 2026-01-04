@@ -1,4 +1,4 @@
-import { TContext } from '../lib/context';
+import type { TContext } from '../lib/context';
 
 export const footerTitle = '\n\n\n#### PR Dependency Tree\n\n';
 export const footerFooter =

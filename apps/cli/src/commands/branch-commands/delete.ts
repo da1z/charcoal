@@ -1,4 +1,4 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { deleteBranchAction } from '../../actions/delete_branch';
 import { graphite } from '../../lib/runner';
 
@@ -19,7 +19,7 @@ const args = {
     default: false,
   },
 } as const;
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
 export const aliases = ['dl'];
 export const command = 'delete [name]';

@@ -1,4 +1,4 @@
-import yargs from 'yargs';
+import type { Arguments, InferredOptionTypes } from 'yargs';
 import { testStack } from '../../actions/test';
 import { SCOPE } from '../../lib/engine/scope_spec';
 import { graphite } from '../../lib/runner';
@@ -20,7 +20,7 @@ const args = {
     type: 'boolean',
   },
 } as const;
-type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
+type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
 export const command = 'test <command>';
 export const canonical = 'downstack test';

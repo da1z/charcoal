@@ -3,10 +3,11 @@ import { version } from '../../../package.json';
 import { getRebaseHead } from '../git/merge_conflict_help';
 import { getBranchNamesAndRevisions } from '../git/sorted_branch_names';
 import { cachePersistenceFactory } from '../spiffy/cache_spf';
-import { TSplog } from '../utils/splog';
-import { TCachedMeta } from './cached_meta';
+import type { TSplog } from '../utils/splog';
+import type { TCachedMeta } from './cached_meta';
 import { getMetadataRefList } from './metadata_ref';
-import { parseBranchesAndMeta, TCacheSeed } from './parse_branches_and_meta';
+import type { TCacheSeed } from './parse_branches_and_meta';
+import { parseBranchesAndMeta } from './parse_branches_and_meta';
 
 type TCacheLoader = {
   loadCachedBranches(

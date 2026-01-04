@@ -1,11 +1,11 @@
-import { expect } from 'chai';
+import { describe, it, expect } from 'bun:test';
 import { allScenes } from '../../lib/scenes/all_scenes';
 import { configureTest } from '../../lib/utils/configure_test';
 import { expectCommits } from '../../lib/utils/expect_commits';
 
 for (const scene of allScenes) {
-  describe(`(${scene}): upstack onto`, function () {
-    configureTest(this, scene);
+  describe(`(${scene}): upstack onto`, () => {
+    configureTest(scene);
 
     it('Can fix a leaf stack onto main', () => {
       scene.repo.createChange('2', 'a');
@@ -28,8 +28,8 @@ for (const scene of allScenes) {
       scene.repo.checkoutBranch('a');
       expect(() => {
         scene.repo.runCliCommand([`upstack`, `onto`, `main`]);
-      }).to.throw();
-      expect(scene.repo.rebaseInProgress()).to.be.true;
+      }).toThrow();
+      expect(scene.repo.rebaseInProgress()).toBe(true);
     });
   });
 }

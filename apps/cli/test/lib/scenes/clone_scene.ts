@@ -1,7 +1,8 @@
-import fs from 'fs-extra';
+import fs from 'node:fs';
 import tmp from 'tmp';
+import { emptyDirSync } from '../../../src/lib/utils/fs_utils';
 import { cuteString } from '../../../src/lib/utils/cute_string';
-import { GitRepo } from '../../../src/lib/utils/git_repo';
+import { GitRepo } from '../utils/git_repo';
 import { AbstractScene } from './abstract_scene';
 
 export class CloneScene extends AbstractScene {
@@ -13,7 +14,7 @@ export class CloneScene extends AbstractScene {
     return 'CloneScene';
   }
 
-  public setup(): void {
+  public override setup(): void {
     super.setup();
     this.repo.createChangeAndCommit('1', '1');
     [this.originDir, this.originRepo, this.originTmpDir] = [
@@ -33,11 +34,11 @@ export class CloneScene extends AbstractScene {
     process.chdir(this.dir);
   }
 
-  public cleanup(): void {
+  public override cleanup(): void {
     process.chdir(this.oldDir);
     if (!process.env.DEBUG) {
-      fs.emptyDirSync(this.originDir);
-      fs.emptyDirSync(this.dir);
+      emptyDirSync(this.originDir);
+      emptyDirSync(this.dir);
       this.tmpDir.removeCallback();
       this.originTmpDir.removeCallback();
     }

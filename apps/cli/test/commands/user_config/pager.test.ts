@@ -1,15 +1,13 @@
-import { expect } from 'chai';
+import { describe, it, expect } from 'bun:test';
 import { BasicScene } from '../../lib/scenes/basic_scene';
 import { configureTest } from '../../lib/utils/configure_test';
 
 for (const scene of [new BasicScene()]) {
-  describe(`(${scene}): user pager`, function () {
-    configureTest(this, scene);
+  describe(`(${scene}): user pager`, () => {
+    configureTest(scene);
 
     it('Sanity check - can check pager', () => {
-      expect(() => scene.repo.runCliCommand([`user`, `pager`])).to.not.throw(
-        Error
-      );
+      expect(() => scene.repo.runCliCommand([`user`, `pager`])).not.toThrow();
     });
 
     it('Sanity check - can set pager', () => {
@@ -20,8 +18,8 @@ for (const scene of [new BasicScene()]) {
           `--set`,
           `less -FRX`,
         ])
-      ).to.equal('Pager set to less -FRX');
-      expect(scene.repo.runCliCommandAndGetOutput([`user`, `pager`])).to.equal(
+      ).toBe('Pager set to less -FRX');
+      expect(scene.repo.runCliCommandAndGetOutput([`user`, `pager`])).toBe(
         'less -FRX'
       );
     });
@@ -29,8 +27,8 @@ for (const scene of [new BasicScene()]) {
     it('Sanity check - can disable pager', () => {
       expect(
         scene.repo.runCliCommandAndGetOutput([`user`, `pager`, `--disable`])
-      ).to.equal('Pager disabled');
-      expect(scene.repo.runCliCommandAndGetOutput([`user`, `pager`])).to.equal(
+      ).toBe('Pager disabled');
+      expect(scene.repo.runCliCommandAndGetOutput([`user`, `pager`])).toBe(
         'Pager is disabled'
       );
     });
@@ -39,7 +37,7 @@ for (const scene of [new BasicScene()]) {
       process.env.TEST_GT_PAGER = 'less';
       expect(
         scene.repo.runCliCommandAndGetOutput([`user`, `pager`, `--unset`])
-      ).to.equal(
+      ).toBe(
         'Pager preference erased. Defaulting to your git pager (currently less)'
       );
     });

@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import { GRAPHITE_COLORS } from '../lib/colors';
-import { TContext } from '../lib/context';
+import type { TContext } from '../lib/context';
 import { SCOPE } from '../lib/engine/scope_spec';
 import { KilledError, PreconditionsFailedError } from '../lib/errors';
 import { uncommittedTrackedChangesPrecondition } from '../lib/preconditions';
