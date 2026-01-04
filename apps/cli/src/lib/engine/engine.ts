@@ -940,7 +940,7 @@ export function composeEngine({
       const meta = assertBranchIsValidAndNotTrunkAndGetMeta(branchName);
       if (meta.frozen) {
         throw new PreconditionsFailedError(
-          `Cannot push frozen branch ${branchName}. Unfreeze with 'gt branch unfreeze ${branchName}' first.`
+          `Cannot push frozen branch ${branchName}. Unfreeze with 'pk branch unfreeze ${branchName}' first.`
         );
       }
       git.pushBranch({ remote, branchName, noVerify, forcePush });

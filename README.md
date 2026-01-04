@@ -1,19 +1,19 @@
-# Charcoal
+# Pancake
 
 > A CLI for managing stacked pull requests
 
-<img width="1346" alt="CleanShot 2023-09-09 at 19 48 49@2x" src="https://github.com/danerwilliams/graphite-cli/assets/22798229/17385828-f235-4b56-84dd-ad73350d55b9">
+## About
 
-## About This Fork
+Pancake is a fork of [danerwilliams/charcoal](https://github.com/danerwilliams/charcoal) (which itself is a fork of the Graphite CLI) with additional features for managing stacked PRs.
 
-This is a fork of [danerwilliams/charcoal](https://github.com/danerwilliams/charcoal) with additional features:
+## Features
 
 ### Stack Merge Command
 
 Merge all PRs in your stack sequentially with a single command:
 
 ```bash
-gt stack merge
+pk stack merge
 ```
 
 The command:
@@ -33,8 +33,8 @@ Options:
 Freeze branches to prevent accidental modifications in collaborative workflows:
 
 ```bash
-gt branch freeze [branch]   # Freeze current or specified branch
-gt branch unfreeze [branch] # Unfreeze a frozen branch
+pk branch freeze [branch]   # Freeze current or specified branch
+pk branch unfreeze [branch] # Unfreeze a frozen branch
 ```
 
 Frozen branches cannot be:
@@ -44,50 +44,53 @@ This is useful when multiple people are working on a stack and you want to preve
 
 ### Restack by Default with Sync
 
-`gt repo sync` now restacks branches by default, keeping your stack up to date with trunk automatically.
+`pk repo sync` now restacks branches by default, keeping your stack up to date with trunk automatically.
 
 ### Bug Fixes
 
 - **Branch traversal fix**: Fixed an issue where `repo sync` could get into an invalid state if a branch was deleted in the middle of a stack
 - **PR body footer fix**: Fixed duplication of the dependency tree footer when external bots (like CI/linters) add content to PR descriptions
 
-## Install
+## Quick Start
 
-`brew install danerwilliams/tap/charcoal`
-
-Or build from source:
 ```bash
-git clone https://github.com/da1z/charcoal.git
-cd charcoal/apps/cli
-npm install
-npm run build
+# Initialize Pancake in your repo
+pk repo init
+
+# Create a new branch
+pk branch create my-feature
+
+# Make changes and commit
+pk commit create -m "Add feature"
+
+# Submit PR
+pk stack submit
+
+# View your stack
+pk log
 ```
 
-## What is Graphite?
+## User Guide
 
-From Graphite:
+The [Graphite Docs](https://graphite.dev/docs/graphite-cli/) cover most of the core functionality. Commands use `pk` instead of `gt`.
 
-> [Graphite](https://graphite.dev) is a **fast, simple code review platform** designed for engineers who want to **write and review smaller pull requests, stay unblocked, and ship faster**. Anyone can start using Graphite individually without needing their coworkers to change tools - we'll seamlessly sync your code changes and reviews. We built Graphite because we missed internal code review tools like Phabricator (at Facebook) and Critique (Google) that help engineers create, approve, and ship small, incremental changes, and long-term we’re passionate about creating products & workflows that help fast-moving eng teams achieve more.
+## Credits
 
-## What is Charcoal?
+Pancake builds on the work of two great projects:
 
-Charcoal is simply the Graphite CLI, but open source!
+### Charcoal by Dane Williams
 
-On 7/14/2023 the Graphite team announced that they closed open source development of the Graphite CLI and [moved development to their private monorepo](https://github.com/withgraphite/graphite-cli). They also added a pay wall limiting free users to 10 open stacks at a time per organization starting 8/7/2023.
+Pancake is a fork of [Charcoal](https://github.com/danerwilliams/charcoal) by [Dane Williams](https://github.com/danerwilliams). Charcoal kept the Graphite CLI open source and free after Graphite moved to a closed-source model.
 
-Graphite is an amazing company and you should absolutely check out their products. In addition to a stacking CLI, they have an entire code review platform, merge queue, and more developer productivity tools.
+Check out Dane's [blog post announcing Charcoal](https://danewilliams.com/announcing-charcoal).
 
-However, many organizations aren't interested in paying for Graphite's team plan at this time.
+### Graphite
 
-The Graphite CLI does not need to depend on Graphite's API, so this project allows for use of the CLI with any git repository (even ones hosted on platforms other than GitHub!), entirely for free.
+The original CLI was created by [Graphite](https://graphite.dev), a fast, simple code review platform designed for engineers who want to write and review smaller pull requests, stay unblocked, and ship faster.
 
-## User guide
+> On 7/14/2023 the Graphite team announced that they closed open source development of the Graphite CLI and moved development to their private monorepo. They also added a pay wall limiting free users to 10 open stacks at a time per organization.
 
-<https://graphite.dev/docs/graphite-cli/>
-
-Right now, the Graphite Docs are more or less in sync with the features available in Charcoal.
-
-As Graphite continues to develop their private version of the CLI, however, these will become out of sync. Ideally we can add our own open source docs to accompany this project.
+Graphite is an amazing company with great products including a code review platform, merge queue, and more. Check them out at [graphite.dev](https://graphite.dev).
 
 ## Contributing
 

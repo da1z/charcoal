@@ -6,19 +6,19 @@ export const command = 'submit';
  * Primary interaction patterns:
  *
  * # (default) allows user to edit PR fields inline and then submits stack as a draft
- * gt stack submit
+ * pk stack submit
  *
  * # skips editing PR fields inline, submits stack as a draft
- * gt stack submit --no-edit
+ * pk stack submit --no-edit
  *
  * # allows user to edit PR fields inline, then opens as draft
- * gt stack submit --draft
+ * pk stack submit --draft
  *
  * # allows user to edit PR fields inline, then publishes
- * gt stack submit --publish
+ * pk stack submit --publish
  *
- * # same as gt stack submit --no-edit
- * gt stack submit --no-interactive
+ * # same as pk stack submit --no-edit
+ * pk stack submit --no-interactive
  *
  */
 export const args = {
@@ -90,7 +90,7 @@ export const args = {
   },
   always: {
     describe:
-      'Always push updates, even if the branch has not changed. Can be helpful for fixing an inconsistent Charcoal stack view on Web/GitHub resulting from downtime/a bug.',
+      'Always push updates, even if the branch has not changed. Can be helpful for fixing an inconsistent Pancake stack view on Web/GitHub resulting from downtime/a bug.',
     type: 'boolean',
     default: false,
   },
