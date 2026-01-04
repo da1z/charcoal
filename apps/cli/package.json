@@ -29,7 +29,7 @@
     "dev": "./scripts/installation/develop.sh",
     "cli": "bun ./src/index.ts",
     "test": "PK_TEST_DIR=.test-tmp bun test --timeout 30000 --ignore 'test/large_repo.test.ts' 'test/**/*.test.ts'",
-    "test-ci": "PK_TEST_DIR=.test-tmp bun test --timeout 30000 --coverage 'test/**/*.test.ts'",
+    "test-ci": "bun test --timeout 30000 --coverage 'test/**/*.test.ts'",
     "test-one": "PK_TEST_DIR=.test-tmp bun test --timeout 30000",
     "test-grep": "PK_TEST_DIR=.test-tmp bun test --test-name-pattern"
   },
