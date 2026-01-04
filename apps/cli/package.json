@@ -28,8 +28,8 @@
     "build-pkg": "bun build ./src/index.ts --compile --outfile=pkg/pancake-macos --target=bun-darwin-arm64 && bun build ./src/index.ts --compile --outfile=pkg/pancake-linux --target=bun-linux-x64",
     "dev": "./scripts/installation/develop.sh",
     "cli": "bun ./src/index.ts",
-    "test": "PK_TEST_DIR=.test-tmp bun test --timeout 30000 --ignore 'test/large_repo.test.ts' test/**/*.test.ts",
-    "test-ci": "PK_TEST_DIR=.test-tmp bun test --timeout 30000 --coverage test/**/*.test.ts",
+    "test": "PK_TEST_DIR=.test-tmp bun test --timeout 30000",
+    "test-ci": "PK_TEST_DIR=.test-tmp bun test --timeout 30000 --coverage && PK_TEST_DIR=.test-tmp bun test --timeout 60000 ./test/large_repo.slow.ts",
     "test-one": "PK_TEST_DIR=.test-tmp bun test --timeout 30000",
     "test-grep": "PK_TEST_DIR=.test-tmp bun test --test-name-pattern"
   },

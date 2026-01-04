@@ -1,4 +1,3 @@
-import { execSync } from 'child_process';
 import fs from 'node:fs';
 import tmp from 'tmp';
 import { cuteString } from '../../../src/lib/utils/cute_string';
@@ -23,8 +22,7 @@ export class PublicRepoScene extends AbstractScene {
   public override setup(): void {
     this.tmpDir = tmp.dirSync();
     this.dir = this.tmpDir.name;
-    this.repo = new GitRepo(this.dir, { repoUrl: this.repoUrl });
-    execSync(`git -C ${this.dir} fetch --all`);
+    this.repo = new GitRepo(this.dir, { repoUrl: this.repoUrl, shallow: true });
     fs.writeFileSync(
       `${this.dir}/.git/.graphite_repo_config`,
       cuteString({ trunk: 'master' })
