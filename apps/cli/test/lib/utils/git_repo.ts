@@ -7,7 +7,14 @@ const TEXT_FILE_NAME = 'test.txt';
 
 // Path to CLI entry point (TypeScript source - bun runs it directly)
 // From test/lib/utils/ -> ../../../src/index.ts
-const CLI_PATH = path.join(import.meta.dir, '..', '..', '..', 'src', 'index.ts');
+const CLI_PATH = path.join(
+  import.meta.dir,
+  '..',
+  '..',
+  '..',
+  'src',
+  'index.ts'
+);
 
 // This class is only used by tests
 export class GitRepo {
@@ -15,17 +22,21 @@ export class GitRepo {
   userConfigPath: string;
   constructor(
     dir: string,
-    opts?: { existingRepo?: boolean; repoUrl?: string }
+    opts?: { existingRepo?: boolean; repoUrl?: string; shallow?: boolean }
   ) {
     this.dir = dir;
     this.userConfigPath = path.join(dir, '.git/.graphite_user_config');
     if (opts?.existingRepo) {
       return;
     }
-    spawnSync(
-      'git',
-      opts?.repoUrl ? [`clone`, opts.repoUrl, dir] : [`init`, dir, `-b`, `main`]
-    );
+    if (opts?.repoUrl) {
+      const cloneArgs = opts.shallow
+        ? [`clone`, `--depth`, `1`, opts.repoUrl, dir]
+        : [`clone`, opts.repoUrl, dir];
+      spawnSync('git', cloneArgs);
+    } else {
+      spawnSync('git', [`init`, dir, `-b`, `main`]);
+    }
   }
 
   runGitCommand(args: string[]): void {
