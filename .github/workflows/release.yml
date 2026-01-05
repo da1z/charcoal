@@ -61,10 +61,10 @@ jobs:
         id: bump
         working-directory: apps/cli
         run: |
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          CURRENT_VERSION=$(bun -e "console.log(require('./package.json').version)")
           echo "Current version: $CURRENT_VERSION"
 
-          NEW_VERSION=$(npm version ${{ inputs.bump-type }} --no-git-tag-version)
+          NEW_VERSION=$(bun pm version ${{ inputs.bump-type }} --no-git-tag-version)
           echo "New version: $NEW_VERSION"
 
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
@@ -86,10 +86,8 @@ jobs:
         if: inputs.dry-run != true
         working-directory: apps/cli
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
-          npm publish --access public
+          NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: bun publish --access public
 
       - name: Commit version bump
         if: inputs.dry-run != true
