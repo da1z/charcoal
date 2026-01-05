@@ -1,47 +1,47 @@
-import chalk from 'chalk';
-import type { Arguments, InferredOptionTypes } from 'yargs';
-import { graphiteWithoutRepo } from '../../lib/runner';
+import chalk from "chalk";
+import type { Arguments, InferredOptionTypes } from "yargs";
+import { graphiteWithoutRepo } from "../../lib/runner";
 
 const args = {
-  set: {
-    demandOption: false,
-    default: '',
-    type: 'string',
-    describe: 'Set default editor for Pancake. eg --set vim.',
-  },
-  unset: {
-    demandOption: false,
-    default: false,
-    type: 'boolean',
-    describe: 'Unset default editor for Pancake.',
-  },
+	set: {
+		demandOption: false,
+		default: "",
+		type: "string",
+		describe: "Set default editor for Pancake. eg --set vim.",
+	},
+	unset: {
+		demandOption: false,
+		default: false,
+		type: "boolean",
+		describe: "Unset default editor for Pancake.",
+	},
 } as const;
 
 type argsT = Arguments<InferredOptionTypes<typeof args>>;
-export const command = 'editor';
-export const description = 'The editor opened by Pancake.';
-export const canonical = 'user editor';
+export const command = "editor";
+export const description = "The editor opened by Pancake.";
+export const canonical = "user editor";
 export const builder = args;
 export const handler = async (argv: argsT): Promise<void> => {
-  return graphiteWithoutRepo(argv, canonical, async (context) => {
-    if (argv.set) {
-      context.userConfig.update((data) => (data.editor = argv.set));
-      context.splog.info(`Editor set to ${chalk.cyan(argv.set)}`);
-    } else if (argv.unset) {
-      context.userConfig.update((data) => (data.editor = undefined));
-      context.splog.info(
-        `Editor preference erased. Defaulting to your git editor (currently ${chalk.cyan(
-          context.userConfig.getEditor()
-        )})`
-      );
-    } else {
-      context.userConfig.data.editor
-        ? context.splog.info(chalk.cyan(context.userConfig.data.editor))
-        : context.splog.info(
-            `Editor is not set. Pancake will use your git editor (currently ${chalk.cyan(
-              context.userConfig.getEditor()
-            )})`
-          );
-    }
-  });
+	return graphiteWithoutRepo(argv, canonical, async (context) => {
+		if (argv.set) {
+			context.userConfig.update((data) => (data.editor = argv.set));
+			context.splog.info(`Editor set to ${chalk.cyan(argv.set)}`);
+		} else if (argv.unset) {
+			context.userConfig.update((data) => (data.editor = undefined));
+			context.splog.info(
+				`Editor preference erased. Defaulting to your git editor (currently ${chalk.cyan(
+					context.userConfig.getEditor(),
+				)})`,
+			);
+		} else {
+			context.userConfig.data.editor
+				? context.splog.info(chalk.cyan(context.userConfig.data.editor))
+				: context.splog.info(
+						`Editor is not set. Pancake will use your git editor (currently ${chalk.cyan(
+							context.userConfig.getEditor(),
+						)})`,
+					);
+		}
+	});
 };

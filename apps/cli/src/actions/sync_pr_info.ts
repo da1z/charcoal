@@ -1,44 +1,44 @@
-import type { TPRInfoToUpsert } from '../lib/api/pr_info';
-import { getPrInfoForBranches } from '../lib/api/pr_info';
-import type { TContext } from '../lib/context';
-import type { TEngine } from '../lib/engine/engine';
+import type { TPRInfoToUpsert } from "../lib/api/pr_info";
+import { getPrInfoForBranches } from "../lib/api/pr_info";
+import type { TContext } from "../lib/context";
+import type { TEngine } from "../lib/engine/engine";
 
 export async function syncPrInfo(
-  branchNames: string[],
-  context: TContext
+	branchNames: string[],
+	context: TContext,
 ): Promise<TPRInfoToUpsert> {
-  const isGithubIntegrationEnabled =
-    context.repoConfig.getIsGithubIntegrationEnabled();
-  if (!isGithubIntegrationEnabled) {
-    return [];
-  }
+	const isGithubIntegrationEnabled =
+		context.repoConfig.getIsGithubIntegrationEnabled();
+	if (!isGithubIntegrationEnabled) {
+		return [];
+	}
 
-  const upsertInfo = await getPrInfoForBranches(
-    branchNames.map((branchName) => ({
-      branchName,
-      prNumber: context.engine.getPrInfo(branchName)?.number,
-    }))
-  );
+	const upsertInfo = await getPrInfoForBranches(
+		branchNames.map((branchName) => ({
+			branchName,
+			prNumber: context.engine.getPrInfo(branchName)?.number,
+		})),
+	);
 
-  upsertPrInfoForBranches(upsertInfo, context.engine);
+	upsertPrInfoForBranches(upsertInfo, context.engine);
 
-  return upsertInfo;
+	return upsertInfo;
 }
 
 export function upsertPrInfoForBranches(
-  prInfoToUpsert: TPRInfoToUpsert,
-  engine: TEngine
+	prInfoToUpsert: TPRInfoToUpsert,
+	engine: TEngine,
 ): void {
-  prInfoToUpsert.forEach((pr) =>
-    engine.upsertPrInfo(pr.headRefName, {
-      number: pr.prNumber,
-      title: pr.title,
-      body: pr.body,
-      state: pr.state,
-      reviewDecision: pr.reviewDecision ?? undefined,
-      base: pr.baseRefName,
-      url: pr.url,
-      isDraft: pr.isDraft,
-    })
-  );
+	prInfoToUpsert.forEach((pr) =>
+		engine.upsertPrInfo(pr.headRefName, {
+			number: pr.prNumber,
+			title: pr.title,
+			body: pr.body,
+			state: pr.state,
+			reviewDecision: pr.reviewDecision ?? undefined,
+			base: pr.baseRefName,
+			url: pr.url,
+			isDraft: pr.isDraft,
+		}),
+	);
 }

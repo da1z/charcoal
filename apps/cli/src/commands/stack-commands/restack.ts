@@ -1,29 +1,29 @@
-import type { Arguments, InferredOptionTypes } from 'yargs';
-import { restackBranches } from '../../actions/restack';
-import { SCOPE } from '../../lib/engine/scope_spec';
-import { graphite } from '../../lib/runner';
+import type { Arguments, InferredOptionTypes } from "yargs";
+import { restackBranches } from "../../actions/restack";
+import { SCOPE } from "../../lib/engine/scope_spec";
+import { graphite } from "../../lib/runner";
 
 const args = {
-  branch: {
-    describe: 'Which branch to run this command from (default: current branch)',
-    type: 'string',
-  },
+	branch: {
+		describe: "Which branch to run this command from (default: current branch)",
+		type: "string",
+	},
 } as const;
 type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
-export const aliases = ['r', 'fix', 'f'];
-export const command = 'restack';
-export const canonical = 'stack restack';
+export const aliases = ["r", "fix", "f"];
+export const command = "restack";
+export const canonical = "stack restack";
 export const description =
-  'Ensure each branch in the current stack is based on its parent, rebasing if necessary.';
+	"Ensure each branch in the current stack is based on its parent, rebasing if necessary.";
 export const builder = args;
 export const handler = async (argv: argsT): Promise<void> =>
-  graphite(argv, canonical, async (context) => {
-    return restackBranches(
-      context.engine.getRelativeStack(
-        argv.branch ?? context.engine.currentBranchPrecondition,
-        SCOPE.STACK
-      ),
-      context
-    );
-  });
+	graphite(argv, canonical, async (context) => {
+		return restackBranches(
+			context.engine.getRelativeStack(
+				argv.branch ?? context.engine.currentBranchPrecondition,
+				SCOPE.STACK,
+			),
+			context,
+		);
+	});

@@ -1,61 +1,61 @@
 {
-  "name": "@da1z/pancake",
-  "version": "0.2.4",
-  "license": "None",
-  "main": "dist/index.js",
-  "homepage": "https://github.com/da1z/pancake",
-  "repository": "github:da1z/pancake",
-  "dependencies": {
-    "@withgraphite/retype": "^0.3.11",
-    "@withgraphite/retyped-routes": "^0.3.1",
-    "chalk": "^4.1.2",
-    "fast-json-stable-hash": "^1.0.3",
-    "prompts": "^2.4.2",
-    "semver": "^7.3.7",
-    "strip-ansi": "^6.0.1",
-    "tmp": "^0.2.1",
-    "yargs": "^17.5.1",
-    "zod": "^3.24.1"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "scripts": {
-    "prepublishOnly": "bun run build",
-    "lint": "eslint src --quiet --ext .ts --cache",
-    "check": "tsc",
-    "build": "rm -rf dist && bun run lint && bun run check && bun build ./src/index.ts --outdir dist --target node",
-    "build-pkg": "bun build ./src/index.ts --compile --outfile=pkg/pancake-macos --target=bun-darwin-arm64 && bun build ./src/index.ts --compile --outfile=pkg/pancake-linux --target=bun-linux-x64",
-    "dev": "./scripts/installation/develop.sh",
-    "cli": "bun ./src/index.ts",
-    "test": "PK_TEST_DIR=.test-tmp bun test --timeout 30000",
-    "test-ci": "PK_TEST_DIR=.test-tmp bun test --timeout 30000 --coverage && PK_TEST_DIR=.test-tmp bun test --timeout 60000 ./test/large_repo.slow.ts",
-    "test-one": "PK_TEST_DIR=.test-tmp bun test --timeout 30000",
-    "test-grep": "PK_TEST_DIR=.test-tmp bun test --test-name-pattern"
-  },
-  "files": [
-    "dist"
-  ],
-  "bin": {
-    "pancake": "dist/index.js",
-    "pk": "dist/index.js"
-  },
-  "devDependencies": {
-    "@types/bun": "latest",
-    "@types/node": "^17.0.40",
-    "@types/prettier": "^2",
-    "@types/prompts": "^2.4.3",
-    "@types/semver": "^7",
-    "@types/tmp": "^0.2.3",
-    "@types/yargs": "^17.0.10",
-    "@typescript-eslint/eslint-plugin": "^5.27.1",
-    "@typescript-eslint/parser": "^5.27.1",
-    "eslint": "^8.17.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-import-resolver-typescript": "3.6.1",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "prettier": "^2.8.3",
-    "typescript": "^5.7.0"
-  }
+	"name": "@da1z/pancake",
+	"version": "0.2.4",
+	"license": "None",
+	"main": "dist/index.js",
+	"homepage": "https://github.com/da1z/pancake",
+	"repository": "github:da1z/pancake",
+	"dependencies": {
+		"@withgraphite/retype": "^0.3.11",
+		"@withgraphite/retyped-routes": "^0.3.1",
+		"chalk": "^4.1.2",
+		"fast-json-stable-hash": "^1.0.3",
+		"prompts": "^2.4.2",
+		"semver": "^7.3.7",
+		"strip-ansi": "^6.0.1",
+		"tmp": "^0.2.1",
+		"yargs": "^17.5.1",
+		"zod": "^3.24.1"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"prepublishOnly": "bun run build",
+		"lint": "eslint src --quiet --ext .ts --cache",
+		"check": "tsc",
+		"build": "rm -rf dist && bun run lint && bun run check && bun build ./src/index.ts --outdir dist --target node",
+		"build-pkg": "bun build ./src/index.ts --compile --outfile=pkg/pancake-macos --target=bun-darwin-arm64 && bun build ./src/index.ts --compile --outfile=pkg/pancake-linux --target=bun-linux-x64",
+		"dev": "./scripts/installation/develop.sh",
+		"cli": "bun ./src/index.ts",
+		"test": "PK_TEST_DIR=.test-tmp bun test --timeout 30000",
+		"test-ci": "PK_TEST_DIR=.test-tmp bun test --timeout 30000 --coverage && PK_TEST_DIR=.test-tmp bun test --timeout 60000 ./test/large_repo.slow.ts",
+		"test-one": "PK_TEST_DIR=.test-tmp bun test --timeout 30000",
+		"test-grep": "PK_TEST_DIR=.test-tmp bun test --test-name-pattern"
+	},
+	"files": [
+		"dist"
+	],
+	"bin": {
+		"pancake": "dist/index.js",
+		"pk": "dist/index.js"
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"@types/node": "^17.0.40",
+		"@types/prettier": "^2",
+		"@types/prompts": "^2.4.3",
+		"@types/semver": "^7",
+		"@types/tmp": "^0.2.3",
+		"@types/yargs": "^17.0.10",
+		"@typescript-eslint/eslint-plugin": "^5.27.1",
+		"@typescript-eslint/parser": "^5.27.1",
+		"eslint": "^8.17.0",
+		"eslint-config-prettier": "^8.5.0",
+		"eslint-import-resolver-typescript": "3.6.1",
+		"eslint-plugin-import": "^2.26.0",
+		"eslint-plugin-prettier": "^4.2.1",
+		"prettier": "^2.8.3",
+		"typescript": "^5.7.0"
+	}
 }

@@ -1,9 +1,9 @@
 {
-  "extends": "@total-typescript/tsconfig/bundler/no-dom",
-  "compilerOptions": {
-    "baseUrl": ".",
-    "types": ["bun"],
-    "noUncheckedIndexedAccess": false
-  },
-  "include": ["src", "test", "scripts"]
+	"extends": "@total-typescript/tsconfig/bundler/no-dom",
+	"compilerOptions": {
+		"baseUrl": ".",
+		"types": ["bun"],
+		"noUncheckedIndexedAccess": false
+	},
+	"include": ["src", "test", "scripts"]
 }

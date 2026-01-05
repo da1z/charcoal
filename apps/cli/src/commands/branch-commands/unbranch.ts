@@ -1,15 +1,15 @@
-import type { Arguments, InferredOptionTypes } from 'yargs';
-import { unbranch } from '../../actions/unbranch';
-import { graphite } from '../../lib/runner';
+import type { Arguments, InferredOptionTypes } from "yargs";
+import { unbranch } from "../../actions/unbranch";
+import { graphite } from "../../lib/runner";
 
 const args = {} as const;
 type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
-export const aliases = ['ub'];
-export const command = 'unbranch';
-export const canonical = 'branch unbranch';
+export const aliases = ["ub"];
+export const command = "unbranch";
+export const canonical = "branch unbranch";
 export const description =
-  'Delete the current branch but retain the state of files in the working tree.';
+	"Delete the current branch but retain the state of files in the working tree.";
 export const builder = args;
 export const handler = async (argv: argsT): Promise<void> =>
-  graphite(argv, canonical, async (context) => unbranch(context));
+	graphite(argv, canonical, async (context) => unbranch(context));

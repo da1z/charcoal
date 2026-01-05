@@ -1,15 +1,15 @@
-import type { Arguments, InferredOptionTypes } from 'yargs';
-import { graphite } from '../../lib/runner';
+import type { Arguments, InferredOptionTypes } from "yargs";
+import { graphite } from "../../lib/runner";
 
 const args = {} as const;
 
-export const command = 'long';
+export const command = "long";
 export const description =
-  'Display a graph of the commit ancestry of all branches.';
+	"Display a graph of the commit ancestry of all branches.";
 export const builder = args;
-export const aliases = ['l'];
-export const canonical = 'log long';
+export const aliases = ["l"];
+export const canonical = "log long";
 
 type argsT = Arguments<InferredOptionTypes<typeof args>>;
 export const handler = async (argv: argsT): Promise<void> =>
-  graphite(argv, canonical, async (context) => context.engine.logLong());
+	graphite(argv, canonical, async (context) => context.engine.logLong());

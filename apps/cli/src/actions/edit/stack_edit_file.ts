@@ -1,11 +1,11 @@
-import fs from 'node:fs';
-import path from 'path';
-import type { TContext } from '../../lib/context';
+import fs from "node:fs";
+import path from "path";
+import type { TContext } from "../../lib/context";
 
-const FILE_NAME = 'graphite_stack_edit';
+const FILE_NAME = "graphite_stack_edit";
 const FILE_FOOTER = [
-  '#',
-  '# Stack will be rearranged on trunk to match the above order.',
+	"#",
+	"# Stack will be rearranged on trunk to match the above order.",
 ];
 
 /* Example file:
@@ -18,32 +18,32 @@ gf--02-09-first
 */
 
 export function createStackEditFile(
-  opts: {
-    branchNames: string[];
-    tmpDir: string;
-  },
-  context: TContext
+	opts: {
+		branchNames: string[];
+		tmpDir: string;
+	},
+	context: TContext,
 ): string {
-  // show the trunk at the bottom of the list to better match "upstack" and "downstack"
-  const fileContents = [
-    ...opts.branchNames.reverse(),
-    `# ${context.engine.trunk} (trunk, shown for orientation)`,
-    ...FILE_FOOTER,
-  ].join('\n');
+	// show the trunk at the bottom of the list to better match "upstack" and "downstack"
+	const fileContents = [
+		...opts.branchNames.reverse(),
+		`# ${context.engine.trunk} (trunk, shown for orientation)`,
+		...FILE_FOOTER,
+	].join("\n");
 
-  const filePath = path.join(opts.tmpDir, FILE_NAME);
-  fs.writeFileSync(filePath, fileContents);
-  return filePath;
+	const filePath = path.join(opts.tmpDir, FILE_NAME);
+	fs.writeFileSync(filePath, fileContents);
+	return filePath;
 }
 
 export function parseEditFile(filePath: string): string[] {
-  return fs
-    .readFileSync(filePath)
-    .toString()
-    .split('\n')
-    .reverse()
-    .map((line) =>
-      line.substring(0, line.includes('#') ? line.indexOf('#') : line.length)
-    )
-    .filter((line) => line.length > 0);
+	return fs
+		.readFileSync(filePath)
+		.toString()
+		.split("\n")
+		.reverse()
+		.map((line) =>
+			line.substring(0, line.includes("#") ? line.indexOf("#") : line.length),
+		)
+		.filter((line) => line.length > 0);
 }

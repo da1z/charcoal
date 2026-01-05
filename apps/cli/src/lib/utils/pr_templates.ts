@@ -1,40 +1,40 @@
-import fs from 'node:fs';
-import path from 'path';
-import type { TContext } from '../context';
-import { currentGitRepoPrecondition } from '../preconditions';
+import fs from "node:fs";
+import path from "path";
+import type { TContext } from "../context";
+import { currentGitRepoPrecondition } from "../preconditions";
 
 export async function getPRTemplate(
-  context: TContext
+	context: TContext,
 ): Promise<string | undefined> {
-  const templateFiles = getPRTemplateFilepaths();
-  if (templateFiles.length === 0) {
-    return undefined;
-  }
+	const templateFiles = getPRTemplateFilepaths();
+	if (templateFiles.length === 0) {
+		return undefined;
+	}
 
-  return fs
-    .readFileSync(
-      templateFiles.length === 1
-        ? templateFiles[0]
-        : (
-            await context.prompts({
-              type: 'select',
-              name: 'templateFilepath',
-              message: `Body Template`,
-              choices: templateFiles.map((file) => {
-                return {
-                  title: getRelativePathFromRepo(file),
-                  value: file,
-                };
-              }),
-            })
-          ).templateFilepath
-    )
-    .toString();
+	return fs
+		.readFileSync(
+			templateFiles.length === 1
+				? templateFiles[0]
+				: (
+						await context.prompts({
+							type: "select",
+							name: "templateFilepath",
+							message: `Body Template`,
+							choices: templateFiles.map((file) => {
+								return {
+									title: getRelativePathFromRepo(file),
+									value: file,
+								};
+							}),
+						})
+					).templateFilepath,
+		)
+		.toString();
 }
 
 function getRelativePathFromRepo(path: string): string {
-  const repoPath = currentGitRepoPrecondition();
-  return path.replace(repoPath, '');
+	const repoPath = currentGitRepoPrecondition();
+	return path.replace(repoPath, "");
 }
 
 /**
@@ -61,44 +61,44 @@ function getRelativePathFromRepo(path: string): string {
  *
  */
 export function getPRTemplateFilepaths(): string[] {
-  const repoPath = currentGitRepoPrecondition();
-  const prTemplateLocations = [
-    repoPath,
-    path.join(repoPath, '.github'),
-    path.join(repoPath, 'docs'),
-  ].filter((location) => fs.existsSync(location));
+	const repoPath = currentGitRepoPrecondition();
+	const prTemplateLocations = [
+		repoPath,
+		path.join(repoPath, ".github"),
+		path.join(repoPath, "docs"),
+	].filter((location) => fs.existsSync(location));
 
-  return prTemplateLocations
-    .flatMap((location) => findSinglePRTemplate(location))
-    .concat(
-      prTemplateLocations.flatMap((location) =>
-        findMultiplePRTemplates(location)
-      )
-    );
+	return prTemplateLocations
+		.flatMap((location) => findSinglePRTemplate(location))
+		.concat(
+			prTemplateLocations.flatMap((location) =>
+				findMultiplePRTemplates(location),
+			),
+		);
 }
 
 function findSinglePRTemplate(folderPath: string): string[] {
-  return fs
-    .readdirSync(folderPath, { withFileTypes: true })
-    .filter(
-      (entry) =>
-        entry.isFile() &&
-        entry.name.match(/^pull_request_template\./gi) !== null
-    )
-    .map((file) => path.join(folderPath, file.name));
+	return fs
+		.readdirSync(folderPath, { withFileTypes: true })
+		.filter(
+			(entry) =>
+				entry.isFile() &&
+				entry.name.match(/^pull_request_template\./gi) !== null,
+		)
+		.map((file) => path.join(folderPath, file.name));
 }
 
 function findMultiplePRTemplates(folderPath: string): string[] {
-  return fs
-    .readdirSync(folderPath, { withFileTypes: true })
-    .filter(
-      (entry) =>
-        entry.isDirectory() &&
-        entry.name.match(/^pull_request_template$/gi) !== null
-    )
-    .flatMap((entry) =>
-      fs
-        .readdirSync(path.join(folderPath, entry.name))
-        .map((filename) => path.join(folderPath, entry.name, filename))
-    );
+	return fs
+		.readdirSync(folderPath, { withFileTypes: true })
+		.filter(
+			(entry) =>
+				entry.isDirectory() &&
+				entry.name.match(/^pull_request_template$/gi) !== null,
+		)
+		.flatMap((entry) =>
+			fs
+				.readdirSync(path.join(folderPath, entry.name))
+				.map((filename) => path.join(folderPath, entry.name, filename)),
+		);
 }

@@ -1,225 +1,225 @@
-import chalk from 'chalk';
-import type { TContext } from '../lib/context';
-import { ExitFailedError, KilledError } from '../lib/errors';
-import { suggest } from '../lib/utils/prompts_helpers';
-import { checkoutBranch } from './checkout_branch';
+import chalk from "chalk";
+import type { TContext } from "../lib/context";
+import { ExitFailedError, KilledError } from "../lib/errors";
+import { suggest } from "../lib/utils/prompts_helpers";
+import { checkoutBranch } from "./checkout_branch";
 
 export async function trackBranchInteractive(
-  context: TContext
+	context: TContext,
 ): Promise<boolean> {
-  const parentBranchName = context.engine.currentBranchPrecondition;
-  const choices = context.engine.allBranchNames
-    .filter(
-      (branchName) =>
-        !context.engine.isTrunk(branchName) &&
-        !context.engine.isBranchTracked(branchName) &&
-        (context.engine.isTrunk(parentBranchName) ||
-          context.engine.isDescendantOf(branchName, parentBranchName))
-    )
-    .map((branchName) => ({ title: branchName, value: branchName }));
+	const parentBranchName = context.engine.currentBranchPrecondition;
+	const choices = context.engine.allBranchNames
+		.filter(
+			(branchName) =>
+				!context.engine.isTrunk(branchName) &&
+				!context.engine.isBranchTracked(branchName) &&
+				(context.engine.isTrunk(parentBranchName) ||
+					context.engine.isDescendantOf(branchName, parentBranchName)),
+		)
+		.map((branchName) => ({ title: branchName, value: branchName }));
 
-  if (!choices.length) {
-    context.splog.info(
-      `No branches available to track as children of ${chalk.blueBright(
-        parentBranchName
-      )}!`
-    );
-    return false;
-  }
+	if (!choices.length) {
+		context.splog.info(
+			`No branches available to track as children of ${chalk.blueBright(
+				parentBranchName,
+			)}!`,
+		);
+		return false;
+	}
 
-  const branchName = (
-    await context.prompts({
-      type: 'autocomplete',
-      name: 'value',
-      message: `Enter a branch to track as a child of ${parentBranchName} (autocomplete or arrow keys)`,
-      choices,
-      suggest,
-    })
-  ).value;
+	const branchName = (
+		await context.prompts({
+			type: "autocomplete",
+			name: "value",
+			message: `Enter a branch to track as a child of ${parentBranchName} (autocomplete or arrow keys)`,
+			choices,
+			suggest,
+		})
+	).value;
 
-  if (!branchName) {
-    throw new KilledError();
-  }
+	if (!branchName) {
+		throw new KilledError();
+	}
 
-  trackHelper({ branchName, parentBranchName }, context);
-  await checkoutBranch(branchName, context);
-  return true;
+	trackHelper({ branchName, parentBranchName }, context);
+	await checkoutBranch(branchName, context);
+	return true;
 }
 
 function getPotentialParents(
-  args: {
-    branchName: string;
-    onlyTrackedParents: boolean;
-  },
-  context: TContext
+	args: {
+		branchName: string;
+		onlyTrackedParents: boolean;
+	},
+	context: TContext,
 ): { title: string; value: string }[] {
-  return context.engine.allBranchNames
-    .filter(
-      (potentialParentBranchName) =>
-        context.engine.isTrunk(potentialParentBranchName) ||
-        ((!args.onlyTrackedParents ||
-          context.engine.isBranchTracked(potentialParentBranchName)) &&
-          context.engine.isDescendantOf(
-            args.branchName,
-            potentialParentBranchName
-          ))
-    )
-    .sort((left, right) => {
-      return left === right
-        ? 0
-        : context.engine.isTrunk(right) ||
-          context.engine.isDescendantOf(left, right)
-        ? -1 // left is a descendant of right
-        : 1; // left is not a descendant of right
-    })
-    .map((b) => {
-      return { title: b, value: b };
-    });
+	return context.engine.allBranchNames
+		.filter(
+			(potentialParentBranchName) =>
+				context.engine.isTrunk(potentialParentBranchName) ||
+				((!args.onlyTrackedParents ||
+					context.engine.isBranchTracked(potentialParentBranchName)) &&
+					context.engine.isDescendantOf(
+						args.branchName,
+						potentialParentBranchName,
+					)),
+		)
+		.sort((left, right) => {
+			return left === right
+				? 0
+				: context.engine.isTrunk(right) ||
+						context.engine.isDescendantOf(left, right)
+					? -1 // left is a descendant of right
+					: 1; // left is not a descendant of right
+		})
+		.map((b) => {
+			return { title: b, value: b };
+		});
 }
 
 export async function trackStack(
-  args: {
-    branchName?: string;
-    force: boolean;
-  },
-  context: TContext
+	args: {
+		branchName?: string;
+		force: boolean;
+	},
+	context: TContext,
 ): Promise<void> {
-  const force = args.force || !context.interactive;
-  const branchName = args.branchName ?? context.engine.currentBranch;
+	const force = args.force || !context.interactive;
+	const branchName = args.branchName ?? context.engine.currentBranch;
 
-  if (!branchName) {
-    throw new ExitFailedError(`No branch checked out.`);
-  }
+	if (!branchName) {
+		throw new ExitFailedError(`No branch checked out.`);
+	}
 
-  if (
-    context.engine.isTrunk(branchName) ||
-    context.engine.isBranchTracked(branchName)
-  ) {
-    context.splog.info(`${chalk.cyan(branchName)} is already tracked!`);
-    return;
-  }
-  context.splog.debug(`Tracking ${branchName}`);
+	if (
+		context.engine.isTrunk(branchName) ||
+		context.engine.isBranchTracked(branchName)
+	) {
+		context.splog.info(`${chalk.cyan(branchName)} is already tracked!`);
+		return;
+	}
+	context.splog.debug(`Tracking ${branchName}`);
 
-  const choices = getPotentialParents(
-    { branchName, onlyTrackedParents: false },
-    context
-  );
+	const choices = getPotentialParents(
+		{ branchName, onlyTrackedParents: false },
+		context,
+	);
 
-  if (choices.length === 0) {
-    throw new ExitFailedError(
-      `No possible parents for this branch. Try running \`git rebase ${context.engine.trunk} ${branchName}\``
-    );
-  }
+	if (choices.length === 0) {
+		throw new ExitFailedError(
+			`No possible parents for this branch. Try running \`git rebase ${context.engine.trunk} ${branchName}\``,
+		);
+	}
 
-  const parentBranchName =
-    choices.length === 1 || force
-      ? choices[0].value
-      : (
-          await context.prompts({
-            type: 'autocomplete',
-            name: 'branch',
-            message: `Select a parent for ${branchName} (autocomplete or arrow keys)`,
-            choices,
-            suggest,
-          })
-        ).branch;
+	const parentBranchName =
+		choices.length === 1 || force
+			? choices[0].value
+			: (
+					await context.prompts({
+						type: "autocomplete",
+						name: "branch",
+						message: `Select a parent for ${branchName} (autocomplete or arrow keys)`,
+						choices,
+						suggest,
+					})
+				).branch;
 
-  await trackStack({ branchName: parentBranchName, force }, context);
-  trackHelper({ branchName, parentBranchName }, context);
+	await trackStack({ branchName: parentBranchName, force }, context);
+	trackHelper({ branchName, parentBranchName }, context);
 }
 
 export async function trackBranch(
-  args: {
-    branchName: string | undefined;
-    parentBranchName: string | undefined;
-    force: boolean;
-  },
-  context: TContext
+	args: {
+		branchName: string | undefined;
+		parentBranchName: string | undefined;
+		force: boolean;
+	},
+	context: TContext,
 ): Promise<void> {
-  const branchName = args.branchName ?? context.engine.currentBranch;
-  if (!branchName) {
-    throw new ExitFailedError(`No branch checked out.`);
-  }
+	const branchName = args.branchName ?? context.engine.currentBranch;
+	if (!branchName) {
+		throw new ExitFailedError(`No branch checked out.`);
+	}
 
-  if (args.force || !args.parentBranchName) {
-    const choices = getPotentialParents(
-      { branchName, onlyTrackedParents: true },
-      context
-    );
+	if (args.force || !args.parentBranchName) {
+		const choices = getPotentialParents(
+			{ branchName, onlyTrackedParents: true },
+			context,
+		);
 
-    if (choices.length === 0) {
-      throw new ExitFailedError(
-        `No possible parents for this branch. Try running \`git rebase ${context.engine.trunk} ${branchName}\``
-      );
-    }
+		if (choices.length === 0) {
+			throw new ExitFailedError(
+				`No possible parents for this branch. Try running \`git rebase ${context.engine.trunk} ${branchName}\``,
+			);
+		}
 
-    if (args.force || choices.length === 1) {
-      trackHelper({ branchName, parentBranchName: choices[0].value }, context);
-      return;
-    }
+		if (args.force || choices.length === 1) {
+			trackHelper({ branchName, parentBranchName: choices[0].value }, context);
+			return;
+		}
 
-    if (!context.interactive) {
-      throw new ExitFailedError(
-        `Multiple possible parents; cannot prompt in non-interactive mode.`
-      );
-    }
+		if (!context.interactive) {
+			throw new ExitFailedError(
+				`Multiple possible parents; cannot prompt in non-interactive mode.`,
+			);
+		}
 
-    trackHelper(
-      {
-        branchName,
-        parentBranchName: (
-          await context.prompts({
-            type: 'autocomplete',
-            name: 'branch',
-            message: `Select a parent for ${branchName} (autocomplete or arrow keys)`,
-            choices,
-            suggest,
-          })
-        ).branch,
-      },
-      context
-    );
-    return;
-  }
+		trackHelper(
+			{
+				branchName,
+				parentBranchName: (
+					await context.prompts({
+						type: "autocomplete",
+						name: "branch",
+						message: `Select a parent for ${branchName} (autocomplete or arrow keys)`,
+						choices,
+						suggest,
+					})
+				).branch,
+			},
+			context,
+		);
+		return;
+	}
 
-  if (
-    !context.engine.isTrunk(args.parentBranchName) &&
-    !context.engine.isDescendantOf(branchName, args.parentBranchName)
-  ) {
-    context.splog.tip(
-      `Are you sure that ${chalk.cyan(
-        args.parentBranchName
-      )} is the right parent for ${chalk.cyan(
-        branchName
-      )}?  If so, you can fix its history with ${chalk.cyan(
-        `git rebase ${args.parentBranchName} ${branchName}`
-      )} and then try again.`
-    );
+	if (
+		!context.engine.isTrunk(args.parentBranchName) &&
+		!context.engine.isDescendantOf(branchName, args.parentBranchName)
+	) {
+		context.splog.tip(
+			`Are you sure that ${chalk.cyan(
+				args.parentBranchName,
+			)} is the right parent for ${chalk.cyan(
+				branchName,
+			)}?  If so, you can fix its history with ${chalk.cyan(
+				`git rebase ${args.parentBranchName} ${branchName}`,
+			)} and then try again.`,
+		);
 
-    throw new ExitFailedError(
-      `${chalk.yellow(
-        args.parentBranchName
-      )} is not in the history of ${chalk.yellow(branchName)}.`
-    );
-  }
+		throw new ExitFailedError(
+			`${chalk.yellow(
+				args.parentBranchName,
+			)} is not in the history of ${chalk.yellow(branchName)}.`,
+		);
+	}
 
-  trackHelper({ branchName, parentBranchName: args.parentBranchName }, context);
+	trackHelper({ branchName, parentBranchName: args.parentBranchName }, context);
 }
 
 function trackHelper(
-  {
-    branchName,
-    parentBranchName,
-  }: {
-    branchName: string;
-    parentBranchName: string;
-  },
-  context: TContext
+	{
+		branchName,
+		parentBranchName,
+	}: {
+		branchName: string;
+		parentBranchName: string;
+	},
+	context: TContext,
 ) {
-  context.engine.trackBranch(branchName, parentBranchName);
-  context.splog.info(
-    `Tracked branch ${chalk.green(branchName)} with parent ${chalk.cyan(
-      parentBranchName
-    )}.`
-  );
+	context.engine.trackBranch(branchName, parentBranchName);
+	context.splog.info(
+		`Tracked branch ${chalk.green(branchName)} with parent ${chalk.cyan(
+			parentBranchName,
+		)}.`,
+	);
 }

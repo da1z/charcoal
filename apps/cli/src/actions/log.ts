@@ -1,361 +1,361 @@
-import chalk from 'chalk';
-import stripAnsi from 'strip-ansi';
-import { GRAPHITE_COLORS } from '../lib/colors';
-import type { TContext } from '../lib/context';
-import { clearPromptResultLine, suggest } from '../lib/utils/prompts_helpers';
-import { getBranchInfo } from './show_branch';
+import chalk from "chalk";
+import stripAnsi from "strip-ansi";
+import { GRAPHITE_COLORS } from "../lib/colors";
+import type { TContext } from "../lib/context";
+import { clearPromptResultLine, suggest } from "../lib/utils/prompts_helpers";
+import { getBranchInfo } from "./show_branch";
 
 function getUntrackedBranchNames(context: TContext) {
-  return context.engine.allBranchNames.filter(
-    (branchName) =>
-      !context.engine.isTrunk(branchName) &&
-      !context.engine.isBranchTracked(branchName)
-  );
+	return context.engine.allBranchNames.filter(
+		(branchName) =>
+			!context.engine.isTrunk(branchName) &&
+			!context.engine.isBranchTracked(branchName),
+	);
 }
 
 export function logAction(
-  opts: {
-    style: 'SHORT' | 'FULL';
-    reverse: boolean;
-    steps: number | undefined;
-    branchName: string;
-    showUntracked?: boolean;
-  },
-  context: TContext
+	opts: {
+		style: "SHORT" | "FULL";
+		reverse: boolean;
+		steps: number | undefined;
+		branchName: string;
+		showUntracked?: boolean;
+	},
+	context: TContext,
 ): void {
-  const logOutput = getStackLines(
-    {
-      short: opts.style === 'SHORT',
-      reverse: opts.reverse,
-      branchName: opts.branchName,
-      indentLevel: 0,
-      steps: opts.steps,
-    },
-    context
-  )
-    .concat(
-      opts.showUntracked
-        ? [
-            '',
-            chalk.yellowBright(`Untracked branches:`),
-            ...getUntrackedBranchNames(context),
-          ]
-        : []
-    )
-    .join('\n');
+	const logOutput = getStackLines(
+		{
+			short: opts.style === "SHORT",
+			reverse: opts.reverse,
+			branchName: opts.branchName,
+			indentLevel: 0,
+			steps: opts.steps,
+		},
+		context,
+	)
+		.concat(
+			opts.showUntracked
+				? [
+						"",
+						chalk.yellowBright(`Untracked branches:`),
+						...getUntrackedBranchNames(context),
+					]
+				: [],
+		)
+		.join("\n");
 
-  context.splog.page(logOutput);
+	context.splog.page(logOutput);
 }
 
 export function logForConflictStatus(
-  rebaseHead: string,
-  context: TContext
+	rebaseHead: string,
+	context: TContext,
 ): void {
-  getStackLines(
-    {
-      short: true,
-      reverse: false,
-      branchName: rebaseHead,
-      indentLevel: 0,
-      steps: 1,
-      noStyleBranchName: true,
-    },
-    context
-  ).forEach((line) => context.splog.info(line));
+	getStackLines(
+		{
+			short: true,
+			reverse: false,
+			branchName: rebaseHead,
+			indentLevel: 0,
+			steps: 1,
+			noStyleBranchName: true,
+		},
+		context,
+	).forEach((line) => context.splog.info(line));
 }
 
 export async function interactiveBranchSelection(
-  opts: {
-    message: string;
-    omitCurrentBranch?: boolean;
-    showUntracked?: boolean;
-  },
-  context: TContext
+	opts: {
+		message: string;
+		omitCurrentBranch?: boolean;
+		showUntracked?: boolean;
+	},
+	context: TContext,
 ): Promise<string> {
-  const choices = getStackLines(
-    {
-      short: true,
-      reverse: false,
-      branchName: context.engine.trunk,
-      indentLevel: 0,
-      omitCurrentBranch: opts.omitCurrentBranch,
-      noStyleBranchName: true,
-    },
-    context
-  )
-    .map((stackLine) => ({
-      title: stackLine,
-      value: ((stackLine) =>
-        stackLine.substring(stackLine.lastIndexOf('  ') + 2))(
-        stripAnsi(stackLine)
-      ),
-    }))
-    .concat(
-      opts.showUntracked
-        ? getUntrackedBranchNames(context).map((branchName) => ({
-            title: branchName,
-            value: branchName,
-          }))
-        : []
-    );
-  const indexOfCurrentIfPresent = choices.findIndex(
-    (choice) =>
-      choice.value ===
-      (opts.omitCurrentBranch
-        ? context.engine.getParentPrecondition(
-            context.engine.currentBranchPrecondition
-          )
-        : context.engine.currentBranch)
-  );
+	const choices = getStackLines(
+		{
+			short: true,
+			reverse: false,
+			branchName: context.engine.trunk,
+			indentLevel: 0,
+			omitCurrentBranch: opts.omitCurrentBranch,
+			noStyleBranchName: true,
+		},
+		context,
+	)
+		.map((stackLine) => ({
+			title: stackLine,
+			value: ((stackLine) =>
+				stackLine.substring(stackLine.lastIndexOf("  ") + 2))(
+				stripAnsi(stackLine),
+			),
+		}))
+		.concat(
+			opts.showUntracked
+				? getUntrackedBranchNames(context).map((branchName) => ({
+						title: branchName,
+						value: branchName,
+					}))
+				: [],
+		);
+	const indexOfCurrentIfPresent = choices.findIndex(
+		(choice) =>
+			choice.value ===
+			(opts.omitCurrentBranch
+				? context.engine.getParentPrecondition(
+						context.engine.currentBranchPrecondition,
+					)
+				: context.engine.currentBranch),
+	);
 
-  const initial =
-    indexOfCurrentIfPresent !== -1
-      ? indexOfCurrentIfPresent
-      : choices.length - 1;
+	const initial =
+		indexOfCurrentIfPresent !== -1
+			? indexOfCurrentIfPresent
+			: choices.length - 1;
 
-  const chosenBranch = (
-    await context.prompts({
-      type: 'autocomplete',
-      name: 'branch',
-      message: opts.message,
-      choices,
-      initial,
-      suggest,
-    })
-  ).branch;
+	const chosenBranch = (
+		await context.prompts({
+			type: "autocomplete",
+			name: "branch",
+			message: opts.message,
+			choices,
+			initial,
+			suggest,
+		})
+	).branch;
 
-  clearPromptResultLine();
-  context.splog.debug(`Selected ${chosenBranch}`);
-  return chosenBranch;
+	clearPromptResultLine();
+	context.splog.debug(`Selected ${chosenBranch}`);
+	return chosenBranch;
 }
 
 type TPrintStackArgs = {
-  short: boolean;
-  reverse: boolean;
-  branchName: string;
-  indentLevel: number;
-  omitCurrentBranch?: boolean;
-  noStyleBranchName?: boolean; // Currently only implemented for short = true
-  steps?: number;
+	short: boolean;
+	reverse: boolean;
+	branchName: string;
+	indentLevel: number;
+	omitCurrentBranch?: boolean;
+	noStyleBranchName?: boolean; // Currently only implemented for short = true
+	steps?: number;
 };
 
 function getLogShortColor(toColor: string, index: number): string {
-  return chalk.rgb(
-    ...GRAPHITE_COLORS[Math.floor(index / 2) % GRAPHITE_COLORS.length]
-  )(toColor);
+	return chalk.rgb(
+		...GRAPHITE_COLORS[Math.floor(index / 2) % GRAPHITE_COLORS.length],
+	)(toColor);
 }
 
 function getStackLines(args: TPrintStackArgs, context: TContext): string[] {
-  const overallIndent = { value: 0 };
-  const outputDeep = [
-    getUpstackExclusiveLines({ ...args, overallIndent }, context),
-    getBranchLines(args, context),
-    getDownstackExclusiveLines(args, context),
-  ];
+	const overallIndent = { value: 0 };
+	const outputDeep = [
+		getUpstackExclusiveLines({ ...args, overallIndent }, context),
+		getBranchLines(args, context),
+		getDownstackExclusiveLines(args, context),
+	];
 
-  return (args.reverse ? outputDeep.reverse().flat() : outputDeep.flat()).map(
-    (line) => {
-      if (!args.short) {
-        return line;
-      }
-      // This lambda is for finalizing log short formatting
-      const circleIndex = line.indexOf('◯');
-      const arrowIndex = line.indexOf('▸');
-      const branchNameAndDetails = line.slice(arrowIndex + 1);
+	return (args.reverse ? outputDeep.reverse().flat() : outputDeep.flat()).map(
+		(line) => {
+			if (!args.short) {
+				return line;
+			}
+			// This lambda is for finalizing log short formatting
+			const circleIndex = line.indexOf("◯");
+			const arrowIndex = line.indexOf("▸");
+			const branchNameAndDetails = line.slice(arrowIndex + 1);
 
-      const replaceCircle =
-        !args.noStyleBranchName &&
-        context.engine.currentBranch &&
-        branchNameAndDetails.split(' ')[0] === context.engine.currentBranch;
+			const replaceCircle =
+				!args.noStyleBranchName &&
+				context.engine.currentBranch &&
+				branchNameAndDetails.split(" ")[0] === context.engine.currentBranch;
 
-      return `${line
-        .slice(0, arrowIndex)
-        .split('')
-        .map(getLogShortColor)
-        .map((c) => (replaceCircle ? c.replace('◯', '◉') : c))
-        .join('')}${' '.repeat(
-        overallIndent.value * 2 + 3 - arrowIndex
-      )}${getLogShortColor(line.slice(arrowIndex + 1), circleIndex)}`;
-    }
-  );
+			return `${line
+				.slice(0, arrowIndex)
+				.split("")
+				.map(getLogShortColor)
+				.map((c) => (replaceCircle ? c.replace("◯", "◉") : c))
+				.join("")}${" ".repeat(
+				overallIndent.value * 2 + 3 - arrowIndex,
+			)}${getLogShortColor(line.slice(arrowIndex + 1), circleIndex)}`;
+		},
+	);
 }
 
 function getDownstackExclusiveLines(
-  args: TPrintStackArgs,
-  context: TContext
+	args: TPrintStackArgs,
+	context: TContext,
 ): string[] {
-  if (context.engine.isTrunk(args.branchName)) {
-    return [];
-  }
+	if (context.engine.isTrunk(args.branchName)) {
+		return [];
+	}
 
-  const outputDeep = [
-    context.engine.trunk,
-    ...context.engine.getRelativeStack(args.branchName, {
-      recursiveParents: true,
-    }),
-  ]
-    .slice(-(args.steps ?? 0))
-    .map((branchName) =>
-      // skip the branching line for downstack because we show 1 child per branch
-      getBranchLines({ ...args, branchName, skipBranchingLine: true }, context)
-    );
+	const outputDeep = [
+		context.engine.trunk,
+		...context.engine.getRelativeStack(args.branchName, {
+			recursiveParents: true,
+		}),
+	]
+		.slice(-(args.steps ?? 0))
+		.map((branchName) =>
+			// skip the branching line for downstack because we show 1 child per branch
+			getBranchLines({ ...args, branchName, skipBranchingLine: true }, context),
+		);
 
-  // opposite of the rest of these because we got the list from trunk upward
-  return args.reverse ? outputDeep.flat() : outputDeep.reverse().flat();
+	// opposite of the rest of these because we got the list from trunk upward
+	return args.reverse ? outputDeep.flat() : outputDeep.reverse().flat();
 }
 
 function getUpstackInclusiveLines(
-  args: TPrintStackArgs & { overallIndent: { value: number } },
-  context: TContext
+	args: TPrintStackArgs & { overallIndent: { value: number } },
+	context: TContext,
 ): string[] {
-  const outputDeep = [
-    getUpstackExclusiveLines(args, context),
-    getBranchLines(args, context),
-  ];
+	const outputDeep = [
+		getUpstackExclusiveLines(args, context),
+		getBranchLines(args, context),
+	];
 
-  return args.reverse ? outputDeep.reverse().flat() : outputDeep.flat();
+	return args.reverse ? outputDeep.reverse().flat() : outputDeep.flat();
 }
 
 function getUpstackExclusiveLines(
-  args: TPrintStackArgs & { overallIndent: { value: number } },
-  context: TContext
+	args: TPrintStackArgs & { overallIndent: { value: number } },
+	context: TContext,
 ): string[] {
-  if (args.steps === 0) {
-    return [];
-  }
-  const children = context.engine
-    .getChildren(args.branchName)
-    .filter(
-      (child) =>
-        !args.omitCurrentBranch ||
-        child !== context.engine.currentBranchPrecondition
-    );
-  const numChildren = children.length;
-  return children.flatMap((child, i) =>
-    getUpstackInclusiveLines(
-      {
-        ...args,
-        steps: args.steps ? args.steps - 1 : undefined,
-        branchName: child,
-        indentLevel:
-          args.indentLevel + (args.reverse ? numChildren - i - 1 : i),
-      },
-      context
-    )
-  );
+	if (args.steps === 0) {
+		return [];
+	}
+	const children = context.engine
+		.getChildren(args.branchName)
+		.filter(
+			(child) =>
+				!args.omitCurrentBranch ||
+				child !== context.engine.currentBranchPrecondition,
+		);
+	const numChildren = children.length;
+	return children.flatMap((child, i) =>
+		getUpstackInclusiveLines(
+			{
+				...args,
+				steps: args.steps ? args.steps - 1 : undefined,
+				branchName: child,
+				indentLevel:
+					args.indentLevel + (args.reverse ? numChildren - i - 1 : i),
+			},
+			context,
+		),
+	);
 }
 
 function getBranchLines(
-  args: TPrintStackArgs & {
-    overallIndent?: { value: number };
-    skipBranchingLine?: boolean;
-  },
-  context: TContext
+	args: TPrintStackArgs & {
+		overallIndent?: { value: number };
+		skipBranchingLine?: boolean;
+	},
+	context: TContext,
 ): string[] {
-  const children = context.engine.getChildren(args.branchName);
-  const numChildren =
-    children.length -
-    (args.omitCurrentBranch &&
-    children.includes(context.engine.currentBranchPrecondition)
-      ? 1
-      : 0);
+	const children = context.engine.getChildren(args.branchName);
+	const numChildren =
+		children.length -
+		(args.omitCurrentBranch &&
+		children.includes(context.engine.currentBranchPrecondition)
+			? 1
+			: 0);
 
-  if (args.overallIndent) {
-    args.overallIndent.value = Math.max(
-      args.overallIndent.value,
-      args.indentLevel
-    );
-  }
+	if (args.overallIndent) {
+		args.overallIndent.value = Math.max(
+			args.overallIndent.value,
+			args.indentLevel,
+		);
+	}
 
-  // `pk log short` case
-  if (args.short) {
-    return [
-      `${'│ '.repeat(args.indentLevel)}${'◯'}${
-        args.skipBranchingLine || numChildren <= 2
-          ? ''
-          : (args.reverse ? '─┬' : '─┴').repeat(numChildren - 2)
-      }${
-        args.skipBranchingLine || numChildren <= 1
-          ? ''
-          : args.reverse
-          ? '─┐'
-          : '─┘'
-      }▸${args.branchName}${
-        args.noStyleBranchName || context.engine.isBranchFixed(args.branchName)
-          ? ''
-          : ` ${chalk.reset(`(needs restack)`)}`
-      }`,
-    ];
-  }
+	// `pk log short` case
+	if (args.short) {
+		return [
+			`${"│ ".repeat(args.indentLevel)}${"◯"}${
+				args.skipBranchingLine || numChildren <= 2
+					? ""
+					: (args.reverse ? "─┬" : "─┴").repeat(numChildren - 2)
+			}${
+				args.skipBranchingLine || numChildren <= 1
+					? ""
+					: args.reverse
+						? "─┐"
+						: "─┘"
+			}▸${args.branchName}${
+				args.noStyleBranchName || context.engine.isBranchFixed(args.branchName)
+					? ""
+					: ` ${chalk.reset(`(needs restack)`)}`
+			}`,
+		];
+	}
 
-  // `pk log` case
-  const outputDeep = [
-    args.skipBranchingLine
-      ? []
-      : getBranchingLine({
-          numChildren,
-          reverse: args.reverse,
-          indentLevel: args.indentLevel,
-        }),
-    getInfoLines(
-      { ...args, noStem: args.reverse && numChildren === 0 },
-      context
-    ),
-  ];
+	// `pk log` case
+	const outputDeep = [
+		args.skipBranchingLine
+			? []
+			: getBranchingLine({
+					numChildren,
+					reverse: args.reverse,
+					indentLevel: args.indentLevel,
+				}),
+		getInfoLines(
+			{ ...args, noStem: args.reverse && numChildren === 0 },
+			context,
+		),
+	];
 
-  return args.reverse ? outputDeep.reverse().flat() : outputDeep.flat();
+	return args.reverse ? outputDeep.reverse().flat() : outputDeep.flat();
 }
 
 function getBranchingLine(args: {
-  numChildren: number;
-  reverse: boolean;
-  indentLevel: number;
+	numChildren: number;
+	reverse: boolean;
+	indentLevel: number;
 }): string[] {
-  // return type is array so that we don't add lines to the output in the empty case
-  if (args.numChildren < 2) {
-    return [];
-  }
-  const [middleBranch, lastBranch] = args.reverse
-    ? ['──┬', '──┐']
-    : ['──┴', '──┘'];
+	// return type is array so that we don't add lines to the output in the empty case
+	if (args.numChildren < 2) {
+		return [];
+	}
+	const [middleBranch, lastBranch] = args.reverse
+		? ["──┬", "──┐"]
+		: ["──┴", "──┘"];
 
-  return [
-    getPrefix(args.indentLevel) +
-      '├'.concat(
-        middleBranch.repeat(args.numChildren > 2 ? args.numChildren - 2 : 0),
-        lastBranch
-      ),
-  ];
+	return [
+		getPrefix(args.indentLevel) +
+			"├".concat(
+				middleBranch.repeat(args.numChildren > 2 ? args.numChildren - 2 : 0),
+				lastBranch,
+			),
+	];
 }
 
 function getInfoLines(
-  args: Omit<TPrintStackArgs, 'short'> & { noStem?: boolean },
-  context: TContext
+	args: Omit<TPrintStackArgs, "short"> & { noStem?: boolean },
+	context: TContext,
 ): string[] {
-  const isCurrent = args.branchName === context.engine.currentBranch;
-  return getBranchInfo(
-    {
-      branchName: args.branchName,
-      displayAsCurrent: isCurrent,
-      showCommitNames: args.reverse ? 'REVERSE' : 'STANDARD',
-    },
-    context
-  )
-    .map(
-      (line, index) =>
-        `${getPrefix(args.indentLevel)}${
-          index === 0
-            ? isCurrent
-              ? chalk.cyan('◉')
-              : '◯'
-            : args.noStem
-            ? ' '
-            : '│'
-        } ${line}`
-    )
-    .concat([getPrefix(args.indentLevel) + (args.noStem ? ' ' : '│')]);
+	const isCurrent = args.branchName === context.engine.currentBranch;
+	return getBranchInfo(
+		{
+			branchName: args.branchName,
+			displayAsCurrent: isCurrent,
+			showCommitNames: args.reverse ? "REVERSE" : "STANDARD",
+		},
+		context,
+	)
+		.map(
+			(line, index) =>
+				`${getPrefix(args.indentLevel)}${
+					index === 0
+						? isCurrent
+							? chalk.cyan("◉")
+							: "◯"
+						: args.noStem
+							? " "
+							: "│"
+				} ${line}`,
+		)
+		.concat([getPrefix(args.indentLevel) + (args.noStem ? " " : "│")]);
 }
 
 function getPrefix(indentLevel: number): string {
-  return '│  '.repeat(indentLevel);
+	return "│  ".repeat(indentLevel);
 }

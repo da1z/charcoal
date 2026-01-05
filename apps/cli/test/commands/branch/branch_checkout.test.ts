@@ -1,18 +1,18 @@
-import { describe, it, expect } from 'bun:test';
-import { allScenes } from '../../lib/scenes/all_scenes';
-import { configureTest } from '../../lib/utils/configure_test';
+import { describe, it, expect } from "bun:test";
+import { allScenes } from "../../lib/scenes/all_scenes";
+import { configureTest } from "../../lib/utils/configure_test";
 
 for (const scene of allScenes) {
-  describe(`(${scene}): branch create`, () => {
-    configureTest(scene);
+	describe(`(${scene}): branch create`, () => {
+		configureTest(scene);
 
-    it('Can checkout a branch', () => {
-      scene.repo.createChange('a', 'a');
-      scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `a`]);
-      scene.repo.checkoutBranch('main');
-      scene.repo.runCliCommand([`branch`, `checkout`, `a`]);
+		it("Can checkout a branch", () => {
+			scene.repo.createChange("a", "a");
+			scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `a`]);
+			scene.repo.checkoutBranch("main");
+			scene.repo.runCliCommand([`branch`, `checkout`, `a`]);
 
-      expect(scene.repo.currentBranchName()).toBe('a');
-    });
-  });
+			expect(scene.repo.currentBranchName()).toBe("a");
+		});
+	});
 }

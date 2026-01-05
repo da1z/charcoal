@@ -1,155 +1,155 @@
-import { describe, it, expect, beforeEach } from 'bun:test';
-import fs from 'node:fs';
+import { describe, it, expect, beforeEach } from "bun:test";
+import fs from "node:fs";
 import {
-  readMetadataRef,
-  writeMetadataRef,
-} from '../../../src/lib/engine/metadata_ref';
-import { allScenes } from '../../lib/scenes/all_scenes';
-import { configureTest } from '../../lib/utils/configure_test';
-import { expectBranches } from '../../lib/utils/expect_branches';
-import { expectCommits } from '../../lib/utils/expect_commits';
-import { fakeGitSquashAndMerge } from '../../lib/utils/fake_squash_and_merge';
+	readMetadataRef,
+	writeMetadataRef,
+} from "../../../src/lib/engine/metadata_ref";
+import { allScenes } from "../../lib/scenes/all_scenes";
+import { configureTest } from "../../lib/utils/configure_test";
+import { expectBranches } from "../../lib/utils/expect_branches";
+import { expectCommits } from "../../lib/utils/expect_commits";
+import { fakeGitSquashAndMerge } from "../../lib/utils/fake_squash_and_merge";
 
 for (const scene of allScenes) {
-  // eslint-disable-next-line max-lines-per-function
-  describe(`(${scene}): repo sync`, () => {
-    configureTest(scene);
+	// eslint-disable-next-line max-lines-per-function
+	describe(`(${scene}): repo sync`, () => {
+		configureTest(scene);
 
-    beforeEach(() => {
-      // Querying PR info requires a repo owner and name so we set
-      // that here too. Note that these values are meaningless (for now)
-      // and just need to exist.
-      // Note: GitHub integration is already disabled by abstract_scene.ts
-      scene.repo.runCliCommand([`repo`, `owner`, `-s`, `integration_test`]);
-      scene.repo.runCliCommand([`repo`, `name`, `-s`, `integration-test-repo`]);
-    });
+		beforeEach(() => {
+			// Querying PR info requires a repo owner and name so we set
+			// that here too. Note that these values are meaningless (for now)
+			// and just need to exist.
+			// Note: GitHub integration is already disabled by abstract_scene.ts
+			scene.repo.runCliCommand([`repo`, `owner`, `-s`, `integration_test`]);
+			scene.repo.runCliCommand([`repo`, `name`, `-s`, `integration-test-repo`]);
+		});
 
-    it('Can delete a single merged branch', async () => {
-      scene.repo.createChange('2', 'a');
-      scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `a`]);
+		it("Can delete a single merged branch", async () => {
+			scene.repo.createChange("2", "a");
+			scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `a`]);
 
-      expectBranches(scene.repo, 'a, main');
+			expectBranches(scene.repo, "a, main");
 
-      fakeGitSquashAndMerge(scene.repo, 'a', 'squash');
-      scene.repo.runCliCommand([`repo`, `owner`]);
-      scene.repo.runCliCommand([`repo`, `sync`, `-f`, `--no-pull`]);
+			fakeGitSquashAndMerge(scene.repo, "a", "squash");
+			scene.repo.runCliCommand([`repo`, `owner`]);
+			scene.repo.runCliCommand([`repo`, `sync`, `-f`, `--no-pull`]);
 
-      expectBranches(scene.repo, 'main');
-    });
+			expectBranches(scene.repo, "main");
+		});
 
-    it('Can delete a branch marked as merged', async () => {
-      scene.repo.createChange('2', 'a');
-      scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `a`]);
+		it("Can delete a branch marked as merged", async () => {
+			scene.repo.createChange("2", "a");
+			scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `a`]);
 
-      expectBranches(scene.repo, 'a, main');
+			expectBranches(scene.repo, "a, main");
 
-      writeMetadataRef(
-        'a',
-        { ...readMetadataRef('a', scene.dir), prInfo: { state: 'MERGED' } },
-        scene.dir
-      );
+			writeMetadataRef(
+				"a",
+				{ ...readMetadataRef("a", scene.dir), prInfo: { state: "MERGED" } },
+				scene.dir,
+			);
 
-      scene.repo.runCliCommand([`repo`, `owner`]);
-      scene.repo.runCliCommand([`repo`, `sync`, `-f`, `--no-pull`]);
+			scene.repo.runCliCommand([`repo`, `owner`]);
+			scene.repo.runCliCommand([`repo`, `sync`, `-f`, `--no-pull`]);
 
-      expectBranches(scene.repo, 'main');
-    });
+			expectBranches(scene.repo, "main");
+		});
 
-    it('Can delete a branch marked as closed', async () => {
-      scene.repo.createChange('2', 'a');
-      scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `a`]);
+		it("Can delete a branch marked as closed", async () => {
+			scene.repo.createChange("2", "a");
+			scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `a`]);
 
-      expectBranches(scene.repo, 'a, main');
-      writeMetadataRef(
-        'a',
-        { ...readMetadataRef('a', scene.dir), prInfo: { state: 'CLOSED' } },
-        scene.dir
-      );
+			expectBranches(scene.repo, "a, main");
+			writeMetadataRef(
+				"a",
+				{ ...readMetadataRef("a", scene.dir), prInfo: { state: "CLOSED" } },
+				scene.dir,
+			);
 
-      scene.repo.runCliCommand([`repo`, `owner`]);
-      scene.repo.runCliCommand([`repo`, `sync`, `-f`, `--no-pull`]);
+			scene.repo.runCliCommand([`repo`, `owner`]);
+			scene.repo.runCliCommand([`repo`, `sync`, `-f`, `--no-pull`]);
 
-      expectBranches(scene.repo, 'main');
-    });
+			expectBranches(scene.repo, "main");
+		});
 
-    it('Can noop sync if there are no stacks', () => {
-      expect(() =>
-        scene.repo.runCliCommand([`repo`, `sync`, `-f`, `--no-pull`])
-      ).not.toThrow();
-    });
+		it("Can noop sync if there are no stacks", () => {
+			expect(() =>
+				scene.repo.runCliCommand([`repo`, `sync`, `-f`, `--no-pull`]),
+			).not.toThrow();
+		});
 
-    it('Can delete the foundation of a double stack and restack it', async () => {
-      scene.repo.createChange('2', 'a');
-      scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `a`]);
+		it("Can delete the foundation of a double stack and restack it", async () => {
+			scene.repo.createChange("2", "a");
+			scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `a`]);
 
-      scene.repo.createChange('3', 'b');
-      scene.repo.runCliCommand([`branch`, `create`, `b`, `-m`, `b`]);
+			scene.repo.createChange("3", "b");
+			scene.repo.runCliCommand([`branch`, `create`, `b`, `-m`, `b`]);
 
-      expectBranches(scene.repo, 'a, b, main');
+			expectBranches(scene.repo, "a, b, main");
 
-      fakeGitSquashAndMerge(scene.repo, 'a', 'squash');
-      scene.repo.runCliCommand([
-        `repo`,
-        `sync`,
-        `-f`,
-        `--no-pull`,
-        `--restack`,
-      ]);
+			fakeGitSquashAndMerge(scene.repo, "a", "squash");
+			scene.repo.runCliCommand([
+				`repo`,
+				`sync`,
+				`-f`,
+				`--no-pull`,
+				`--restack`,
+			]);
 
-      expectBranches(scene.repo, 'b, main');
-      expectCommits(scene.repo, 'squash, 1');
+			expectBranches(scene.repo, "b, main");
+			expectCommits(scene.repo, "squash, 1");
 
-      scene.repo.checkoutBranch('b');
-      expectCommits(scene.repo, 'b, squash, 1');
-    });
+			scene.repo.checkoutBranch("b");
+			expectCommits(scene.repo, "b, squash, 1");
+		});
 
-    it('Can delete two branches off a three-stack', async () => {
-      scene.repo.createChange('2', 'a');
-      scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `a`]);
+		it("Can delete two branches off a three-stack", async () => {
+			scene.repo.createChange("2", "a");
+			scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `a`]);
 
-      scene.repo.createChange('3', 'b');
-      scene.repo.runCliCommand([`branch`, `create`, `b`, `-m`, `b`]);
+			scene.repo.createChange("3", "b");
+			scene.repo.runCliCommand([`branch`, `create`, `b`, `-m`, `b`]);
 
-      scene.repo.createChange('4', 'c');
-      scene.repo.runCliCommand([`branch`, `create`, `c`, `-m`, `c`]);
+			scene.repo.createChange("4", "c");
+			scene.repo.runCliCommand([`branch`, `create`, `c`, `-m`, `c`]);
 
-      expectBranches(scene.repo, 'a, b, c, main');
+			expectBranches(scene.repo, "a, b, c, main");
 
-      fakeGitSquashAndMerge(scene.repo, 'a', 'squash_a');
-      fakeGitSquashAndMerge(scene.repo, 'b', 'squash_b');
-      scene.repo.runCliCommand([`repo`, `sync`, `-f`, `--no-pull`]);
+			fakeGitSquashAndMerge(scene.repo, "a", "squash_a");
+			fakeGitSquashAndMerge(scene.repo, "b", "squash_b");
+			scene.repo.runCliCommand([`repo`, `sync`, `-f`, `--no-pull`]);
 
-      expectBranches(scene.repo, 'c, main');
-      expectCommits(scene.repo, 'squash_b, squash_a, 1');
-    });
+			expectBranches(scene.repo, "c, main");
+			expectCommits(scene.repo, "squash_b, squash_a, 1");
+		});
 
-    it('Can delete two branches, while syncing inbetween, off a three-stack', async () => {
-      scene.repo.createChange('2', 'a');
-      scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `a`]);
+		it("Can delete two branches, while syncing inbetween, off a three-stack", async () => {
+			scene.repo.createChange("2", "a");
+			scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `a`]);
 
-      scene.repo.createChange('3', 'b');
-      scene.repo.runCliCommand([`branch`, `create`, `b`, `-m`, `b`]);
+			scene.repo.createChange("3", "b");
+			scene.repo.runCliCommand([`branch`, `create`, `b`, `-m`, `b`]);
 
-      scene.repo.createChange('4', 'c');
-      scene.repo.runCliCommand([`branch`, `create`, `c`, `-m`, `c`]);
+			scene.repo.createChange("4", "c");
+			scene.repo.runCliCommand([`branch`, `create`, `c`, `-m`, `c`]);
 
-      expectBranches(scene.repo, 'a, b, c, main');
+			expectBranches(scene.repo, "a, b, c, main");
 
-      fakeGitSquashAndMerge(scene.repo, 'a', 'squash_a');
-      scene.repo.runCliCommand([`repo`, `sync`, `-f`, `--no-pull`]);
-      fakeGitSquashAndMerge(scene.repo, 'b', 'squash_b');
-      scene.repo.runCliCommand([`repo`, `sync`, `-f`, `--no-pull`]);
+			fakeGitSquashAndMerge(scene.repo, "a", "squash_a");
+			scene.repo.runCliCommand([`repo`, `sync`, `-f`, `--no-pull`]);
+			fakeGitSquashAndMerge(scene.repo, "b", "squash_b");
+			scene.repo.runCliCommand([`repo`, `sync`, `-f`, `--no-pull`]);
 
-      expectBranches(scene.repo, 'c, main');
-      expectCommits(scene.repo, 'squash_b, squash_a, 1');
+			expectBranches(scene.repo, "c, main");
+			expectCommits(scene.repo, "squash_b, squash_a, 1");
 
-      const metadata = fs.readdirSync(
-        `${scene.repo.dir}/.git/refs/branch-metadata`
-      );
+			const metadata = fs.readdirSync(
+				`${scene.repo.dir}/.git/refs/branch-metadata`,
+			);
 
-      expect(metadata.includes('a')).toBe(false);
-      expect(metadata.includes('b')).toBe(false);
-      expect(metadata.includes('c')).toBe(true);
-    });
-  });
+			expect(metadata.includes("a")).toBe(false);
+			expect(metadata.includes("b")).toBe(false);
+			expect(metadata.includes("c")).toBe(true);
+		});
+	});
 }

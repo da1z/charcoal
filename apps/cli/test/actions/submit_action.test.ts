@@ -1,127 +1,127 @@
-import { describe, it, expect } from 'bun:test';
-import { inferPRBody } from '../../src/actions/submit/pr_body';
-import { getPRTitle } from '../../src/actions/submit/pr_title';
-import { updatePrBodyFooter } from '../../src/actions/submit/submit_action';
-import { validateNoEmptyBranches } from '../../src/actions/submit/validate_branches';
-import { BasicScene } from '../lib/scenes/basic_scene';
-import { configureTest } from '../lib/utils/configure_test';
+import { describe, it, expect } from "bun:test";
+import { inferPRBody } from "../../src/actions/submit/pr_body";
+import { getPRTitle } from "../../src/actions/submit/pr_title";
+import { updatePrBodyFooter } from "../../src/actions/submit/submit_action";
+import { validateNoEmptyBranches } from "../../src/actions/submit/validate_branches";
+import { BasicScene } from "../lib/scenes/basic_scene";
+import { configureTest } from "../lib/utils/configure_test";
 
 for (const scene of [new BasicScene()]) {
-  describe(`(${scene}): correctly infers submit info from commits`, () => {
-    configureTest(scene);
+	describe(`(${scene}): correctly infers submit info from commits`, () => {
+		configureTest(scene);
 
-    it('can infer title/body from single commit', async () => {
-      const title = 'Test Title';
-      const body = ['Test body line 1.', 'Test body line 2.'].join('\n');
-      const message = `${title}\n\n${body}`;
+		it("can infer title/body from single commit", async () => {
+			const title = "Test Title";
+			const body = ["Test body line 1.", "Test body line 2."].join("\n");
+			const message = `${title}\n\n${body}`;
 
-      scene.repo.createChange('a');
-      scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, message]);
+			scene.repo.createChange("a");
+			scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, message]);
 
-      expect(
-        await getPRTitle(
-          { branchName: 'a', editPRFieldsInline: false },
-          scene.getContext()
-        )
-      ).toBe(title);
-      expect(
-        inferPRBody(
-          { branchName: 'a', template: 'template' },
-          scene.getContext()
-        ).inferredBody
-      ).toBe(`template`);
+			expect(
+				await getPRTitle(
+					{ branchName: "a", editPRFieldsInline: false },
+					scene.getContext(),
+				),
+			).toBe(title);
+			expect(
+				inferPRBody(
+					{ branchName: "a", template: "template" },
+					scene.getContext(),
+				).inferredBody,
+			).toBe(`template`);
 
-      scene
-        .getContext()
-        .userConfig.update((data) => (data.submitIncludeCommitMessages = true));
+			scene
+				.getContext()
+				.userConfig.update((data) => (data.submitIncludeCommitMessages = true));
 
-      expect(
-        await getPRTitle(
-          { branchName: 'a', editPRFieldsInline: false },
-          scene.getContext()
-        )
-      ).toBe(title);
-      expect(
-        inferPRBody(
-          { branchName: 'a', template: 'template' },
-          scene.getContext()
-        ).inferredBody
-      ).toBe(`${body}\n\ntemplate`);
-    });
+			expect(
+				await getPRTitle(
+					{ branchName: "a", editPRFieldsInline: false },
+					scene.getContext(),
+				),
+			).toBe(title);
+			expect(
+				inferPRBody(
+					{ branchName: "a", template: "template" },
+					scene.getContext(),
+				).inferredBody,
+			).toBe(`${body}\n\ntemplate`);
+		});
 
-    it('can infer just title with no body', async () => {
-      const title = 'Test Title';
-      const commitMessage = title;
+		it("can infer just title with no body", async () => {
+			const title = "Test Title";
+			const commitMessage = title;
 
-      scene.repo.createChange('a');
-      scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, commitMessage]);
+			scene.repo.createChange("a");
+			scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, commitMessage]);
 
-      expect(
-        await getPRTitle(
-          { branchName: 'a', editPRFieldsInline: false },
-          scene.getContext()
-        )
-      ).toBe(title);
-      expect(
-        inferPRBody(
-          { branchName: 'a', template: 'template' },
-          scene.getContext()
-        ).inferredBody
-      ).toBe('template');
-    });
+			expect(
+				await getPRTitle(
+					{ branchName: "a", editPRFieldsInline: false },
+					scene.getContext(),
+				),
+			).toBe(title);
+			expect(
+				inferPRBody(
+					{ branchName: "a", template: "template" },
+					scene.getContext(),
+				).inferredBody,
+			).toBe("template");
+		});
 
-    it('can infer title/body from multiple commits', async () => {
-      const title = 'Test Title';
-      const secondSubj = 'Second commit subject';
+		it("can infer title/body from multiple commits", async () => {
+			const title = "Test Title";
+			const secondSubj = "Second commit subject";
 
-      scene.repo.createChange('a');
-      scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, title]);
-      scene.repo.createChangeAndCommit(secondSubj);
+			scene.repo.createChange("a");
+			scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, title]);
+			scene.repo.createChangeAndCommit(secondSubj);
 
-      expect(
-        await getPRTitle(
-          { branchName: 'a', editPRFieldsInline: false },
-          scene.getContext()
-        )
-      ).toBe(title);
-      expect(
-        inferPRBody({ branchName: 'a' }, scene.getContext()).inferredBody
-      ).toBe(``);
+			expect(
+				await getPRTitle(
+					{ branchName: "a", editPRFieldsInline: false },
+					scene.getContext(),
+				),
+			).toBe(title);
+			expect(
+				inferPRBody({ branchName: "a" }, scene.getContext()).inferredBody,
+			).toBe(``);
 
-      scene
-        .getContext()
-        .userConfig.update((data) => (data.submitIncludeCommitMessages = true));
+			scene
+				.getContext()
+				.userConfig.update((data) => (data.submitIncludeCommitMessages = true));
 
-      expect(
-        await getPRTitle(
-          { branchName: 'a', editPRFieldsInline: false },
-          scene.getContext()
-        )
-      ).toBe(title);
-      expect(
-        inferPRBody({ branchName: 'a' }, scene.getContext()).inferredBody
-      ).toBe(`${title}\n\n${secondSubj}`);
-    });
+			expect(
+				await getPRTitle(
+					{ branchName: "a", editPRFieldsInline: false },
+					scene.getContext(),
+				),
+			).toBe(title);
+			expect(
+				inferPRBody({ branchName: "a" }, scene.getContext()).inferredBody,
+			).toBe(`${title}\n\n${secondSubj}`);
+		});
 
-    it('aborts if the branch is empty', async () => {
-      scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `a`]);
-      await expect(
-        validateNoEmptyBranches(['a'], scene.getContext())
-      ).rejects.toThrow();
-    });
+		it("aborts if the branch is empty", async () => {
+			scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `a`]);
+			await expect(
+				validateNoEmptyBranches(["a"], scene.getContext()),
+			).rejects.toThrow();
+		});
 
-    it('does not abort if the branch is not empty', async () => {
-      scene.repo.createChange('a');
-      scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `a`]);
-      await expect(
-        validateNoEmptyBranches(['a'], scene.getContext())
-      ).resolves.toBeUndefined();
-    });
-  });
+		it("does not abort if the branch is not empty", async () => {
+			scene.repo.createChange("a");
+			scene.repo.runCliCommand([`branch`, `create`, `a`, `-m`, `a`]);
+			await expect(
+				validateNoEmptyBranches(["a"], scene.getContext()),
+			).resolves.toBeUndefined();
+		});
+	});
 }
 
-describe('updatePrBodyFooter', () => {
-  const newFooter = `
+describe("updatePrBodyFooter", () => {
+	const newFooter = `
 
 
 #### PR Dependency Tree
@@ -131,17 +131,17 @@ describe('updatePrBodyFooter', () => {
 
 This tree was auto-generated by [Pancake](https://github.com/da1z/pancake)`;
 
-  describe('when there is no existing body', () => {
-    it('adds the footer', () => {
-      const updatedPrBodyFooter = updatePrBodyFooter(undefined, newFooter);
+	describe("when there is no existing body", () => {
+		it("adds the footer", () => {
+			const updatedPrBodyFooter = updatePrBodyFooter(undefined, newFooter);
 
-      expect(newFooter).toBe(updatedPrBodyFooter);
-    });
-  });
+			expect(newFooter).toBe(updatedPrBodyFooter);
+		});
+	});
 
-  describe('when there is already a body', () => {
-    it('replaces the footer', () => {
-      const existingBody = `Fix issue where dependency tree prints multiple times
+	describe("when there is already a body", () => {
+		it("replaces the footer", () => {
+			const existingBody = `Fix issue where dependency tree prints multiple times
 
 **Changes In This Pull Request:**
 
@@ -157,13 +157,13 @@ This tree was auto-generated by [Pancake](https://github.com/da1z/pancake)`;
 
 This tree was auto-generated by [Pancake](https://github.com/da1z/pancake)`;
 
-      const updatedPrBody = updatePrBodyFooter(existingBody, newFooter);
+			const updatedPrBody = updatePrBodyFooter(existingBody, newFooter);
 
-      expect(existingBody).toBe(updatedPrBody);
-    });
-    describe('and there is no existing footer', () => {
-      it('adds the footer', () => {
-        const existingBody = `Fix issue where dependency tree prints multiple times
+			expect(existingBody).toBe(updatedPrBody);
+		});
+		describe("and there is no existing footer", () => {
+			it("adds the footer", () => {
+				const existingBody = `Fix issue where dependency tree prints multiple times
 
 **Changes In This Pull Request:**
 
@@ -171,21 +171,21 @@ This tree was auto-generated by [Pancake](https://github.com/da1z/pancake)`;
 
 ![CleanShot 2024-02-08 at 21 18 49@2x](https://github.com/da1z/pancake/assets/22798229/3821e8dc-d6df-4e1d-bd4b-2ed5ccf7aec9)`;
 
-        const updatedPrBodyFooter = updatePrBodyFooter(existingBody, newFooter);
+				const updatedPrBodyFooter = updatePrBodyFooter(existingBody, newFooter);
 
-        expect(existingBody + newFooter).toBe(updatedPrBodyFooter);
-      });
-    });
+				expect(existingBody + newFooter).toBe(updatedPrBodyFooter);
+			});
+		});
 
-    describe('and external bot content appears after the footer', () => {
-      it('replaces the footer and preserves external content', () => {
-        const bodyBeforeFooter = `Fix bug in user authentication
+		describe("and external bot content appears after the footer", () => {
+			it("replaces the footer and preserves external content", () => {
+				const bodyBeforeFooter = `Fix bug in user authentication
 
 **Changes In This Pull Request:**
 
 **Test Plan:**`;
 
-        const existingFooter = `
+				const existingFooter = `
 
 #### PR Dependency Tree
 
@@ -195,31 +195,31 @@ This tree was auto-generated by [Pancake](https://github.com/da1z/pancake)`;
 
 This tree was auto-generated by [Pancake](https://github.com/da1z/pancake)`;
 
-        const externalBotContent = `
+				const externalBotContent = `
 
 <!-- EXTERNAL_BOT -->
 ---
 Some external bot added this content after the footer.
 <!-- /EXTERNAL_BOT -->`;
 
-        const existingBody =
-          bodyBeforeFooter + existingFooter + externalBotContent;
+				const existingBody =
+					bodyBeforeFooter + existingFooter + externalBotContent;
 
-        const updatedPrBody = updatePrBodyFooter(existingBody, newFooter);
+				const updatedPrBody = updatePrBodyFooter(existingBody, newFooter);
 
-        expect(updatedPrBody).toBe(
-          bodyBeforeFooter + externalBotContent + newFooter
-        );
-      });
-    });
+				expect(updatedPrBody).toBe(
+					bodyBeforeFooter + externalBotContent + newFooter,
+				);
+			});
+		});
 
-    describe('and there are duplicate footers', () => {
-      it('removes all duplicates and adds a single footer', () => {
-        const bodyBeforeFooter = `Fix bug
+		describe("and there are duplicate footers", () => {
+			it("removes all duplicates and adds a single footer", () => {
+				const bodyBeforeFooter = `Fix bug
 
 **Test Plan:**`;
 
-        const existingFooter1 = `
+				const existingFooter1 = `
 
 #### PR Dependency Tree
 
@@ -229,14 +229,14 @@ Some external bot added this content after the footer.
 
 This tree was auto-generated by [Pancake](https://github.com/da1z/pancake)`;
 
-        const externalBotContent = `
+				const externalBotContent = `
 
 <!-- EXTERNAL_BOT -->
 ---
 External bot content here.
 <!-- /EXTERNAL_BOT -->`;
 
-        const existingFooter2 = `
+				const existingFooter2 = `
 
 
 #### PR Dependency Tree
@@ -248,18 +248,18 @@ External bot content here.
 
 This tree was auto-generated by [Pancake](https://github.com/da1z/pancake)`;
 
-        const existingBody =
-          bodyBeforeFooter +
-          existingFooter1 +
-          externalBotContent +
-          existingFooter2;
+				const existingBody =
+					bodyBeforeFooter +
+					existingFooter1 +
+					externalBotContent +
+					existingFooter2;
 
-        const updatedPrBody = updatePrBodyFooter(existingBody, newFooter);
+				const updatedPrBody = updatePrBodyFooter(existingBody, newFooter);
 
-        expect(updatedPrBody).toBe(
-          bodyBeforeFooter + externalBotContent + newFooter
-        );
-      });
-    });
-  });
+				expect(updatedPrBody).toBe(
+					bodyBeforeFooter + externalBotContent + newFooter,
+				);
+			});
+		});
+	});
 });

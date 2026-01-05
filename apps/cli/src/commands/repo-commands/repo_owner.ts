@@ -1,29 +1,29 @@
-import type { Arguments, InferredOptionTypes } from 'yargs';
-import { graphite } from '../../lib/runner';
+import type { Arguments, InferredOptionTypes } from "yargs";
+import { graphite } from "../../lib/runner";
 
 const args = {
-  set: {
-    optional: false,
-    type: 'string',
-    alias: 's',
-    describe:
-      "Override the value of the repo owner's name in the Pancake config. This is expected to match the name of the repo owner on GitHub and should only be set in cases where Pancake is incorrectly inferring the repo owner's name.",
-  },
+	set: {
+		optional: false,
+		type: "string",
+		alias: "s",
+		describe:
+			"Override the value of the repo owner's name in the Pancake config. This is expected to match the name of the repo owner on GitHub and should only be set in cases where Pancake is incorrectly inferring the repo owner's name.",
+	},
 } as const;
 
 type argsT = Arguments<InferredOptionTypes<typeof args>>;
 
-export const command = 'owner';
-export const canonical = 'repo owner';
+export const command = "owner";
+export const canonical = "repo owner";
 export const description =
-  "The current repo owner's name stored in Pancake. e.g. in 'da1z/pancake', this is 'da1z'.";
+	"The current repo owner's name stored in Pancake. e.g. in 'da1z/pancake', this is 'da1z'.";
 export const builder = args;
 export const handler = async (argv: argsT): Promise<void> => {
-  return graphite(argv, canonical, async (context) => {
-    if (argv.set) {
-      context.repoConfig.update((data) => (data.owner = argv.set));
-    } else {
-      context.splog.info(context.repoConfig.getRepoOwner());
-    }
-  });
+	return graphite(argv, canonical, async (context) => {
+		if (argv.set) {
+			context.repoConfig.update((data) => (data.owner = argv.set));
+		} else {
+			context.splog.info(context.repoConfig.getRepoOwner());
+		}
+	});
 };

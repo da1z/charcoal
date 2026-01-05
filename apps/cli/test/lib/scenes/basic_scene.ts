@@ -1,11 +1,11 @@
-import { AbstractScene } from './abstract_scene';
+import { AbstractScene } from "./abstract_scene";
 
 export class BasicScene extends AbstractScene {
-  public toString(): string {
-    return 'BasicScene';
-  }
-  public override setup(): void {
-    super.setup();
-    this.repo.createChangeAndCommit('1', '1');
-  }
+	public toString(): string {
+		return "BasicScene";
+	}
+	public override setup(): void {
+		super.setup();
+		this.repo.createChangeAndCommit("1", "1");
+	}
 }
