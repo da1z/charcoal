@@ -180,8 +180,6 @@ async function getBranchPoints({
 				await context.prompts({
 					type: "select",
 					name: "value",
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-ignore the types are out of date
 					warn: " ",
 					message: `Toggle a commit to split the branch there.`,
 					hint: "Arrow keys and return/space. Select confirm to finish.",
@@ -217,7 +215,7 @@ async function getBranchPoints({
 							}${commit}`;
 
 							const title = chalk.rgb(...titleColor)(titleText);
-							return { title, value: "" + index };
+							return { title, value: `${index}` };
 						}),
 						{
 							title: chalk.reset(
@@ -233,6 +231,7 @@ async function getBranchPoints({
 					],
 				})
 			).value,
+			10,
 		);
 		clearPromptResultLine();
 		// Never toggle the first commmit, it always needs a branch
@@ -268,7 +267,7 @@ async function splitByHunk(
 			context.splog.info(instructions);
 			context.splog.newline();
 			context.splog.info(chalk.yellow("Remaining changes:"));
-			context.splog.info(" " + unstagedChanges);
+			context.splog.info(` ${unstagedChanges}`);
 			context.splog.newline();
 			context.splog.info(
 				chalk.yellow(`Stage changes for branch ${branchNames.length + 1}:`),

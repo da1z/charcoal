@@ -1,8 +1,8 @@
-import { describe, it, expect } from "bun:test";
+import { describe, expect, it } from "bun:test";
+import { removeUnsupportedTrailingCharacters } from "../../../src/lib/utils/branch_name";
 import { allScenes } from "../../lib/scenes/all_scenes";
 import { configureTest } from "../../lib/utils/configure_test";
 import { expectCommits } from "../../lib/utils/expect_commits";
-import { removeUnsupportedTrailingCharacters } from "../../../src/lib/utils/branch_name";
 
 for (const scene of allScenes) {
 	describe(`(${scene}): branch create`, () => {

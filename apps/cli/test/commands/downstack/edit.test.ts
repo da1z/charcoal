@@ -1,6 +1,6 @@
-import { describe, it, expect } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import fs from "node:fs";
-import path from "path";
+import path from "node:path";
 import { performInTmpDir } from "../../../src/lib/utils/perform_in_tmp_dir";
 import { BasicScene } from "../../lib/scenes/basic_scene";
 import { configureTest } from "../../lib/utils/configure_test";

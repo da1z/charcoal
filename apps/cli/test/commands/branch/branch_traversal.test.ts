@@ -1,4 +1,4 @@
-import { describe, it, expect } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import { allScenes } from "../../lib/scenes/all_scenes";
 import type { BasicScene } from "../../lib/scenes/basic_scene";
 import type { TrailingProdScene } from "../../lib/scenes/trailing_prod_scene";

@@ -27,10 +27,14 @@ export const builder = args;
 export const handler = async (argv: argsT): Promise<void> => {
 	return graphiteWithoutRepo(argv, canonical, async (context) => {
 		if (argv.enable) {
-			context.userConfig.update((data) => (data.branchDate = true));
+			context.userConfig.update((data) => {
+				data.branchDate = true;
+			});
 			context.splog.info(`Enabled date`);
 		} else if (argv.disable) {
-			context.userConfig.update((data) => (data.branchDate = false));
+			context.userConfig.update((data) => {
+				data.branchDate = false;
+			});
 			context.splog.info(`Disabled date`);
 		} else {
 			context.splog.info(

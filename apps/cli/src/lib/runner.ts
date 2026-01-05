@@ -1,8 +1,9 @@
 // Why does an open source CLI include telemetry?
 // We the creators want to understand how people are using the tool
 // All metrics logged are listed plain to see, and are non blocking in case the server is unavailable.
-import type { Arguments } from "yargs";
+
 import chalk from "chalk";
+import type { Arguments } from "yargs";
 import { version } from "../../package.json";
 import { init } from "../actions/init";
 import { refreshPRInfoInBackground } from "../background_tasks/fetch_pr_info";
@@ -10,20 +11,11 @@ import type { TContext, TContextLite } from "./context";
 import { initContext, initContextLite } from "./context";
 import type { TCacheLock } from "./engine/cache_lock";
 import { getCacheLock } from "./engine/cache_lock";
-import {
-	BadTrunkOperationError,
-	ConcurrentExecutionError,
-	DetachedError,
-	ExitFailedError,
-	KilledError,
-	PreconditionsFailedError,
-	RebaseConflictError,
-	UntrackedBranchError,
-} from "./errors";
+import { DetachedError, KilledError, RebaseConflictError } from "./errors";
 import { composeGit } from "./git/git";
+import { CommandKilledError } from "./git/runner";
 import type { TGlobalArguments } from "./global_arguments";
 import { tracer } from "./utils/tracer";
-import { CommandFailedError, CommandKilledError } from "./git/runner";
 
 export async function graphite(
 	args: Arguments & TGlobalArguments,
@@ -62,7 +54,9 @@ async function graphiteInternal(
 	process.on("SIGINT", (): never => {
 		handlerMaybeWithCacheLock.cacheLock?.release();
 		// End all current traces abruptly.
-		tracer.allSpans.forEach((s) => s.end(undefined, new KilledError()));
+		for (const s of tracer.allSpans) {
+			s.end(undefined, new KilledError());
+		}
 		// eslint-disable-next-line no-restricted-syntax
 		process.exit(1);
 	});
@@ -149,7 +143,7 @@ async function graphiteHelper(
 	} finally {
 		try {
 			context.engine.persist();
-		} catch (persistError) {
+		} catch {
 			context.engine.clear();
 			context.splog.debug(`Failed to persist Pancake cache`);
 		}
@@ -159,8 +153,11 @@ async function graphiteHelper(
 	return { cacheBefore, cacheAfter: context.engine.debug };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function handleGraphiteError(err: any, context: TContextLite): void {
+function handleGraphiteError(err: unknown, context: TContextLite): void {
+	if (!(err instanceof Error)) {
+		context.splog.error(String(err));
+		return;
+	}
 	switch (err.constructor) {
 		case CommandKilledError:
 		case KilledError: // the user doesn't need a message if they ended gt
@@ -168,12 +165,6 @@ function handleGraphiteError(err: any, context: TContextLite): void {
 			// pass
 			return;
 
-		case UntrackedBranchError:
-		case BadTrunkOperationError:
-		case ExitFailedError:
-		case ConcurrentExecutionError:
-		case PreconditionsFailedError:
-		case CommandFailedError:
 		default:
 			context.splog.error(err.message);
 			return;

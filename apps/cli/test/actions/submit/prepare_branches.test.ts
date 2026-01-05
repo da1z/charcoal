@@ -1,4 +1,4 @@
-import { describe, it, expect } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import fs from "node:fs";
 import prompts from "prompts";
 import { getPRInfoForBranches } from "../../../src/actions/submit/prepare_branches";
@@ -26,11 +26,11 @@ describe(`(${scene}): correctly get PR information for branches`, () => {
 
 		const updatedBody = "updatedBody";
 		// Skip editor and inject the updated body
-		context.userConfig.execEditor = function (editFilePath: string) {
+		context.userConfig.execEditor = (editFilePath: string) => {
 			fs.writeFileSync(editFilePath, updatedBody);
 		};
 		// Pretend the stack has been submitted
-		context.engine.getPrInfo = function (_branchName: string) {
+		context.engine.getPrInfo = (_branchName: string) => {
 			return {
 				number: 1,
 			};

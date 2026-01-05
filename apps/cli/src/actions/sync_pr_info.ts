@@ -29,7 +29,7 @@ export function upsertPrInfoForBranches(
 	prInfoToUpsert: TPRInfoToUpsert,
 	engine: TEngine,
 ): void {
-	prInfoToUpsert.forEach((pr) =>
+	for (const pr of prInfoToUpsert) {
 		engine.upsertPrInfo(pr.headRefName, {
 			number: pr.prNumber,
 			title: pr.title,
@@ -39,6 +39,6 @@ export function upsertPrInfoForBranches(
 			base: pr.baseRefName,
 			url: pr.url,
 			isDraft: pr.isDraft,
-		}),
-	);
+		});
+	}
 }

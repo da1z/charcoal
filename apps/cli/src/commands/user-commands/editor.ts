@@ -25,10 +25,14 @@ export const builder = args;
 export const handler = async (argv: argsT): Promise<void> => {
 	return graphiteWithoutRepo(argv, canonical, async (context) => {
 		if (argv.set) {
-			context.userConfig.update((data) => (data.editor = argv.set));
+			context.userConfig.update((data) => {
+				data.editor = argv.set;
+			});
 			context.splog.info(`Editor set to ${chalk.cyan(argv.set)}`);
 		} else if (argv.unset) {
-			context.userConfig.update((data) => (data.editor = undefined));
+			context.userConfig.update((data) => {
+				data.editor = undefined;
+			});
 			context.splog.info(
 				`Editor preference erased. Defaulting to your git editor (currently ${chalk.cyan(
 					context.userConfig.getEditor(),

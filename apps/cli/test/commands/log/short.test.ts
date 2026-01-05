@@ -1,5 +1,5 @@
-import { describe, it, expect } from "bun:test";
-import { execSync } from "child_process";
+import { describe, expect, it } from "bun:test";
+import { execSync } from "node:child_process";
 import fs from "node:fs";
 import { TrailingProdScene } from "../../lib/scenes/trailing_prod_scene";
 import { configureTest } from "../../lib/utils/configure_test";

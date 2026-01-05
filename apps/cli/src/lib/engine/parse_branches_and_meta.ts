@@ -68,8 +68,7 @@ export function parseBranchesAndMeta(
 			throw new PreconditionsFailedError("Cycle detected in Pancake metadata");
 		}
 
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		const current = branchesToParse.shift()!;
+		const current = branchesToParse.shift() as TBranchToParse;
 		const {
 			branchName,
 			branchRevision,

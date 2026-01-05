@@ -33,11 +33,15 @@ export const surveyConfigFactory = spiffy({
 	helperFunctions: (data, update) => {
 		return {
 			setSurveyResponses: (responses: TSurveyResponse): void => {
-				update((data) => (data.responses = responses));
+				update((data) => {
+					data.responses = responses;
+				});
 			},
 			hasSurveyResponse: (): boolean => data.responses !== undefined,
 			clearPriorSurveyResponses: (): void => {
-				update((data) => (data.responses = undefined));
+				update((data) => {
+					data.responses = undefined;
+				});
 			},
 		};
 	},

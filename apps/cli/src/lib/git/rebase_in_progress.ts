@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import path from "path";
+import path from "node:path";
 import { runGitCommand } from "./runner";
 
 export function rebaseInProgress(options?: { cwd: string }): boolean {

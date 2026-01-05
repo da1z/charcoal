@@ -2,7 +2,7 @@ import type { Arguments, InferredOptionTypes } from "yargs";
 import { graphiteWithoutRepo } from "../../lib/runner";
 
 const args = {
-	["include-commit-messages"]: {
+	"include-commit-messages": {
 		demandOption: false,
 		type: "boolean",
 		describe:
@@ -19,14 +19,14 @@ export const builder = args;
 export const handler = async (argv: argsT): Promise<void> => {
 	return graphiteWithoutRepo(argv, canonical, async (context) => {
 		if (argv["include-commit-messages"] === true) {
-			context.userConfig.update(
-				(data) => (data.submitIncludeCommitMessages = true),
-			);
+			context.userConfig.update((data) => {
+				data.submitIncludeCommitMessages = true;
+			});
 			context.splog.info(`default PR body will include commit messages`);
 		} else if (argv["include-commit-messages"] === false) {
-			context.userConfig.update(
-				(data) => (data.submitIncludeCommitMessages = false),
-			);
+			context.userConfig.update((data) => {
+				data.submitIncludeCommitMessages = false;
+			});
 			context.splog.info(`default PR body will not include commit messages`);
 		} else {
 			context.userConfig.data.submitIncludeCommitMessages

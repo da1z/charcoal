@@ -14,10 +14,10 @@ import { getCommitRange } from "./commit_range";
 import { getCommitTree } from "./commit_tree";
 import {
 	detectStagedChanges,
-	getUnstagedChanges,
-	showDiff,
-	isDiffEmpty,
 	getDiff,
+	getUnstagedChanges,
+	isDiffEmpty,
+	showDiff,
 } from "./diff";
 import {
 	fetchBranch,
@@ -25,24 +25,24 @@ import {
 	readFetchHead,
 	writeFetchBase,
 } from "./fetch_branch";
-import { getFilesChanged } from "./files_changed";
 import { getFileContents } from "./file_contents";
+import { getFilesChanged } from "./files_changed";
 import { findRemoteBranch } from "./find_remote_branch";
 import { getUserEmail } from "./get_email";
-import { getShaOrThrow, getSha, composeGetRemoteSha } from "./get_sha";
+import { composeGetRemoteSha, getSha, getShaOrThrow } from "./get_sha";
 import { getGitEditor, getGitPager } from "./git_editor";
-import { unstagedChanges, trackedUncommittedChanges } from "./git_status_utils";
+import { trackedUncommittedChanges, unstagedChanges } from "./git_status_utils";
 import { isMerged } from "./is_merged";
 import { logLong } from "./log";
 import { getMergeBase } from "./merge_base";
-import { getUnmergedFiles, getRebaseHead } from "./merge_conflict_help";
+import { getRebaseHead, getUnmergedFiles } from "./merge_conflict_help";
 import { pruneRemote } from "./prune_remote";
 import { pullBranch } from "./pull_branch";
 import { pushBranch } from "./push_branch";
 import {
 	rebase,
-	rebaseContinue,
 	rebaseAbort,
+	rebaseContinue,
 	rebaseInteractive,
 } from "./rebase";
 import { rebaseInProgress } from "./rebase_in_progress";

@@ -1,5 +1,5 @@
-import { runGitCommand, runGitCommandAndSplitLines } from "./runner";
 import { getSha } from "./get_sha";
+import { runGitCommand, runGitCommandAndSplitLines } from "./runner";
 
 export function getCommitTree(branchNames: string[]): Record<string, string[]> {
 	const parentOfMergeBase = getSha(
@@ -10,7 +10,7 @@ export function getCommitTree(branchNames: string[]): Record<string, string[]> {
 		})}~`,
 	);
 	const ret: Record<string, string[]> = {};
-	runGitCommandAndSplitLines({
+	const lines = runGitCommandAndSplitLines({
 		args: [
 			`rev-list`,
 			`--parents`,
@@ -21,8 +21,9 @@ export function getCommitTree(branchNames: string[]): Record<string, string[]> {
 		],
 		onError: "throw",
 		resource: "getCommitTree",
-	})
-		.map((l) => l.split(" "))
-		.forEach((l) => (ret[l[0]] = l.slice(1)));
+	}).map((l) => l.split(" "));
+	for (const l of lines) {
+		ret[l[0]] = l.slice(1);
+	}
 	return ret;
 }

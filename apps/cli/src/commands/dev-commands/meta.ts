@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import path from "path";
+import path from "node:path";
 import tmp from "tmp";
 import type { Arguments, InferredOptionTypes } from "yargs";
 import {

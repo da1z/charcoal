@@ -1,5 +1,5 @@
+import { execFileSync } from "node:child_process";
 import chalk from "chalk";
-import { execFileSync } from "child_process";
 import type { TContext } from "../../lib/context";
 import { ExitFailedError } from "../../lib/errors";
 import type { Unpacked } from "../../lib/utils/ts_helpers";

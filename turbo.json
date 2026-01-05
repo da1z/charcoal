@@ -26,6 +26,10 @@
 			"outputs": ["coverage/**"],
 			"inputs": ["src/**", "test/**"],
 			"env": ["PK_TEST_DIR"]
+		},
+		"//#format-and-lint": {},
+		"//#format-and-lint:fix": {
+			"cache": false
 		}
 	}
 }

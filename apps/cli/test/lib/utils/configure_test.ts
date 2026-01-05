@@ -1,4 +1,4 @@
-import { beforeEach, afterEach } from "bun:test";
+import { afterEach, beforeEach } from "bun:test";
 import type { AbstractScene } from "../scenes/abstract_scene";
 
 export function configureTest(scene: AbstractScene): void {

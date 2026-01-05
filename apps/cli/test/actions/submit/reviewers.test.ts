@@ -1,7 +1,7 @@
-import { describe, it, expect } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import { getReviewers } from "../../../src/actions/submit/reviewers";
 
-describe("reviewers.ts unit tests", function () {
+describe("reviewers.ts unit tests", () => {
 	it("should return empty list when the value of reviewers is undefined", () => {
 		expect(getReviewers(undefined)).resolves.toEqual([]);
 	});

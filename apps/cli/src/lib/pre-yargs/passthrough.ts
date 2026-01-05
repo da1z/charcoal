@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
+
+import cp from "node:child_process";
 import chalk from "chalk";
-import cp from "child_process";
 
 const GIT_COMMAND_ALLOWLIST = [
 	"add",

@@ -13,7 +13,9 @@
 		"test-ci": "turbo test-ci",
 		"test-one": "bun run --filter @da1z/pancake test-one",
 		"cli": "bun run --filter @da1z/pancake cli",
-		"dev": "bun run --filter @da1z/pancake dev"
+		"dev": "bun run --filter @da1z/pancake dev",
+		"format-and-lint": "biome check .",
+		"format-and-lint:fix": "biome check . --write"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.3.11",

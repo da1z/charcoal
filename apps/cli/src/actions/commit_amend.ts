@@ -1,8 +1,8 @@
 import type { TContext } from "../lib/context";
 import { SCOPE } from "../lib/engine/scope_spec";
 import {
-	PreconditionsFailedError,
 	BlockedDuringRebaseError,
+	PreconditionsFailedError,
 } from "../lib/errors";
 import { restackBranches } from "./restack";
 

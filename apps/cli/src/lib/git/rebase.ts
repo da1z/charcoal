@@ -1,7 +1,6 @@
-import type { SpawnSyncOptions } from "child_process";
-import { runGitCommand } from "./runner";
-
+import type { SpawnSyncOptions } from "node:child_process";
 import { rebaseInProgress } from "./rebase_in_progress";
+import { runGitCommand } from "./runner";
 
 type TRebaseResult = "REBASE_CONFLICT" | "REBASE_DONE";
 export function rebase(args: {

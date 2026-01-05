@@ -1,14 +1,14 @@
-import type { Arguments, InferredOptionTypes } from "yargs";
+import { execFileSync } from "node:child_process";
 import chalk from "chalk";
-import { execFileSync } from "child_process";
-import { graphite } from "../../lib/runner";
+import type { Arguments, InferredOptionTypes } from "yargs";
+import { submitAction } from "../../actions/submit/submit_action";
+import { syncAction } from "../../actions/sync/sync";
+import { syncPrInfo } from "../../actions/sync_pr_info";
 import type { TContext } from "../../lib/context";
 import { SCOPE } from "../../lib/engine/scope_spec";
 import { KilledError, PreconditionsFailedError } from "../../lib/errors";
-import { syncAction } from "../../actions/sync/sync";
-import { submitAction } from "../../actions/submit/submit_action";
-import { syncPrInfo } from "../../actions/sync_pr_info";
 import { uncommittedTrackedChangesPrecondition } from "../../lib/preconditions";
+import { graphite } from "../../lib/runner";
 
 const args = {
 	"dry-run": {

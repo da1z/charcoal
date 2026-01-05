@@ -1,6 +1,6 @@
-import { spawnSync } from "child_process";
+import { spawnSync } from "node:child_process";
 import fs from "node:fs";
-import path from "path";
+import path from "node:path";
 import { USER_CONFIG_OVERRIDE_ENV } from "../../../src/lib/context";
 
 const TEXT_FILE_NAME = "test.txt";
@@ -99,7 +99,7 @@ export class GitRepo {
 	createChange(textValue: string, prefix?: string, unstaged?: boolean): void {
 		const filePath = path.join(
 			`${this.dir}`,
-			`${prefix ? prefix + "_" : ""}${TEXT_FILE_NAME}`,
+			`${prefix ? `${prefix}_` : ""}${TEXT_FILE_NAME}`,
 		);
 		fs.writeFileSync(filePath, textValue);
 		if (!unstaged) {

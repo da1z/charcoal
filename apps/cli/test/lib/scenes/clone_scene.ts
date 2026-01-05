@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import tmp from "tmp";
-import { emptyDirSync } from "../../../src/lib/utils/fs_utils";
 import { cuteString } from "../../../src/lib/utils/cute_string";
+import { emptyDirSync } from "../../../src/lib/utils/fs_utils";
 import { GitRepo } from "../utils/git_repo";
 import { AbstractScene } from "./abstract_scene";
 

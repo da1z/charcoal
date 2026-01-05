@@ -7,8 +7,8 @@ export const command = "commit <command>";
 export const desc =
 	"Commands that operate on commits. Run `pk commit --help` to learn more.";
 export const aliases = ["c"];
-export const builder = function (yargs: Argv): Argv {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const builder = (yargs: Argv): Argv => {
+	// biome-ignore lint/suspicious/noExplicitAny: yargs command types are complex
 	const cmds: any[] = [amendCmd, createCmd];
 	let y = yargs;
 	for (const cmd of cmds) {

@@ -1,7 +1,7 @@
+import fs from "node:fs";
 import type { Arguments, InferredOptionTypes } from "yargs";
 import { graphite } from "../../lib/runner";
 import { getPRTemplateFilepaths } from "../../lib/utils/pr_templates";
-import fs from "fs";
 
 const args = {} as const;
 

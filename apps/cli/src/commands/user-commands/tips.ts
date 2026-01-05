@@ -25,10 +25,14 @@ export const builder = args;
 export const handler = async (argv: argsT): Promise<void> => {
 	return graphiteWithoutRepo(argv, canonical, async (context) => {
 		if (argv.enable) {
-			context.userConfig.update((data) => (data.tips = true));
+			context.userConfig.update((data) => {
+				data.tips = true;
+			});
 			context.splog.info(`tips enabled`);
 		} else if (argv.disable) {
-			context.userConfig.update((data) => (data.tips = false));
+			context.userConfig.update((data) => {
+				data.tips = false;
+			});
 			context.splog.info(`tips disabled`);
 		} else {
 			context.userConfig.data.tips

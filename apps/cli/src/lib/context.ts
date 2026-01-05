@@ -1,5 +1,6 @@
 import type { TEngine } from "./engine/engine";
 import { composeEngine } from "./engine/engine";
+import { NonInteractiveError } from "./errors";
 import type { TGit } from "./git/git";
 import { rebaseInProgress } from "./git/rebase_in_progress";
 import type { TContinueConfig } from "./spiffy/continuation_spf";
@@ -13,11 +14,10 @@ import type { TMessageConfig } from "./spiffy/upgrade_message_spf";
 import { messageConfigFactory } from "./spiffy/upgrade_message_spf";
 import type { TUserConfig } from "./spiffy/user_config_spf";
 import { userConfigFactory } from "./spiffy/user_config_spf";
-import type { TSplog } from "./utils/splog";
-import { composeSplog } from "./utils/splog";
-import { NonInteractiveError } from "./errors";
 import type { TPrompts } from "./utils/prompts_helpers";
 import { gtPrompts } from "./utils/prompts_helpers";
+import type { TSplog } from "./utils/splog";
+import { composeSplog } from "./utils/splog";
 
 export const USER_CONFIG_OVERRIDE_ENV = "GRAPHITE_USER_CONFIG_PATH" as const;
 

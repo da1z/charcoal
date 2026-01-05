@@ -9,8 +9,8 @@ export const command = "stack <command>";
 export const desc =
 	"Commands that operate on your current stack of branches. Run `pk stack --help` to learn more.";
 export const aliases = ["s"];
-export const builder = function (yargs: Argv): Argv {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const builder = (yargs: Argv): Argv => {
+	// biome-ignore lint/suspicious/noExplicitAny: yargs command types are complex
 	const cmds: any[] = [mergeCmd, restackCmd, submitCmd, testCmd];
 	let y = yargs;
 	for (const cmd of cmds) {

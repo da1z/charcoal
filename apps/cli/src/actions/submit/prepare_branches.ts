@@ -1,13 +1,13 @@
 import chalk from "chalk";
 import type { TContext } from "../../lib/context";
 import type { TBranchPRInfo } from "../../lib/engine/metadata_ref";
+import { PreconditionsFailedError } from "../../lib/errors";
+import { getGithubAuthorizationStatus } from "../../lib/utils/gh_auth";
 import { editPRBody, getPRBody } from "./pr_body";
 import { getPRDraftStatus } from "./pr_draft";
 import { getPRTitle } from "./pr_title";
 import { getReviewers } from "./reviewers";
 import type { TPRSubmissionInfo } from "./submit_prs";
-import { PreconditionsFailedError } from "../../lib/errors";
-import { getGithubAuthorizationStatus } from "../../lib/utils/gh_auth";
 
 type TPRSubmissionAction = { branchName: string } & (
 	| { update: false }

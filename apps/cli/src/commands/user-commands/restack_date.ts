@@ -2,7 +2,7 @@ import type { Arguments, InferredOptionTypes } from "yargs";
 import { graphiteWithoutRepo } from "../../lib/runner";
 
 const args = {
-	["use-author-date"]: {
+	"use-author-date": {
 		demandOption: false,
 		type: "boolean",
 		describe: [
@@ -22,23 +22,23 @@ export const canonical = "user restack-date";
 export const builder = args;
 export const handler = async (argv: argsT): Promise<void> => {
 	return graphiteWithoutRepo(argv, canonical, async (context) => {
-		if (typeof argv["use-author-date"] === undefined) {
+		if (typeof argv["use-author-date"] === "undefined") {
 			context.splog.info(
 				`\`--committer-date-is-author-date\` will ${
 					context.userConfig.data.restackCommitterDateIsAuthorDate ? "" : "not "
 				}be passed to the internal \`git rebase\``,
 			);
 		} else if (argv["use-author-date"]) {
-			context.userConfig.update(
-				(data) => (data.restackCommitterDateIsAuthorDate = true),
-			);
+			context.userConfig.update((data) => {
+				data.restackCommitterDateIsAuthorDate = true;
+			});
 			context.splog.info(
 				"`--committer-date-is-author-date` will be passed to the internal `git rebase`",
 			);
 		} else {
-			context.userConfig.update(
-				(data) => (data.restackCommitterDateIsAuthorDate = false),
-			);
+			context.userConfig.update((data) => {
+				data.restackCommitterDateIsAuthorDate = false;
+			});
 			context.splog.info(
 				"`--committer-date-is-author-date` will not be passed to the internal `git rebase`",
 			);

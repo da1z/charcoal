@@ -3,19 +3,19 @@ import { graphiteWithoutRepo } from "../../lib/runner";
 import { getBranchReplacement } from "../../lib/utils/branch_name";
 
 const args = {
-	["set-underscore"]: {
+	"set-underscore": {
 		demandOption: false,
 		optional: true,
 		type: "boolean",
 		describe: "Use underscore (_) as the replacement character",
 	},
-	["set-dash"]: {
+	"set-dash": {
 		demandOption: false,
 		optional: true,
 		type: "boolean",
 		describe: "Use dash (-) as the replacement character",
 	},
-	["set-empty"]: {
+	"set-empty": {
 		demandOption: false,
 		optional: true,
 		type: "boolean",

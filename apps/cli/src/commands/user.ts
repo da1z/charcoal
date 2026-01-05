@@ -12,8 +12,8 @@ import * as tipsCmd from "./user-commands/tips";
 export const command = "user <command>";
 export const desc =
 	"Read or write Pancake's user configuration settings. Run `pk user --help` to learn more.";
-export const builder = function (yargs: Argv): Argv {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const builder = (yargs: Argv): Argv => {
+	// biome-ignore lint/suspicious/noExplicitAny: yargs command types are complex
 	const cmds: any[] = [
 		branch_dateCmd,
 		branch_prefixCmd,

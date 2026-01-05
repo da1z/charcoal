@@ -30,13 +30,19 @@ export const builder = args;
 export const handler = async (argv: argsT): Promise<void> => {
 	return graphiteWithoutRepo(argv, canonical, async (context) => {
 		if (argv.disable) {
-			context.userConfig.update((data) => (data.pager = ""));
+			context.userConfig.update((data) => {
+				data.pager = "";
+			});
 			context.splog.info(`Pager disabled`);
 		} else if (argv.set) {
-			context.userConfig.update((data) => (data.pager = argv.set));
+			context.userConfig.update((data) => {
+				data.pager = argv.set;
+			});
 			context.splog.info(`Pager set to ${chalk.cyan(argv.set)}`);
 		} else if (argv.unset) {
-			context.userConfig.update((data) => (data.pager = undefined));
+			context.userConfig.update((data) => {
+				data.pager = undefined;
+			});
 			const currentPager = context.userConfig.getPager();
 			context.splog.info(
 				`Pager preference erased. Defaulting to your git pager (currently ${

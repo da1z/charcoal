@@ -1,8 +1,8 @@
 import type { Arguments, InferredOptionTypes } from "yargs";
-import { graphiteWithoutRepo } from "../lib/runner";
 // @ts-expect-error Bun import attribute syntax
 // eslint-disable-next-line prettier/prettier, import/no-default-export
 import fishContent from "../lib/pk.fish" with { type: "text" };
+import { graphiteWithoutRepo } from "../lib/runner";
 
 const args = {} as const;
 

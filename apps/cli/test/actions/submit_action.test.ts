@@ -1,4 +1,4 @@
-import { describe, it, expect } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import { inferPRBody } from "../../src/actions/submit/pr_body";
 import { getPRTitle } from "../../src/actions/submit/pr_title";
 import { updatePrBodyFooter } from "../../src/actions/submit/submit_action";
@@ -31,9 +31,9 @@ for (const scene of [new BasicScene()]) {
 				).inferredBody,
 			).toBe(`template`);
 
-			scene
-				.getContext()
-				.userConfig.update((data) => (data.submitIncludeCommitMessages = true));
+			scene.getContext().userConfig.update((data) => {
+				data.submitIncludeCommitMessages = true;
+			});
 
 			expect(
 				await getPRTitle(
@@ -88,9 +88,9 @@ for (const scene of [new BasicScene()]) {
 				inferPRBody({ branchName: "a" }, scene.getContext()).inferredBody,
 			).toBe(``);
 
-			scene
-				.getContext()
-				.userConfig.update((data) => (data.submitIncludeCommitMessages = true));
+			scene.getContext().userConfig.update((data) => {
+				data.submitIncludeCommitMessages = true;
+			});
 
 			expect(
 				await getPRTitle(

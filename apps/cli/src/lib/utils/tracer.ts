@@ -116,7 +116,7 @@ class Tracer {
 	) {
 		const span = this.startSpan(opts);
 		this.currentSpanId = span.spanId;
-		let result;
+		let result: T | undefined;
 		try {
 			result = handler();
 		} catch (err) {
@@ -138,7 +138,7 @@ class Tracer {
 	) {
 		const span = this.startSpan(opts);
 		this.currentSpanId = span.spanId;
-		let result;
+		let result: T | undefined;
 		try {
 			result = await handler();
 		} catch (err) {
@@ -156,12 +156,12 @@ class Tracer {
 			.filter(notUndefined);
 
 		// Set the parent id to the command if any are unset
-		const rootSpanId = trace.find((span) => span.name == "command");
+		const rootSpanId = trace.find((span) => span.name === "command");
 		if (rootSpanId) {
 			trace = trace.map((s) => {
 				return {
 					...s,
-					...(s.parent_id != undefined
+					...(s.parent_id !== undefined
 						? { parent_id: s.parent_id }
 						: { parent_id: rootSpanId.span_id }),
 				};

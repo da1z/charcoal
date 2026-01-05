@@ -1,10 +1,10 @@
 import type { Arguments, InferredOptionTypes } from "yargs";
-import { graphite } from "../../lib/runner";
-import type { RepoInfo } from "../../shared-types";
 import {
 	currentGitRepoPrecondition,
 	getRepoRootPathPrecondition,
 } from "../../lib/preconditions";
+import { graphite } from "../../lib/runner";
+import type { RepoInfo } from "../../shared-types";
 
 const args = {} as const;
 

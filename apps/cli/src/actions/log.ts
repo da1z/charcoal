@@ -51,7 +51,7 @@ export function logForConflictStatus(
 	rebaseHead: string,
 	context: TContext,
 ): void {
-	getStackLines(
+	const lines = getStackLines(
 		{
 			short: true,
 			reverse: false,
@@ -61,7 +61,10 @@ export function logForConflictStatus(
 			noStyleBranchName: true,
 		},
 		context,
-	).forEach((line) => context.splog.info(line));
+	);
+	for (const line of lines) {
+		context.splog.info(line);
+	}
 }
 
 export async function interactiveBranchSelection(

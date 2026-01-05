@@ -1,6 +1,6 @@
 import * as t from "@withgraphite/retype";
-import { cuteString } from "../utils/cute_string";
 import { runGitCommand, runGitCommandAndSplitLines } from "../git/runner";
+import { cuteString } from "../utils/cute_string";
 
 export const prInfoSchema = t.shape({
 	number: t.optional(t.number),
@@ -88,7 +88,7 @@ export function deleteMetadataRef(branchName: string): void {
 
 export function getMetadataRefList(): Record<string, string> {
 	const meta: Record<string, string> = {};
-	runGitCommandAndSplitLines({
+	const lines = runGitCommandAndSplitLines({
 		args: [
 			`for-each-ref`,
 			`--format=%(refname:lstrip=2):%(objectname)`,
@@ -101,8 +101,10 @@ export function getMetadataRefList(): Record<string, string> {
 		.filter(
 			(lineSplit): lineSplit is [string, string] =>
 				lineSplit.length === 2 && lineSplit.every((s) => s.length > 0),
-		)
-		.forEach(([branchName, metaSha]) => (meta[branchName] = metaSha));
+		);
+	for (const [branchName, metaSha] of lines) {
+		meta[branchName] = metaSha;
+	}
 
 	return meta;
 }

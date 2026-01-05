@@ -1,4 +1,4 @@
-import { describe, it, expect } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import { syncAction } from "../../src/actions/sync/sync";
 import { composeGit } from "../../src/lib/git/git";
 import { CloneScene } from "../lib/scenes/clone_scene";
@@ -6,7 +6,7 @@ import { configureTest } from "../lib/utils/configure_test";
 
 for (const scene of [new CloneScene()]) {
 	// eslint-disable-next-line max-lines-per-function
-	describe("handle remote actions properly (sync/submit)", function () {
+	describe("handle remote actions properly (sync/submit)", () => {
 		configureTest(scene);
 
 		it("can push a branch to remote", async () => {

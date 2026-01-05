@@ -1,9 +1,9 @@
-import { beforeEach, afterEach, describe, it, expect } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import fs from "node:fs";
 import tmp from "tmp";
-import { emptyDirSync, removeSync } from "../../../src/lib/utils/fs_utils";
 import type { TProfile } from "../../../src/lib/spiffy/user_config_spf";
 import { userConfigFactory } from "../../../src/lib/spiffy/user_config_spf";
+import { emptyDirSync, removeSync } from "../../../src/lib/utils/fs_utils";
 
 // Test cases for userConfigFactory with a focus on the profile helper functions.
 describe("userConfigFactory", () => {

@@ -27,17 +27,23 @@ export const repoConfigFactory = spiffy({
 	helperFunctions: (data, update) => {
 		return {
 			setRemote: (remote: string) => {
-				update((data) => (data.remote = remote));
+				update((data) => {
+					data.remote = remote;
+				});
 			},
 
 			getRemote: () => data.remote ?? "origin",
 
 			setTrunk: (trunk: string) => {
-				update((data) => (data.trunk = trunk));
+				update((data) => {
+					data.trunk = trunk;
+				});
 			},
 
 			setIsGithubIntegrationEnabled: (isEnabled: boolean) => {
-				update((data) => (data.isGithubIntegrationEnabled = isEnabled));
+				update((data) => {
+					data.isGithubIntegrationEnabled = isEnabled;
+				});
 			},
 
 			getIsGithubIntegrationEnabled: (): boolean =>

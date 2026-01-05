@@ -1,7 +1,7 @@
-import chalk from "chalk";
-import cp from "child_process";
+import cp from "node:child_process";
 import fs from "node:fs";
-import path from "path";
+import path from "node:path";
+import chalk from "chalk";
 import tmp from "tmp";
 import type { TContext } from "../lib/context";
 import type { TScopeSpec } from "../lib/engine/scope_spec";
@@ -43,12 +43,12 @@ export function testStack(
 
 	// Kick off the testing.
 	logState(state, false, context);
-	branches.forEach((branchName) =>
+	for (const branchName of branches) {
 		testBranch(
 			{ command: opts.command, branchName, tmpDirName, state },
 			context,
-		),
-	);
+		);
+	}
 
 	context.splog.info(
 		`Output files: ${chalk.gray(
@@ -86,12 +86,24 @@ function testBranch(
 		const out = cp.execSync(opts.command, { encoding: "utf-8" });
 		fs.writeFileSync(outputPath, out);
 		opts.state[opts.branchName].status = "[success]";
-	} catch (e: any) {
-		if (e?.signal) {
-			fs.writeFileSync(outputPath, [e.stdout, e.stderr, e.signal].join("\n"));
+	} catch (e: unknown) {
+		const err = e as {
+			signal?: string;
+			status?: number;
+			stdout?: string;
+			stderr?: string;
+		};
+		if (err?.signal) {
+			fs.writeFileSync(
+				outputPath,
+				[err.stdout, err.stderr, err.signal].join("\n"),
+			);
 			opts.state[opts.branchName].status = "[killed]";
-		} else if (e?.status) {
-			fs.writeFileSync(outputPath, [e.stdout, e.stderr, e.status].join("\n"));
+		} else if (err?.status) {
+			fs.writeFileSync(
+				outputPath,
+				[err.stdout, err.stderr, err.status].join("\n"),
+			);
 			opts.state[opts.branchName].status = "[failed]";
 		} else {
 			throw e;

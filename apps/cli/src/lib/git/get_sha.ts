@@ -32,7 +32,7 @@ export function composeGetRemoteSha(): {
 	populateRemoteShas: (remote: string) => Promise<void>;
 	getRemoteSha: (branchName: string) => string | undefined;
 } {
-	let remoteShas: undefined | Record<string, string> = undefined;
+	let remoteShas: undefined | Record<string, string>;
 
 	const populateRemoteShas = async (remote: string) =>
 		new Promise<void>((resolve) => {
@@ -47,7 +47,7 @@ export function composeGetRemoteSha(): {
 function fetchRemoteShas(remote: string) {
 	const remoteShas: Record<string, string> = {};
 
-	runGitCommandAndSplitLines({
+	const lines = runGitCommandAndSplitLines({
 		args: [`ls-remote`, "--heads", remote],
 		onError: "ignore",
 		resource: "fetchRemoteShas",
@@ -60,10 +60,10 @@ function fetchRemoteShas(remote: string) {
 				lineSplit.length === 2 &&
 				lineSplit.every((s) => s.length > 0) &&
 				lineSplit[1].startsWith("refs/heads/"),
-		)
-		.forEach(
-			([sha, ref]) => (remoteShas[ref.slice("refs/heads/".length)] = sha),
 		);
+	for (const [sha, ref] of lines) {
+		remoteShas[ref.slice("refs/heads/".length)] = sha;
+	}
 
 	return remoteShas;
 }

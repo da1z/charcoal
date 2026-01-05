@@ -48,9 +48,9 @@ async function validateNoMergedOrClosedBranches(
 		} already been merged or closed:`,
 	);
 
-	mergedOrClosedBranches.forEach((b) =>
-		context.splog.warn(`▸ ${chalk.reset(b)}`),
-	);
+	for (const b of mergedOrClosedBranches) {
+		context.splog.warn(`▸ ${chalk.reset(b)}`);
+	}
 
 	context.splog.newline();
 	if (!context.interactive) {
@@ -144,7 +144,9 @@ export async function validateNoEmptyBranches(
 			hasMultipleBranches ? "es have" : " has"
 		} no changes:`,
 	);
-	emptyBranches.forEach((b) => context.splog.warn(`▸ ${chalk.reset(b)}`));
+	for (const b of emptyBranches) {
+		context.splog.warn(`▸ ${chalk.reset(b)}`);
+	}
 	context.splog.warn(
 		`Are you sure you want to submit ${hasMultipleBranches ? "them" : "it"}?`,
 	);

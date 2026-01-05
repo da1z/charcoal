@@ -1,17 +1,17 @@
+import { execFileSync } from "node:child_process";
 import chalk from "chalk";
 import type { TContext } from "../../lib/context";
 import type { TScopeSpec } from "../../lib/engine/scope_spec";
 import { ExitFailedError, KilledError } from "../../lib/errors";
 import { CommandFailedError } from "../../lib/git/runner";
-import { getPRInfoForBranches } from "./prepare_branches";
-import { validateBranchesToSubmit } from "./validate_branches";
-import { submitPullRequest } from "./submit_prs";
 import {
 	createPrBodyFooter,
 	footerFooter,
 	footerTitle,
 } from "../create_pr_body_footer";
-import { execFileSync } from "child_process";
+import { getPRInfoForBranches } from "./prepare_branches";
+import { submitPullRequest } from "./submit_prs";
+import { validateBranchesToSubmit } from "./validate_branches";
 
 // eslint-disable-next-line max-lines-per-function
 export async function submitAction(

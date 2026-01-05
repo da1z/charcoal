@@ -1,6 +1,6 @@
-import { describe, it, expect } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import fs from "node:fs";
-import path from "path";
+import path from "node:path";
 import { BasicScene } from "../lib/scenes/basic_scene";
 import { configureTest } from "../lib/utils/configure_test";
 
@@ -65,23 +65,27 @@ function testPRTemplates(
 	},
 	scene: BasicScene,
 ) {
-	args.templatePaths.forEach((template) =>
-		createFile(path.join(scene.repo.dir, template)),
-	);
-	args.nonTemplatePaths?.forEach((nonTemplate) =>
-		createFile(path.join(scene.repo.dir, nonTemplate)),
-	);
+	for (const template of args.templatePaths) {
+		createFile(path.join(scene.repo.dir, template));
+	}
+	if (args.nonTemplatePaths) {
+		for (const nonTemplate of args.nonTemplatePaths) {
+			createFile(path.join(scene.repo.dir, nonTemplate));
+		}
+	}
 
 	const foundPRTemplates = scene.repo.runCliCommandAndGetOutput([
 		"repo",
 		"pr-templates",
 	]);
-	args.templatePaths.forEach((template) =>
-		expect(foundPRTemplates.includes(template)).toBe(true),
-	);
-	args.nonTemplatePaths?.forEach((nonTemplate) =>
-		expect(foundPRTemplates.includes(nonTemplate)).toBe(false),
-	);
+	for (const template of args.templatePaths) {
+		expect(foundPRTemplates.includes(template)).toBe(true);
+	}
+	if (args.nonTemplatePaths) {
+		for (const nonTemplate of args.nonTemplatePaths) {
+			expect(foundPRTemplates.includes(nonTemplate)).toBe(false);
+		}
+	}
 }
 
 function createFile(filepath: string) {

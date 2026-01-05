@@ -1,22 +1,23 @@
 import chalk from "chalk";
+import fjsh from "fast-json-stable-hash";
 import {
 	DetachedError,
 	NoBranchError,
 	PreconditionsFailedError,
 } from "../errors";
+import type { TChangedFile, TStatusFile } from "../git/changed_files";
 import type { TCommitOpts } from "../git/commit";
 import type { TCommitFormat } from "../git/commit_range";
 import type { TGit } from "../git/git";
 import { cuteString } from "../utils/cute_string";
 import type { TSplog } from "../utils/splog";
+import { composeCacheLoader } from "./cache_loader";
 import type { TValidCachedMetaExceptTrunk } from "./cached_meta";
 import {
 	assertCachedMetaIsNotTrunk,
 	assertCachedMetaIsValidAndNotTrunk,
 	assertCachedMetaIsValidOrTrunk,
 } from "./cached_meta";
-import { composeCacheLoader } from "./cache_loader";
-import type { TChangedFile, TStatusFile } from "../git/changed_files";
 import type { TBranchPRInfo } from "./metadata_ref";
 import {
 	deleteMetadataRef,
@@ -25,7 +26,6 @@ import {
 } from "./metadata_ref";
 import { validateOrFixParentBranchRevision } from "./parse_branches_and_meta";
 import type { TScopeSpec } from "./scope_spec";
-import fjsh from "fast-json-stable-hash";
 
 export type TEngine = {
 	debug: string;
@@ -448,9 +448,9 @@ export function composeEngine({
 		},
 		reset(newTrunkName?: string) {
 			trunkName = newTrunkName ?? trunkName;
-			Object.keys(getMetadataRefList()).forEach((branchName) =>
-				deleteMetadataRef(branchName),
-			);
+			for (const branchName of Object.keys(getMetadataRefList())) {
+				deleteMetadataRef(branchName);
+			}
 			cache.branches = cacheLoader.loadCachedBranches(trunkName);
 		},
 		rebuild(newTrunkName?: string) {
@@ -495,8 +495,7 @@ export function composeEngine({
 			// We have to fix validation state for any recursive children
 			const childrenToUntrack = cachedMeta.children.slice();
 			while (childrenToUntrack.length) {
-				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-				const childBranchName = childrenToUntrack.pop()!;
+				const childBranchName = childrenToUntrack.pop() as string;
 				const childCachedMeta = cache.branches[childBranchName];
 				assertCachedMetaIsNotTrunk(childCachedMeta);
 				if (childCachedMeta.validationResult !== "BAD_PARENT_NAME") {
@@ -677,9 +676,9 @@ export function composeEngine({
 			git.moveBranch(branchName);
 			updateMeta(branchName, { ...cachedMeta, prInfo: {} });
 
-			cachedMeta.children.forEach((childBranchName) =>
-				setParent(childBranchName, branchName),
-			);
+			for (const childBranchName of cachedMeta.children) {
+				setParent(childBranchName, branchName);
+			}
 
 			removeChild(cachedMeta.parentBranchName, currentBranchName);
 			delete cache.branches[currentBranchName];
@@ -701,11 +700,12 @@ export function composeEngine({
 					parentBranchName: parentCachedMeta.parentBranchName,
 					parentBranchRevision: parentCachedMeta.parentBranchRevision,
 				});
-				parentCachedMeta.children
-					.filter((childBranchName) => childBranchName !== currentBranchName)
-					.forEach((childBranchName) =>
-						setParent(childBranchName, currentBranchName),
-					);
+				const siblingsToReparent = parentCachedMeta.children.filter(
+					(childBranchName) => childBranchName !== currentBranchName,
+				);
+				for (const childBranchName of siblingsToReparent) {
+					setParent(childBranchName, currentBranchName);
+				}
 				deleteAllBranchData(parentBranchName);
 			} else {
 				git.forceCheckoutNewBranch(parentBranchName, cachedMeta.branchRevision);
@@ -713,9 +713,9 @@ export function composeEngine({
 					...parentCachedMeta,
 					branchRevision: cachedMeta.branchRevision,
 				});
-				cachedMeta.children.forEach((childBranchName) =>
-					setParent(childBranchName, parentBranchName),
-				);
+				for (const childBranchName of cachedMeta.children) {
+					setParent(childBranchName, parentBranchName);
+				}
 				checkoutBranch(cachedMeta.parentBranchName);
 				deleteAllBranchData(currentBranchName);
 			}
@@ -727,9 +727,9 @@ export function composeEngine({
 				checkoutBranch(cachedMeta.parentBranchName);
 			}
 
-			cachedMeta.children.forEach((childBranchName) =>
-				setParent(childBranchName, cachedMeta.parentBranchName),
-			);
+			for (const childBranchName of cachedMeta.children) {
+				setParent(childBranchName, cachedMeta.parentBranchName);
+			}
 
 			deleteAllBranchData(branchName);
 		},
@@ -839,9 +839,9 @@ export function composeEngine({
 				lastBranch.revision = branchRevision;
 			});
 			if (lastBranch.name !== branchToSplit) {
-				children.forEach((childBranchName) =>
-					setParent(childBranchName, lastBranch.name),
-				);
+				for (const childBranchName of children) {
+					setParent(childBranchName, lastBranch.name);
+				}
 			}
 			if (!branchNames.includes(branchToSplit)) {
 				deleteAllBranchData(branchToSplit);

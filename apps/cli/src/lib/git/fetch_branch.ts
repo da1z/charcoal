@@ -1,5 +1,5 @@
-import { runGitCommand } from "./runner";
 import { getShaOrThrow } from "./get_sha";
+import { runGitCommand } from "./runner";
 
 const FETCH_HEAD = "refs/pk-metadata/FETCH_HEAD";
 const FETCH_BASE = "refs/pk-metadata/FETCH_BASE";

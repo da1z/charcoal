@@ -77,7 +77,7 @@ function traverseDownward(
 	if (stepsRemaining === "bottom" && context.engine.isTrunk(parentBranchName)) {
 		return currentBranchName;
 	}
-	context.splog.info("⮑  " + parentBranchName);
+	context.splog.info(`⮑  ${parentBranchName}`);
 	return traverseDownward(
 		parentBranchName,
 		context,
@@ -101,7 +101,7 @@ async function traverseUpward(
 		children.length === 1
 			? children[0]
 			: await handleMultipleChildren(children, context);
-	context.splog.info("⮑  " + childBranchName);
+	context.splog.info(`⮑  ${childBranchName}`);
 	return await traverseUpward(
 		childBranchName,
 		context,

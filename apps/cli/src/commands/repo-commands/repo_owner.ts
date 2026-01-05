@@ -21,7 +21,9 @@ export const builder = args;
 export const handler = async (argv: argsT): Promise<void> => {
 	return graphite(argv, canonical, async (context) => {
 		if (argv.set) {
-			context.repoConfig.update((data) => (data.owner = argv.set));
+			context.repoConfig.update((data) => {
+				data.owner = argv.set;
+			});
 		} else {
 			context.splog.info(context.repoConfig.getRepoOwner());
 		}

@@ -1,6 +1,6 @@
-import { describe, it, expect } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import fs from "node:fs";
-import path from "path";
+import path from "node:path";
 import { getOwnerAndNameFromURL } from "../../../src/lib/spiffy/repo_config_spf";
 import { BasicScene } from "../../lib/scenes/basic_scene";
 import { configureTest } from "../../lib/utils/configure_test";
@@ -14,8 +14,8 @@ for (const scene of [new BasicScene()]) {
 				"https://github.com/withgraphite/graphite-cli.git",
 			);
 			expect(match).not.toBeNull();
-			expect(match!.owner).toBe("withgraphite");
-			expect(match!.name).toBe("graphite-cli");
+			expect(match?.owner).toBe("withgraphite");
+			expect(match?.name).toBe("graphite-cli");
 		});
 
 		it("Can infer SSH cloned repos", () => {
@@ -23,8 +23,8 @@ for (const scene of [new BasicScene()]) {
 				"git@github.com:withgraphite/graphite-cli.git",
 			);
 			expect(match).not.toBeNull();
-			expect(match!.owner).toBe("withgraphite");
-			expect(match!.name).toBe("graphite-cli");
+			expect(match?.owner).toBe("withgraphite");
+			expect(match?.name).toBe("graphite-cli");
 		});
 
 		it("Can infer SSH cloned repos (with git@ configured separately)", () => {
@@ -32,8 +32,8 @@ for (const scene of [new BasicScene()]) {
 				"github.com/withgraphite/graphite-cli.git",
 			);
 			expect(match).not.toBeNull();
-			expect(match!.owner).toBe("withgraphite");
-			expect(match!.name).toBe("graphite-cli");
+			expect(match?.owner).toBe("withgraphite");
+			expect(match?.name).toBe("graphite-cli");
 		});
 
 		it("Can read the existing repo config when executing from a subfolder in the project", () => {
@@ -52,15 +52,15 @@ for (const scene of [new BasicScene()]) {
 				"https://github.com/withgraphite/graphite-cli",
 			);
 			expect(clone).not.toBeNull();
-			expect(clone!.owner).toBe("withgraphite");
-			expect(clone!.name).toBe("graphite-cli");
+			expect(clone?.owner).toBe("withgraphite");
+			expect(clone?.name).toBe("graphite-cli");
 
 			const sshClone = getOwnerAndNameFromURL(
 				"git@github.com:withgraphite/graphite-cli",
 			);
 			expect(sshClone).not.toBeNull();
-			expect(sshClone!.owner).toBe("withgraphite");
-			expect(sshClone!.name).toBe("graphite-cli");
+			expect(sshClone?.owner).toBe("withgraphite");
+			expect(sshClone?.name).toBe("graphite-cli");
 		});
 	});
 }

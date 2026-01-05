@@ -1,7 +1,7 @@
-import type * as t from "@withgraphite/retype";
 import fs from "node:fs";
-import os from "os";
-import path from "path";
+import os from "node:os";
+import path from "node:path";
+import type * as t from "@withgraphite/retype";
 import { ExitFailedError } from "../errors";
 import { getRepoRootPathPrecondition } from "../preconditions";
 import { cuteString } from "../utils/cute_string";

@@ -1,9 +1,9 @@
-import type { BranchInfo } from "../../shared-types";
 import type { Arguments, InferredOptionTypes } from "yargs";
 import type { TContext } from "../../lib/context";
 import { UntrackedBranchError } from "../../lib/errors";
 import { getMergeBaseAsync } from "../../lib/git/merge_base";
 import { graphite } from "../../lib/runner";
+import type { BranchInfo } from "../../shared-types";
 
 const args = {} as const;
 
@@ -51,13 +51,12 @@ export const handler = async (argv: argsT): Promise<void> => {
 					needsSubmit,
 					title: prInfo?.title || "",
 					description: prInfo?.body || "",
-					pr:
-						prInfo && prInfo.number
-							? {
-									number: prInfo.number?.toString(),
-									isDraft: prInfo.isDraft || false,
-								}
-							: undefined,
+					pr: prInfo?.number
+						? {
+								number: prInfo.number?.toString(),
+								isDraft: prInfo.isDraft || false,
+							}
+						: undefined,
 				};
 			}),
 		);

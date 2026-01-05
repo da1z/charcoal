@@ -9,8 +9,8 @@ export const command = "upstack <command>";
 export const desc =
 	"Commands that operate on a branch and its descendants. Run `pk upstack --help` to learn more.";
 export const aliases = ["us"];
-export const builder = function (yargs: Argv): Argv {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const builder = (yargs: Argv): Argv => {
+	// biome-ignore lint/suspicious/noExplicitAny: yargs command types are complex
 	const cmds: any[] = [ontoCmd, restackCmd, submitCmd, testCmd];
 	let y = yargs;
 	for (const cmd of cmds) {

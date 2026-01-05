@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import path from "path";
+import path from "node:path";
 import tmp from "tmp";
 import type { TContext } from "./context";
 import type { TMeta } from "./engine/metadata_ref";
@@ -129,7 +129,7 @@ function createBranches(
 	Object.keys(opts.branches).forEach((branch) => {
 		const originalRef = opts.refMappingsOldToNew[opts.branches[branch]];
 		if (
-			branch !=
+			branch !==
 			runGitCommand({
 				args: [`branch`, `--show-current`],
 				onError: "ignore",
@@ -172,8 +172,7 @@ function recreateCommits(
 	const totalOldCommits = Object.keys(opts.commitTree).length;
 
 	while (commitsToCreate.length > 0) {
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		const originalCommitRef: string = commitsToCreate.shift()!;
+		const originalCommitRef = commitsToCreate.shift() as string;
 
 		if (originalCommitRef in opts.refMappingsOldToNew) {
 			continue;

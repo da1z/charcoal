@@ -4,8 +4,8 @@ import { SCOPE } from "../../lib/engine/scope_spec";
 import { KilledError } from "../../lib/errors";
 import { uncommittedTrackedChangesPrecondition } from "../../lib/preconditions";
 import { restackBranches } from "../restack";
-import { cleanBranches } from "./clean_branches";
 import { syncPrInfo } from "../sync_pr_info";
+import { cleanBranches } from "./clean_branches";
 
 export async function syncAction(
 	opts: {
@@ -53,11 +53,11 @@ export async function syncAction(
 			return;
 		}
 
-		branchesWithNewParents
-			.flatMap((branchName) =>
+		branchesToRestack.push(
+			...branchesWithNewParents.flatMap((branchName) =>
 				context.engine.getRelativeStack(branchName, SCOPE.UPSTACK),
-			)
-			.forEach((branchName) => branchesToRestack.push(branchName));
+			),
+		);
 	}
 	if (!opts.restack) {
 		return;
@@ -82,9 +82,9 @@ export async function syncAction(
 		context.engine.isBranchTracked(currentBranch) &&
 		!branchesToRestack.includes(currentBranch)
 	) {
-		context.engine
-			.getRelativeStack(currentBranch, SCOPE.STACK)
-			.forEach((branchName) => branchesToRestack.push(branchName));
+		branchesToRestack.push(
+			...context.engine.getRelativeStack(currentBranch, SCOPE.STACK),
+		);
 	}
 
 	restackBranches(branchesToRestack, context);

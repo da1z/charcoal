@@ -1,5 +1,5 @@
-import type { SpawnOptions, SpawnSyncOptions } from "child_process";
-import { spawn, spawnSync } from "child_process";
+import type { SpawnOptions, SpawnSyncOptions } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { cuteString } from "../utils/cute_string";
 import { tracer } from "../utils/tracer";
 
@@ -130,13 +130,13 @@ function runAsyncGitCommandInternal(
 
 		let stdout = "";
 		proc.stdout.setEncoding("utf8");
-		proc.stdout.on("data", function (data) {
+		proc.stdout.on("data", (data) => {
 			stdout += data.toString();
 		});
 
 		let stderr = "";
 		proc.stderr.setEncoding("utf8");
-		proc.stderr.on("data", function (data) {
+		proc.stderr.on("data", (data) => {
 			stderr += data.toString();
 		});
 

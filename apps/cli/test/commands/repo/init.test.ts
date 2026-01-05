@@ -1,4 +1,4 @@
-import { describe, it, expect } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import fs from "node:fs";
 import { removeSync } from "../../../src/lib/utils/fs_utils";
 import { TrailingProdScene } from "../../lib/scenes/trailing_prod_scene";
@@ -15,7 +15,7 @@ for (const scene of [new TrailingProdScene()]) {
 			const savedConfig = JSON.parse(
 				fs.readFileSync(repoConfigPath).toString(),
 			);
-			expect(savedConfig["trunk"]).toBe("main");
+			expect(savedConfig.trunk).toBe("main");
 		});
 
 		it("Falls back to main if non-existent branch is passed in", () => {
@@ -30,7 +30,7 @@ for (const scene of [new TrailingProdScene()]) {
 			const savedConfig = JSON.parse(
 				fs.readFileSync(repoConfigPath).toString(),
 			);
-			expect(savedConfig["trunk"]).toBe("main");
+			expect(savedConfig.trunk).toBe("main");
 		});
 
 		it("Cannot set an invalid trunk if trunk cannot be inferred", () => {

@@ -3,14 +3,14 @@ import { splitCurrentBranch } from "../../actions/split";
 import { graphite } from "../../lib/runner";
 
 const args = {
-	["by-commit"]: {
+	"by-commit": {
 		describe: `Split by commit - slice up the history of this branch.`,
 		demandOption: false,
 		default: false,
 		type: "boolean",
 		alias: ["c", "commit"],
 	},
-	["by-hunk"]: {
+	"by-hunk": {
 		describe: `Split by hunk - split into new single-commit branches.`,
 		demandOption: false,
 		default: false,

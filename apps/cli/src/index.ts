@@ -4,9 +4,6 @@
 import chalk from "chalk";
 import tmp from "tmp";
 import yargs from "yargs";
-import { globalArgumentsOptions } from "./lib/global_arguments";
-import { getYargsInput } from "./lib/pre-yargs/preprocess_command";
-
 // Import all commands explicitly (required for bundling)
 import * as branchCmd from "./commands/branch";
 import * as commitCmd from "./commands/commit";
@@ -20,6 +17,8 @@ import * as repoCmd from "./commands/repo";
 import * as stackCmd from "./commands/stack";
 import * as upstackCmd from "./commands/upstack";
 import * as userCmd from "./commands/user";
+import { globalArgumentsOptions } from "./lib/global_arguments";
+import { getYargsInput } from "./lib/pre-yargs/preprocess_command";
 
 // this line gets rid of warnings about "experimental fetch API" for our users
 // while still showing us warnings when we test with DEBUG=1
@@ -37,7 +36,7 @@ process.on("uncaughtException", (err) => {
 	process.exit(1);
 });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: yargs command types are complex
 const commands: any[] = [
 	branchCmd,
 	commitCmd,

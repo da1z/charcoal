@@ -51,8 +51,7 @@ export async function cleanBranches(
 		: {};
 
 	while (branchesToProcess.length > 0) {
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		const branchName = branchesToProcess.pop()!;
+		const branchName = branchesToProcess.pop() as string;
 
 		if (branchName in branchesToDelete) {
 			continue;
@@ -76,7 +75,7 @@ export async function cleanBranches(
 		// Always traverse children (DFS) regardless of whether this branch is deleted.
 		// This ensures we check ALL branches for deletion, not just direct children of trunk.
 		const children = context.engine.getChildren(branchName);
-		children.forEach((b) => branchesToProcess.push(b));
+		branchesToProcess.push(...children);
 
 		if (shouldDelete) {
 			// Value in branchesToDelete is a list of children blocking deletion.
@@ -134,8 +133,7 @@ function greedilyDeleteUnblockedBranches(
 	context.splog.debug(`Unblocked branches: ${unblockedBranches}`);
 
 	while (unblockedBranches.length > 0) {
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		const branchName = unblockedBranches.pop()!;
+		const branchName = unblockedBranches.pop() as string;
 		const parentBranchName = context.engine.getParentPrecondition(branchName);
 
 		deleteBranchAction({ branchName: branchName, force: true }, context);
@@ -158,18 +156,16 @@ function greedilyDeleteUnblockedBranches(
 
 function getProgressMarkers(trunkChildren: string[]): Record<string, string> {
 	const progressMarkers: Record<string, string> = {};
-	trunkChildren
-		// Ignore the first child - don't show 0% progress.
-		.slice(1)
-		.forEach(
-			(child, i) =>
-				(progressMarkers[child] = `${+(
-					// Add 1 to the overall children length to account for the fact that
-					// when we're on the last trunk child, we're not 100% done - we need
-					// to go through its stack.
-					((i + 1 / (trunkChildren.length + 1)) * 100).toFixed(2)
-				)}%`),
-		);
+	// Ignore the first child - don't show 0% progress.
+	const children = trunkChildren.slice(1);
+	for (let i = 0; i < children.length; i++) {
+		const child = children[i];
+		// Add 1 to the overall children length to account for the fact that
+		// when we're on the last trunk child, we're not 100% done - we need
+		// to go through its stack.
+		progressMarkers[child] =
+			`${+((i + 1 / (trunkChildren.length + 1)) * 100).toFixed(2)}%`;
+	}
 	return progressMarkers;
 }
 

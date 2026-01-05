@@ -70,9 +70,9 @@ export async function createBranchAction(
 	// Now we actually handle the `insert` case.
 
 	// Change the parent of each sibling to the new branch.
-	siblings.forEach((siblingBranchName) =>
-		context.engine.setParent(siblingBranchName, branchName),
-	);
+	for (const siblingBranchName of siblings) {
+		context.engine.setParent(siblingBranchName, branchName);
+	}
 
 	// If we're restacking siblings onto this branch, we need to restack
 	// all of their recursive children as well. Get all the upstacks!

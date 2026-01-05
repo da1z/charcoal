@@ -1,8 +1,8 @@
-import { describe, it, expect } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import { emptyDirSync, removeSync } from "../../../src/lib/utils/fs_utils";
-import { GitRepo } from "../../lib/utils/git_repo";
 import { TrailingProdScene } from "../../lib/scenes/trailing_prod_scene";
 import { configureTest } from "../../lib/utils/configure_test";
+import { GitRepo } from "../../lib/utils/git_repo";
 
 for (const scene of [new TrailingProdScene()]) {
 	describe(`(${scene}): feedback debug-context`, () => {

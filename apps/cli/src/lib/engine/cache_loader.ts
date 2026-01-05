@@ -1,4 +1,4 @@
-import { createHash } from "crypto";
+import { createHash } from "node:crypto";
 import { version } from "../../../package.json";
 import { getRebaseHead } from "../git/merge_conflict_help";
 import { getBranchNamesAndRevisions } from "../git/sorted_branch_names";

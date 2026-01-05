@@ -1,4 +1,4 @@
-import { execSync } from "child_process";
+import { execSync } from "node:child_process";
 import { writeMetadataRef } from "../../../src/lib/engine/metadata_ref";
 import { AbstractScene } from "./abstract_scene";
 

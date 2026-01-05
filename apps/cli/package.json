@@ -22,7 +22,7 @@
 	},
 	"scripts": {
 		"prepublishOnly": "bun run build",
-		"lint": "eslint src --quiet --ext .ts --cache",
+		"lint": "biome lint",
 		"check": "tsc",
 		"build": "rm -rf dist && bun run lint && bun run check && bun build ./src/index.ts --outdir dist --target node",
 		"build-pkg": "bun build ./src/index.ts --compile --outfile=pkg/pancake-macos --target=bun-darwin-arm64 && bun build ./src/index.ts --compile --outfile=pkg/pancake-linux --target=bun-linux-x64",

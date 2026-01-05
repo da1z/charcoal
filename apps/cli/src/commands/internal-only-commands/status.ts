@@ -1,7 +1,7 @@
-import type { ChangedFile, Status } from "../../shared-types";
 import type { Arguments, InferredOptionTypes } from "yargs";
 import type { TStatusFile } from "../../lib/git/changed_files";
 import { graphite } from "../../lib/runner";
+import type { ChangedFile, Status } from "../../shared-types";
 
 const args = {} as const;
 

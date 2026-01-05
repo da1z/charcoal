@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import path from "path";
+import path from "node:path";
 import type { TContext } from "../../lib/context";
 
 const FILE_NAME = "graphite_stack_edit";

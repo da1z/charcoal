@@ -1,6 +1,6 @@
-import type { ChangedFiles } from "../../shared-types";
 import type { Arguments, InferredOptionTypes } from "yargs";
 import { graphite } from "../../lib/runner";
+import type { ChangedFiles } from "../../shared-types";
 
 const args = {
 	branch: {

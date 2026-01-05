@@ -3,7 +3,7 @@ import { runGitCommandAndSplitLines } from "./runner";
 export function getBranchNamesAndRevisions(): Record<string, string> {
 	const branches: Record<string, string> = {};
 
-	runGitCommandAndSplitLines({
+	const lines = runGitCommandAndSplitLines({
 		args: [
 			`for-each-ref`,
 			`--format=%(refname:short):%(objectname)`,
@@ -17,8 +17,10 @@ export function getBranchNamesAndRevisions(): Record<string, string> {
 		.filter(
 			(lineSplit): lineSplit is [string, string] =>
 				lineSplit.length === 2 && lineSplit.every((s) => s.length > 0),
-		)
-		.forEach(([branchName, sha]) => (branches[branchName] = sha));
+		);
+	for (const [branchName, sha] of lines) {
+		branches[branchName] = sha;
+	}
 
 	return branches;
 }

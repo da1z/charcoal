@@ -1,5 +1,5 @@
+import { execSync } from "node:child_process";
 import * as t from "@withgraphite/retype";
-import { execSync } from "child_process";
 import { getGitEditor, getGitPager } from "../git/git_editor";
 import { CommandFailedError } from "../git/runner";
 import { spiffy } from "./spiffy";
@@ -143,8 +143,15 @@ export const userConfigFactory = spiffy({
 				const command = `${getEditor()} ${editFilePath}`;
 				try {
 					execSync(command, { stdio: "inherit", encoding: "utf-8" });
-				} catch (e: any) {
-					throw new CommandFailedError({ command, args: [editFilePath], ...e });
+				} catch (e) {
+					const error = e as Error & { status?: number };
+					throw new CommandFailedError({
+						command,
+						args: [editFilePath],
+						status: error.status ?? 1,
+						stdout: "",
+						stderr: error.message,
+					});
 				}
 			},
 		};
