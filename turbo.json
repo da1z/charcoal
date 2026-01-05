@@ -8,7 +8,7 @@
 		},
 		"lint": {
 			"outputs": [],
-			"inputs": ["src/**", ".eslintrc*", ".eslintignore"]
+			"inputs": ["src/**", "biome.json"]
 		},
 		"check": {
 			"dependsOn": [],
