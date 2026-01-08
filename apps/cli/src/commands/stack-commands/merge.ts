@@ -96,6 +96,7 @@ function getCheckStatus(prNumber: number): CheckInfo {
 			"pr",
 			"checks",
 			`${prNumber}`,
+			"--required",
 			"--json",
 			"state,name",
 		]).toString();
@@ -120,7 +121,8 @@ function getCheckStatus(prNumber: number): CheckInfo {
 		} else if (pending === 0 && checks.length > 0) {
 			state = "success";
 		}
-		// When checks.length === 0, keep state as 'pending' to wait for checks to appear
+		// When checks.length === 0, either no required checks exist or they haven't started yet.
+		// In this case, we rely on mergeStateStatus to determine if PR is ready to merge.
 
 		return { state, total: checks.length, completed };
 	} catch {

@@ -23,6 +23,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     permissions:
       contents: write
+      pull-requests: write
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ vars.TURBO_TEAM }}
@@ -89,15 +90,21 @@ jobs:
           NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: bun publish --access public
 
-      - name: Commit version bump
+      - name: Create release branch and PR
         if: inputs.dry-run != true
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          BRANCH_NAME="release/${{ steps.bump.outputs.new_version }}"
+          git checkout -b "$BRANCH_NAME"
           git add apps/cli/package.json
           git commit -m "${{ steps.bump.outputs.new_version }}"
-
-      - name: Push changes
-        if: inputs.dry-run != true
-        run: git push origin main
+          git push origin "$BRANCH_NAME"
+          gh pr create \
+            --title "${{ steps.bump.outputs.new_version }}" \
+            --body "Bump version to ${{ steps.bump.outputs.new_version }}" \
+            --base main \
+            --head "$BRANCH_NAME"
 
       - name: Create summary
         run: |
@@ -110,7 +117,9 @@ jobs:
           else
             echo "## Release Complete" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "Successfully released version **${{ steps.bump.outputs.new_version }}**" >> $GITHUB_STEP_SUMMARY
+            echo "Successfully released version **${{ steps.bump.outputs.new_version }}** to npm" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "- npm: https://www.npmjs.com/package/@da1z/pancake/v/${{ steps.bump.outputs.new_version_number }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "A PR has been created to merge the version bump to main." >> $GITHUB_STEP_SUMMARY
           fi
